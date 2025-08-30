@@ -44,6 +44,14 @@ clean:
 user-setup:
     ./user-setup.sh
 
+# Smart setup (detects system type)
+setup:
+    ./setup.sh
+
+# Desktop-specific setup (OpenRGB, etc.)
+desktop-setup:
+    ./desktop-setup.sh
+
 # Backup current system configuration
 backup-config:
     ./backup-config.sh

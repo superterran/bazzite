@@ -1,0 +1,14 @@
+[Unit]
+Description=OpenRGB - RGB Lighting Control
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/flatpak run org.openrgb.OpenRGB --server -p Ideal
+Restart=on-failure
+RestartSec=5
+SuccessExitStatus=0
+Environment=DISPLAY=:0
+
+[Install]
+WantedBy=default.target

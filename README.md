@@ -35,17 +35,40 @@ sudo systemctl reboot
 ```
 
 ### Post-Rebase Setup
-After rebasing and rebooting, run the user setup script:
+After rebasing and rebooting, run the setup script:
 
 ```bash
-# Download and run the user setup script
+# Smart setup - automatically detects desktop vs handheld
+curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/setup.sh | bash
+```
+
+**Or run setup scripts individually:**
+
+```bash
+# Common setup (all systems)
 curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/user-setup.sh | bash
+
+# Desktop-specific setup (OpenRGB, etc.)
+curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/desktop-setup.sh | bash
 ```
 
 This will:
 - Install common Flatpak applications (Chrome, Slack, Obsidian, etc.)
 - Enable user services (ollama, openrgb, sunshine)
 - Set up development directories
+
+### Desktop-Specific Setup
+For desktop systems that need OpenRGB configuration:
+
+```bash
+# Download and run the desktop setup script
+curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/desktop-setup.sh | bash
+```
+
+This will:
+- Install and configure OpenRGB with the "Ideal" profile (turns off all RGB lights)
+- Set up OpenRGB to start automatically on login
+- Configure the systemd service for RGB control
 
 ## Local Development
 

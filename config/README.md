@@ -12,6 +12,23 @@ Custom YUM repository configurations for additional software packages:
 
 These repository files are copied to `/etc/yum.repos.d/` during the container build process, before running the shared customizations script.
 
+## OpenRGB Configuration (`openrgb/`)
+
+RGB lighting configuration for desktop systems:
+
+- **`Ideal.orp`** - OpenRGB profile that turns off all RGB lighting
+- **`OpenRGB.json`** - OpenRGB application configuration
+
+These files are deployed via the `desktop-setup.sh` script to `~/.config/OpenRGB/`.
+
+## SystemD User Services (`systemd/user/`)
+
+User-level systemd service files:
+
+- **`openrgb.service`** - Automatically starts OpenRGB with the Ideal profile on login
+
+These files are deployed via the `desktop-setup.sh` script to `~/.config/systemd/user/`.
+
 ## Adding New Repositories
 
 To add a new repository:
