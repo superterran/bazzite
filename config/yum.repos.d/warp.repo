@@ -1,0 +1,8 @@
+[warp]
+name=Warp Terminal Repository
+baseurl=https://releases.warp.dev/linux/rpm/stable
+enabled=1
+gpgcheck=1
+gpgkey=https://releases.warp.dev/linux/keys/warp.asc
+metadata_expire=300
+type=rpm

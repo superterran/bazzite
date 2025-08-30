@@ -11,6 +11,14 @@ build-desktop:
 # Build both variants
 build-all: build-handheld build-desktop
 
+# Run handheld variant interactively
+run-handheld: build-handheld
+    docker run -it --rm bazzite:handheld /bin/bash
+
+# Run desktop variant interactively  
+run-desktop: build-desktop
+    docker run -it --rm bazzite:desktop /bin/bash
+
 # Build and tag for registry push
 build-handheld-release:
     docker build --target handheld -t ghcr.io/superterran/bazzite:handheld .
@@ -31,3 +39,27 @@ push-all: push-handheld push-desktop
 clean:
     docker rmi bazzite:handheld bazzite:desktop || true
     docker rmi ghcr.io/superterran/bazzite:handheld ghcr.io/superterran/bazzite:desktop || true
+
+# User setup commands
+user-setup:
+    ./user-setup.sh
+
+# Backup current system configuration
+backup-config:
+    ./backup-config.sh
+
+# Rebase to desktop variant (local testing)
+rebase-desktop-local:
+    sudo rpm-ostree rebase ostree-unverified-registry:localhost/bazzite:desktop
+
+# Rebase to handheld variant (local testing)
+rebase-handheld-local:
+    sudo rpm-ostree rebase ostree-unverified-registry:localhost/bazzite:handheld
+
+# Test what packages are in the built image
+test-desktop-packages:
+    docker run --rm localhost/bazzite:desktop-test rpm -qa | grep -E "(docker-compose|gnome-boxes|podman-docker|warp-terminal|code|1password)" | sort
+
+# Test handheld packages
+test-handheld-packages:
+    docker run --rm localhost/bazzite:handheld-test rpm -qa | grep -E "(docker-compose|gnome-boxes|podman-docker|warp-terminal|code|1password)" | sort

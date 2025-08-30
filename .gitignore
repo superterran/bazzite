@@ -1,0 +1,27 @@
+# Configuration backups (contain potentially sensitive data)
+config-backups/
+
+# Build artifacts and caches
+.cache/
+.buildah/
+.docker/
+
+# Local test files
+*.local
+test-*
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
