@@ -22,6 +22,7 @@ Scripts are named with a numeric prefix to control execution order:
 - `02-install-warp-terminal.sh` - Installs Warp Terminal from official RPM  
 - `10-setup-shell-config.sh` - Applies bashrc additions and shell configurations
 - `20-setup-openrgb.sh` - Configures OpenRGB with custom profiles and systemd service
+- `20-setup-ssh.sh` - Enables SSH service for remote connections using ujust
 - `100-fix-sleep-issues.sh` - Fixes NVIDIA GPU sleep/wake issues and USB wake-up problems
 
 ## Adding New Scripts
