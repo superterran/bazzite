@@ -1,47 +1,33 @@
 #!/bin/bash
 # Desktop-specific setup script
 # This should only be run on desktop systems, not handheld
+# Executes all scripts in the desktop.d/ directory in order
 
 set -euo pipefail
 
 echo "Setting up desktop-specific configurations..."
 
-# Configure OpenRGB
-echo "Configuring OpenRGB for desktop..."
-mkdir -p ~/.config/OpenRGB
-mkdir -p ~/.config/systemd/user
-
-# Copy OpenRGB configuration files from the repo
+# Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DESKTOP_DIR="$SCRIPT_DIR/desktop.d"
 
-if [ -f "$SCRIPT_DIR/config/openrgb/Ideal.orp" ]; then
-    echo "Installing OpenRGB profile 'Ideal'..."
-    cp "$SCRIPT_DIR/config/openrgb/Ideal.orp" ~/.config/OpenRGB/
-fi
+# Execute all scripts in desktop.d/ directory in order
+echo "Found desktop.d/ directory, executing modular setup scripts..."
 
-if [ -f "$SCRIPT_DIR/config/openrgb/OpenRGB.json" ]; then
-    echo "Installing OpenRGB configuration..."
-    cp "$SCRIPT_DIR/config/openrgb/OpenRGB.json" ~/.config/OpenRGB/
-fi
-
-if [ -f "$SCRIPT_DIR/config/systemd/user/openrgb.service" ]; then
-    echo "Installing OpenRGB systemd service..."
-    cp "$SCRIPT_DIR/config/systemd/user/openrgb.service" ~/.config/systemd/user/
+# Find all executable .sh files and sort them
+for script in $(find "$DESKTOP_DIR" -name "*.sh" -type f -executable | sort); do
+    script_name=$(basename "$script")
+    echo ""
+    echo "=== Executing $script_name ==="
     
-    # Reload systemd and enable the service
-    systemctl --user daemon-reload
-    systemctl --user enable openrgb.service
-    
-    # Only start if OpenRGB flatpak is installed
-    if flatpak list --app | grep -q org.openrgb.OpenRGB; then
-        echo "Starting OpenRGB service..."
-        systemctl --user start openrgb.service || echo "Failed to start OpenRGB service - will start on next login"
+    if bash "$script"; then
+        echo "✓ $script_name completed successfully"
     else
-        echo "OpenRGB Flatpak not found. Install it first: flatpak install flathub org.openrgb.OpenRGB"
+        echo "✗ $script_name failed with exit code $?"
+        echo "Continuing with remaining scripts..."
     fi
-else
-    echo "OpenRGB systemd service file not found, skipping..."
-fi
+done
 
+echo ""
 echo "Desktop-specific setup complete!"
-echo "OpenRGB will start automatically on login and load the 'Ideal' profile to turn off all lights."
+echo "All modular setup scripts have been executed."

@@ -24,6 +24,10 @@ if rpm -q 1password &>/dev/null; then
 fi
 
 # Install 1Password
+
+echo "Adding 1password-cli from brew..."
+brew install --cask 1password-cli
+
 echo "Adding 1Password RPM package..."
 rpm-ostree install https://downloads.1password.com/linux/rpm/stable/x86_64/1password-latest.rpm
 
