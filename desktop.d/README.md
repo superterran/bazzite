@@ -1,17 +1,17 @@
 # Desktop.d Directory
 
-This directory contains modular setup scripts that are executed by `desktop-setup.sh` when setting up desktop-specific configurations. The orchestrator runs `common.d` first, then this directory when the target is `desktop`.
+This directory contains modular setup scripts that are executed by `setup.sh` when setting up desktop-specific configurations. The orchestrator runs `common.d` first, then this directory when the target is `desktop`.
 
 ## How it Works
 
-The `desktop-setup.sh` script automatically discovers and executes all `.sh` files in lexical order (no executable bit required). This allows for modular, maintainable setup scripts.
+The `setup.sh` script automatically discovers and executes all `.sh` files in lexical order (no executable bit required). This allows for modular, maintainable setup scripts.
 
 ## Naming Convention
 
 Scripts are named with a numeric prefix to control execution order:
 
 - `01-*` - System package installations (RPM packages)
-- `10-*` - Early user configuration for desktop (note: shared shell config now lives in `common.d/10-setup-shell-config.sh`)
+- `10-*` - Early user configuration for desktop
 - `20-*` - Application-specific configurations
 - `90-*` - Final setup and cleanup tasks
 - `100-*` - System-level fixes and optimizations
@@ -20,6 +20,7 @@ Scripts are named with a numeric prefix to control execution order:
 
 - `01-install-1password.sh` - Installs 1Password from official RPM
 - `02-install-warp-terminal.sh` - Installs Warp Terminal from official RPM  
+- `15-mac-like-keybindings.sh` - Enables mac-like keybindings via keyd (Super as Command-style combos)
 - `20-setup-openrgb.sh` - Configures OpenRGB with custom profiles and systemd service
 - `20-setup-ssh.sh` - Enables SSH service for remote connections using ujust
 - `25-setup-gamescope-display.sh` - Configures gamescope to prioritize HDMI over DisplayPort for Steam Big Picture mode
@@ -52,5 +53,5 @@ You can test individual scripts by running them directly:
 Or run the orchestrator (auto-detects target, or pass `desktop` explicitly):
 
 ```bash
-./desktop-setup.sh desktop
+./setup.sh desktop
 ```
