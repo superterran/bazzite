@@ -1,33 +1,69 @@
 #!/bin/bash
-# Desktop-specific setup script
-# This should only be run on desktop systems, not handheld
-# Executes all scripts in the desktop.d/ directory in order
+# Unified setup orchestrator
+# Runs common.d and <target>.d (desktop|handheld) modular scripts in order
 
 set -euo pipefail
 
-echo "Setting up desktop-specific configurations..."
+# Resolve repo root
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Get script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DESKTOP_DIR="$SCRIPT_DIR/desktop.d"
+echo "Bazzite Modular Setup"
+echo "======================"
 
-# Execute all scripts in desktop.d/ directory in order
-echo "Found desktop.d/ directory, executing modular setup scripts..."
+# Determine target from first arg or auto-detect
+TARGET_DIR_ARG="${1:-}"
+TARGET=""
 
-# Find all executable .sh files and sort them
-for script in $(find "$DESKTOP_DIR" -name "*.sh" -type f -executable | sort); do
-    script_name=$(basename "$script")
-    echo ""
-    echo "=== Executing $script_name ==="
-    
-    if bash "$script"; then
-        echo "✓ $script_name completed successfully"
+detect_system_type() {
+    if grep -qi "ROG Ally\|Steam Deck\|GPD" /sys/devices/virtual/dmi/id/product_name 2>/dev/null; then
+        echo handheld
+    elif grep -qi "desktop\|tower" /sys/devices/virtual/dmi/id/chassis_type 2>/dev/null; then
+        echo desktop
     else
-        echo "✗ $script_name failed with exit code $?"
-        echo "Continuing with remaining scripts..."
+        echo desktop
     fi
-done
+}
+
+if [[ -n "$TARGET_DIR_ARG" ]]; then
+    TARGET="$TARGET_DIR_ARG"
+else
+    TARGET="$(detect_system_type)"
+fi
+
+COMMON_DIR="$REPO_ROOT/common.d"
+TARGET_DIR="$REPO_ROOT/${TARGET}.d"
+
+echo "Target: $TARGET"
+echo "Root: $REPO_ROOT"
+echo ""
+
+run_dir() {
+    local dir="$1"
+    local title="$2"
+    if [[ -d "$dir" ]]; then
+        echo "Running $title scripts from: $dir"
+        # Execute all .sh files in lexical order regardless of executable bit
+        while IFS= read -r -d '' script; do
+            local name
+            name="$(basename "$script")"
+            echo ""
+            echo "=== Executing $name ==="
+            if bash "$script"; then
+                echo "✓ $name completed successfully"
+            else
+                echo "✗ $name failed with exit code $?"
+                echo "Continuing with remaining scripts..."
+            fi
+        done < <(find "$dir" -maxdepth 1 -type f -name "*.sh" -print0 | sort -z)
+    else
+        echo "Skipping $title: directory not found: $dir"
+    fi
+}
+
+# Run common first, then target-specific
+run_dir "$COMMON_DIR" "common"
+run_dir "$TARGET_DIR" "$TARGET"
 
 echo ""
-echo "Desktop-specific setup complete!"
+echo "Setup complete for target: $TARGET"
 echo "All modular setup scripts have been executed."

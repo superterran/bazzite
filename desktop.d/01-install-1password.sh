@@ -1,36 +1,27 @@
 #!/bin/bash
-# Install 1Password
-# This script installs 1Password from the official RPM package
-
+# Install 1Password (desktop)
 set -euo pipefail
 
 echo "Installing 1Password..."
 
-# 1Password SSH Agent
-BASHRC="$HOME/.bashrc"
-SSH_AGENT_LINE='export SSH_AUTH_SOCK=/home/me/.1password/agent.sock'
+# Ensure repo is present (repo file shipped under config/yum.repos.d/)
+if ! rpm -q 1password &>/dev/null || ! rpm -q 1password-cli &>/dev/null; then
+    echo "Queuing 1Password packages via rpm-ostree..."
+    rpm-ostree install 1password 1password-cli || true
+else
+    echo "1Password packages already installed"
+fi
 
-if ! grep -Fxq "$SSH_AGENT_LINE" "$BASHRC"; then
+# Configure 1Password SSH Agent environment
+BASHRC="$HOME/.bashrc"
+SSH_AGENT_LINE="export SSH_AUTH_SOCK=\"$HOME/.1password/agent.sock\""
+if ! grep -Fqx "$SSH_AGENT_LINE" "$BASHRC"; then
     echo "$SSH_AGENT_LINE" >> "$BASHRC"
     echo "Added SSH agent export to .bashrc"
 else
     echo "SSH agent export already present in .bashrc"
 fi
 
-# Check if 1Password is already installed
-if rpm -q 1password &>/dev/null; then
-    echo "1Password is already installed, skipping..."
-    exit 0
-fi
-
-# Install 1Password
-
-echo "Adding 1password-cli from brew..."
-brew install --cask 1password-cli
-
-echo "Adding 1Password RPM package..."
-rpm-ostree install https://downloads.1password.com/linux/rpm/stable/x86_64/1password-latest.rpm
-
-echo "1Password installation queued. A reboot will be required to complete the installation."
+echo "1Password installation/configuration complete. A reboot may be required to finalize rpm-ostree changes."
 
 

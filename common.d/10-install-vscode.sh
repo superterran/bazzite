@@ -3,7 +3,7 @@
 
 set -euo pipefail
 
-echo "Installing shared software packages..."
+echo "Installing vscode and podman-docker..."
 
 # Import GPG keys for the repositories we added
 # Note: Repository files are copied in the Containerfile before this script runs
@@ -11,10 +11,6 @@ rpm --import https://packages.microsoft.com/keys/microsoft.asc
 
 
 # Install RPM packages that should be layered
-rpm-ostree install \
-    docker-compose \
-    gnome-boxes \
-    podman-docker \
-    code
+rpm-ostree install code podman-docker docker-compose
 
-echo "Shared customizations complete."
+echo "Visual Studio Code installation complete."

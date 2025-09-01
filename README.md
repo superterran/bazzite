@@ -20,6 +20,27 @@ This repository contains custom Bazzite variants optimized for my personal setup
 
 ## Quick Start
 
+### Fresh Installation (New Systems)
+
+For completely new systems, follow these steps:
+
+1. **Install standard Bazzite first**:
+   - Download from [bazzite.gg](https://bazzite.gg)
+   - Choose the base variant that matches your hardware
+   - Flash to USB and install normally
+
+2. **Switch to custom variant** (after first boot):
+   ```bash
+   # Auto-detect and rebase (recommended)
+   curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/fresh-install.sh | bash
+   ```
+
+3. **Complete setup** (after reboot):
+   ```bash
+   # Install apps and configure system (auto-detects desktop/handheld)
+   curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/desktop-setup.sh | bash
+   ```
+
 ### For Existing Bazzite Systems
 Rebase to the custom variant:
 
@@ -39,23 +60,26 @@ After rebasing and rebooting, run the setup script:
 
 ```bash
 # Smart setup - automatically detects desktop vs handheld
-curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/setup.sh | bash
-```
-
-**Or run setup scripts individually:**
-
-```bash
-# Common setup (all systems)
-curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/user-setup.sh | bash
-
-# Desktop-specific setup (OpenRGB, etc.)
 curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/desktop-setup.sh | bash
 ```
 
-This will:
-- Install common Flatpak applications (Chrome, Slack, Obsidian, etc.)
-- Enable user services (ollama, openrgb, sunshine)
-- Set up development directories
+**Or run setup manually with the unified orchestrator:**
+
+```bash
+# Run only common modules (Flatpaks, user services, shell config)
+curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/user-setup.sh | bash
+
+# Run desktop-specific modules (includes common first)
+curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/desktop-setup.sh | bash -s -- desktop
+
+# Run handheld-specific modules (if/when present)
+curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/desktop-setup.sh | bash -s -- handheld
+```
+
+This will (common modules):
+- Install common Flatpak applications (Slack, Obsidian, etc.)
+- Enable user services (ollama, sunshine) when available
+- Set up shell and development directories
 
 ### Desktop-Specific Setup
 For desktop systems that need OpenRGB configuration:

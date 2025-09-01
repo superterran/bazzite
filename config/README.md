@@ -10,7 +10,7 @@ Custom YUM repository configurations for additional software packages:
 - **`warp.repo`** - Warp Terminal
 - **`vscode.repo`** - Visual Studio Code
 
-These repository files are copied to `/etc/yum.repos.d/` during the container build process, before running the shared customizations script.
+These repository files are copied to `/etc/yum.repos.d/` during the container build process, before running the shared customizations script (`shared-customizations.sh`).
 
 ## OpenRGB Configuration (`openrgb/`)
 
@@ -19,7 +19,7 @@ RGB lighting configuration for desktop systems:
 - **`Ideal.orp`** - OpenRGB profile that turns off all RGB lighting
 - **`OpenRGB.json`** - OpenRGB application configuration
 
-These files are deployed via the `desktop-setup.sh` script to `~/.config/OpenRGB/`.
+These files are deployed via the orchestrator (`desktop-setup.sh desktop`) to `~/.config/OpenRGB/` on first run.
 
 ## SystemD User Services (`systemd/user/`)
 
@@ -27,7 +27,7 @@ User-level systemd service files:
 
 - **`openrgb.service`** - Automatically starts OpenRGB with the Ideal profile on login
 
-These files are deployed via the `desktop-setup.sh` script to `~/.config/systemd/user/`.
+These files are deployed via the orchestrator (`desktop-setup.sh desktop`) to `~/.config/systemd/user/`.
 
 ## Adding New Repositories
 

@@ -50,7 +50,7 @@ setup:
 
 # Desktop-specific setup (OpenRGB, etc.)
 desktop-setup:
-    ./desktop-setup.sh
+    ./desktop-setup.sh desktop
 
 # Backup current system configuration
 backup-config:
@@ -66,8 +66,8 @@ rebase-handheld-local:
 
 # Test what packages are in the built image
 test-desktop-packages:
-    docker run --rm localhost/bazzite:desktop-test rpm -qa | grep -E "(docker-compose|gnome-boxes|podman-docker|warp-terminal|code|1password)" | sort
+    docker run --rm bazzite:desktop rpm -qa | grep -E "(docker-compose|gnome-boxes|podman-docker|warp-terminal|code|1password)" | sort
 
 # Test handheld packages
 test-handheld-packages:
-    docker run --rm localhost/bazzite:handheld-test rpm -qa | grep -E "(docker-compose|gnome-boxes|podman-docker|warp-terminal|code|1password)" | sort
+    docker run --rm bazzite:handheld rpm -qa | grep -E "(docker-compose|gnome-boxes|podman-docker|warp-terminal|code|1password)" | sort

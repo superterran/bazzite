@@ -39,7 +39,10 @@ After=multi-user.target network.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash -c 'WIFI_IF=\$(iw dev | awk "/Interface/ {print \$2}" | head -1); if [[ -n "\$WIFI_IF" ]]; then /usr/sbin/iw dev "\$WIFI_IF" set power_save off; fi'
+ExecStart=/bin/bash -c '\
+IW=\$(command -v iw || echo /usr/sbin/iw); \
+WIFI_IF=\$("$IW" dev | awk "/Interface/ {print \$2}" | head -1); \
+if [[ -n "\$WIFI_IF" ]]; then "$IW" dev "\$WIFI_IF" set power_save off; fi'
 RemainAfterExit=yes
 
 [Install]
@@ -129,7 +132,7 @@ if [[ ! -f "$USB_RULE_FILE" ]]; then
     echo "Creating udev rule to prevent WiFi adapter suspension..."
     sudo tee "$USB_RULE_FILE" > /dev/null <<UDEVEOF
 # Disable autosuspend for WiFi adapters to prevent SSH disconnections
-ACTION=="add", SUBSYSTEM=="usb", ATTR{bInterfaceClass}=="0e", ATTR{power/autosuspend}="-1"
+ACTION=="add", SUBSYSTEM=="usb", ATTR{bInterfaceClass}=="e0", ATTR{power/autosuspend}="-1"
 UDEVEOF
     
     sudo udevadm control --reload-rules

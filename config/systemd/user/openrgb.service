@@ -8,7 +8,9 @@ ExecStart=/usr/bin/flatpak run org.openrgb.OpenRGB --server -p Ideal
 Restart=on-failure
 RestartSec=5
 SuccessExitStatus=0
-Environment=DISPLAY=:0
+# If running under Wayland + server mode, DISPLAY is typically not needed.
+# Uncomment if required by your environment:
+# Environment=DISPLAY=:0
 
 [Install]
 WantedBy=default.target
