@@ -38,7 +38,7 @@ For completely new systems, follow these steps:
 3. **Complete setup** (after reboot):
    ```bash
    # Install apps and configure system (auto-detects desktop/handheld)
-   curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/desktop-setup.sh | bash
+   curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/setup.sh | bash
    ```
 
 ### For Existing Bazzite Systems
@@ -60,20 +60,17 @@ After rebasing and rebooting, run the setup script:
 
 ```bash
 # Smart setup - automatically detects desktop vs handheld
-curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/desktop-setup.sh | bash
+curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/setup.sh | bash
 ```
 
-**Or run setup manually with the unified orchestrator:**
+To force a specific target:
 
 ```bash
-# Run only common modules (Flatpaks, user services, shell config)
-curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/user-setup.sh | bash
+# Desktop-specific modules (runs common first)
+curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/setup.sh | bash -s -- desktop
 
-# Run desktop-specific modules (includes common first)
-curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/desktop-setup.sh | bash -s -- desktop
-
-# Run handheld-specific modules (if/when present)
-curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/desktop-setup.sh | bash -s -- handheld
+# Handheld-specific modules (runs common first)
+curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/setup.sh | bash -s -- handheld
 ```
 
 This will (common modules):
@@ -85,8 +82,8 @@ This will (common modules):
 For desktop systems that need OpenRGB configuration:
 
 ```bash
-# Download and run the desktop setup script
-curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/desktop-setup.sh | bash
+# Download and run the setup script
+curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/setup.sh | bash
 ```
 
 This will:

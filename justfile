@@ -40,17 +40,13 @@ clean:
     docker rmi bazzite:handheld bazzite:desktop || true
     docker rmi ghcr.io/superterran/bazzite:handheld ghcr.io/superterran/bazzite:desktop || true
 
-# User setup commands
-user-setup:
-    ./user-setup.sh
-
 # Smart setup (detects system type)
 setup:
     ./setup.sh
 
 # Desktop-specific setup (OpenRGB, etc.)
 desktop-setup:
-    ./desktop-setup.sh desktop
+    ./setup.sh desktop
 
 # Backup current system configuration
 backup-config:

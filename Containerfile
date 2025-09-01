@@ -6,13 +6,8 @@ FROM ghcr.io/ublue-os/bazzite-deck-gnome:latest AS handheld
 # Copy repository configurations
 COPY config/yum.repos.d/ /etc/yum.repos.d/
 
-# Copy and run shared customizations
-COPY shared-customizations.sh /tmp/shared-customizations.sh
-RUN chmod +x /tmp/shared-customizations.sh && \
-    /tmp/shared-customizations.sh && \
-    rm /tmp/shared-customizations.sh && \
-    rpm-ostree cleanup -m && \
-    ostree container commit
+# No build-time customizations (runtime setup scripts handle installs)
+RUN rpm-ostree cleanup -m && ostree container commit
 
 # Desktop target (NVIDIA)
 FROM ghcr.io/ublue-os/bazzite-deck-nvidia-gnome:latest AS desktop
@@ -20,10 +15,5 @@ FROM ghcr.io/ublue-os/bazzite-deck-nvidia-gnome:latest AS desktop
 # Copy repository configurations
 COPY config/yum.repos.d/ /etc/yum.repos.d/
 
-# Copy and run shared customizations  
-COPY shared-customizations.sh /tmp/shared-customizations.sh
-RUN chmod +x /tmp/shared-customizations.sh && \
-    /tmp/shared-customizations.sh && \
-    rm /tmp/shared-customizations.sh && \
-    rpm-ostree cleanup -m && \
-    ostree container commit
+# No build-time customizations (runtime setup scripts handle installs)
+RUN rpm-ostree cleanup -m && ostree container commit

@@ -41,7 +41,7 @@ echo "✅ Rebase complete!"
 echo ""
 echo "🔄 Rebooting to apply changes..."
 echo "After reboot, run the setup script:"
-echo "curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/desktop-setup.sh | bash"
+echo "curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/setup.sh | bash"
 echo ""
 echo "Rebooting in 10 seconds... (Ctrl+C to cancel)"
 sleep 10
