@@ -20,9 +20,11 @@ Scripts are named with a numeric prefix to control execution order:
 
 - `01-install-1password.sh` - Installs 1Password from official RPM
 - `02-install-warp-terminal.sh` - Installs Warp Terminal from official RPM  
-- `15-mac-like-keybindings.sh` - Enables mac-like keybindings via keyd (Super as Command-style combos)
+- `10-setup-shell-config.sh` - Sets up shell configuration and development directories
 - `20-setup-openrgb.sh` - Configures OpenRGB with custom profiles and systemd service
 - `20-setup-ssh.sh` - Enables SSH service for remote connections using ujust
+- `21-setup-vscode-tunnel.sh` - Configures VS Code tunnel for remote development
+- `22-fix-ssh-stability.sh` - Fixes SSH stability issues and configuration
 - `25-setup-gamescope-display.sh` - Configures gamescope to prioritize HDMI over DisplayPort for Steam Big Picture mode
 - `100-fix-sleep-issues.sh` - Fixes NVIDIA GPU sleep/wake issues and USB wake-up problems
 
