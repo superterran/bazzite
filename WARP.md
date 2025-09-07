@@ -202,11 +202,19 @@ This is an immutable Linux distribution using rpm-ostree:
 4. **CI validation**: Push to main triggers automated builds
 5. **Deployment**: Users rebase to new images using `rpm-ostree rebase`
 
+## Software Installation Philosophy
+
+**Container-first approach**: For optimal compatibility and system integration on immutable systems like Bazzite:
+- **System packages** (RPM): Install via container build process in Containerfile for best integration
+- **User applications** (Flatpak): Use for sandboxed applications that don't need deep system integration
+- **Development tools** (Homebrew): Use as fallback for tools not available as RPMs
+- **Runtime configuration**: Use setup scripts for user-level configuration only, not installation
+
 ## Important Notes
 
 - **Immutable base**: The OS layer is immutable; all customizations happen via layered packages or user-space configuration
 - **Modular design**: Setup scripts are designed to be independently executable and idempotent
 - **Hardware detection**: System automatically detects desktop vs handheld and applies appropriate configurations
 - **Container-first**: Development and deployment use container images as the primary artifact
-- **User-space focus**: Most applications installed as Flatpaks to avoid modifying the base system
+- **Installation preference**: RPMs via container build > Flatpaks > Homebrew > rpm-ostree install (requires reboot)
 - **Customization workflow**: Always use the modular script approach for system changes to maintain consistency and reproducibility

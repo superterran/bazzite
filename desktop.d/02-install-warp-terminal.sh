@@ -1,19 +1,16 @@
 #!/bin/bash
-# Install Warp Terminal
-# This script installs Warp Terminal from the official RPM package
+# Verify Warp Terminal installation (installed during container build)
 
 set -euo pipefail
 
-echo "Installing Warp Terminal..."
+echo "Checking Warp Terminal installation..."
 
-# Check if Warp Terminal is already installed
+# Check if Warp Terminal is installed (should be from container build)
 if rpm -q warp-terminal &>/dev/null; then
-    echo "Warp Terminal is already installed, skipping..."
-    exit 0
+    echo "✓ Warp Terminal is installed and ready"
+else
+    echo "Warning: Warp Terminal not found. This usually means you need to reboot after the container update."
+    echo "Warp Terminal is installed during container build - reboot required for availability."
 fi
 
-# Install Warp Terminal
-echo "Adding Warp Terminal RPM package..."
-rpm-ostree install warp-terminal
-
-echo "Warp Terminal installation queued. A reboot will be required to complete the installation."
+echo "Warp Terminal check completed"

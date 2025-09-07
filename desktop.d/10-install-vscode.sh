@@ -3,26 +3,15 @@
 
 set -euo pipefail
 
-echo "Installing Visual Studio Code and configuring podman for devcontainers..."
+echo "Configuring VS Code and podman for devcontainers..."
 
-# Check if VS Code is already installed
-if flatpak list | grep -q "com.visualstudio.code" 2>/dev/null; then
-    echo "Visual Studio Code already installed, skipping..."
+# Check if VS Code is installed (should be from container build)
+if ! command -v code >/dev/null 2>&1; then
+    echo "Warning: VS Code not found. This usually means you need to reboot after the container update."
+    echo "VS Code is installed during container build - reboot required for availability."
 else
-    echo "Installing Visual Studio Code from Flathub..."
-    flatpak install -y flathub com.visualstudio.code
-    echo "✓ Visual Studio Code installed successfully"
+    echo "VS Code (RPM) is available, continuing with configuration..."
 fi
-
-# Configure Flatpak permissions for devcontainer access
-echo "Configuring VS Code Flatpak permissions for devcontainer access..."
-flatpak override --user --filesystem=/var/run/docker.sock com.visualstudio.code
-flatpak override --user --filesystem=/run/user/1000/podman com.visualstudio.code
-flatpak override --user --filesystem=host com.visualstudio.code
-flatpak override --user --share=network com.visualstudio.code
-flatpak override --user --socket=session-bus com.visualstudio.code
-flatpak override --user --socket=system-bus com.visualstudio.code
-echo "✓ VS Code Flatpak permissions configured for devcontainer access"
 
 # Check if podman is available (should be pre-installed on Bazzite)
 if ! command -v podman >/dev/null 2>&1; then
@@ -30,32 +19,23 @@ if ! command -v podman >/dev/null 2>&1; then
     exit 1
 fi
 
-# Install docker-compose for devcontainer orchestration
-if command -v docker-compose >/dev/null 2>&1; then
-    echo "docker-compose already installed, skipping..."
-else
-    echo "Installing docker-compose via Homebrew..."
+# Check if docker-compose and podman-docker are available (should be from container build)
+if ! command -v docker-compose >/dev/null 2>&1; then
+    echo "Installing docker-compose via Homebrew as fallback..."
     brew install docker-compose
     echo "✓ docker-compose installed successfully"
-fi
-
-# Create docker symlink for podman compatibility
-echo "Setting up Docker compatibility symlink..."
-mkdir -p ~/.local/bin
-
-if [[ ! -e ~/.local/bin/docker ]]; then
-    ln -s /usr/bin/podman ~/.local/bin/docker
-    echo "✓ Docker symlink created at ~/.local/bin/docker"
 else
-    echo "Docker symlink already exists, skipping..."
+    echo "docker-compose is available, skipping..."
 fi
 
-# Ensure ~/.local/bin is in PATH
-if ! echo "$PATH" | grep -q "$HOME/.local/bin"; then
-    echo "Adding ~/.local/bin to PATH in ~/.bashrc"
-    echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-    export PATH="$HOME/.local/bin:$PATH"
-    echo "✓ ~/.local/bin added to PATH"
+echo "Checking Docker CLI compatibility..."
+if ! command -v docker >/dev/null 2>&1; then
+    echo "Warning: docker command not found. podman-docker should be installed from container build."
+    echo "You may need to reboot after the container update for docker command to be available."
+elif rpm -q podman-docker >/dev/null 2>&1; then
+    echo "podman-docker package is installed, Docker CLI compatibility ready"
+else
+    echo "Docker command available but podman-docker package not detected"
 fi
 
 # Configure podman for optimal devcontainer performance
