@@ -8,20 +8,26 @@ The `setup.sh` script automatically discovers and executes all `.sh` files in le
 
 ## Naming Convention
 
-Scripts are named with a numeric prefix to control execution order:
+**Updated**: Scripts now use descriptive names without numeric prefixes for easier identification and tab completion. The setup orchestrator executes scripts in alphabetical order, but dependencies are managed through script logic rather than execution order.
 
-- `01-*` - System package installations (RPM packages that require user context)
-- `10-*` - Early system configuration
-- `20-*` - Application-specific configurations and Flatpak installations
-- `90-*` - Final setup and cleanup tasks
+**Benefits**:
+- Easy tab completion: Type `./common.d/war<TAB>` to run `warp.sh`
+- Self-documenting: Script names clearly indicate their purpose
+- Flexible execution: Run individual scripts directly without memorizing numbers
 
 ## Current Scripts
 
-- `01-install-1password.sh` - Installs 1Password GUI app via rpm-ostree (requires user-session context for PolicyKit setup)
-- `20-gnome-boxes.sh` - Installs GNOME Boxes virtualization via Flatpak
-- `20-install-obsidian.sh` - Installs Obsidian note-taking app via Flatpak
-- `20-install-slack.sh` - Installs Slack communication app via Flatpak
-- `20-install-utility-flatpaks.sh` - Installs various utility applications via Flatpak
+### Security & Authentication
+- `onepassword.sh` - Installs 1Password GUI app via rpm-ostree (requires user-session context)
+
+### Development & Productivity
+- `gnome-boxes.sh` - Installs GNOME Boxes virtualization via Flatpak
+- `obsidian.sh` - Installs Obsidian note-taking app via Flatpak
+- `warp.sh` - Verifies Warp Terminal installation (requires user-session context)
+
+### Communication & Utilities
+- `slack.sh` - Installs Slack communication app via Flatpak
+- `utility-flatpaks.sh` - Installs various utility applications via Flatpak
 
 ## Why Some Packages Are Here vs Container Build
 
