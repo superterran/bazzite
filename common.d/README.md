@@ -18,6 +18,7 @@ Scripts are named with a numeric prefix to control execution order:
 ## Current Scripts
 
 - `01-install-1password.sh` - Installs 1Password GUI app via rpm-ostree (requires user-session context for PolicyKit setup)
+- `02-install-warp-terminal.sh` - Installs Warp Terminal via rpm-ostree (requires runtime installation due to container build issues)
 - `20-gnome-boxes.sh` - Installs GNOME Boxes virtualization via Flatpak
 - `20-install-obsidian.sh` - Installs Obsidian note-taking app via Flatpak
 - `20-install-slack.sh` - Installs Slack communication app via Flatpak
@@ -32,6 +33,12 @@ Scripts are named with a numeric prefix to control execution order:
 - Creates user-specific desktop integration
 - Sets up browser integration with proper permissions
 - Container builds don't have the user context needed for proper setup
+
+**Warp Terminal** - Installed here because:
+- Simple postinstall script but fails during container build transaction phase
+- Reason for container build failure under investigation
+- Runtime installation via rpm-ostree works reliably
+- Repository configuration and GPG keys handled in container build
 
 ### Container Build Installation
 **VS Code, podman-docker** - Installed in Containerfile because:
