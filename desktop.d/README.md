@@ -18,9 +18,8 @@ Scripts are named with a numeric prefix to control execution order:
 
 ## Current Scripts
 
-- `01-install-1password.sh` - Installs 1Password from official RPM
-- `02-install-warp-terminal.sh` - Installs Warp Terminal from official RPM
-- `10-install-vscode.sh` - Installs VS Code via Flatpak with host permissions, configures podman for optimal devcontainer performance, creates Docker compatibility symlink and socket
+- `02-install-warp-terminal.sh` - Verifies Warp Terminal installation (Warp requires user-session context for proper setup)
+- `10-install-vscode.sh` - Configures VS Code (installed via container build) and podman for optimal devcontainer performance
 - `10-setup-shell-config.sh` - Sets up shell configuration and development directories
 - `20-setup-openrgb.sh` - Configures OpenRGB with custom profiles and systemd service
 - `20-setup-ssh.sh` - Enables SSH service for remote connections using ujust

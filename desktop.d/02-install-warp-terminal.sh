@@ -1,5 +1,9 @@
 #!/bin/bash
-# Verify Warp Terminal installation (installed during container build)
+# Verify Warp Terminal installation
+#
+# NOTE: Warp Terminal installation approach TBD - may move to container build
+# Current: Runtime installation via rpm-ostree (like 1Password)
+# Future: Could move to container build since postinstall script is simpler
 
 set -euo pipefail
 

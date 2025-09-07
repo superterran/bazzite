@@ -11,7 +11,13 @@ RUN rpm --import https://packages.microsoft.com/keys/microsoft.asc && \
     rpm --import https://releases.warp.dev/linux/keys/warp.asc && \
     rpm --import https://downloads.1password.com/linux/keys/1password.asc
 
-# Install software packages
+# Install packages that work well in container builds
+# These packages have simple postinstall scripts with no user-session dependencies:
+# - code: VS Code for development with full host access (needed for devcontainers)
+# - podman-docker: Docker CLI compatibility for VS Code devcontainer support
+# 
+# NOTE: Packages with complex user-session requirements (like 1Password GUI)
+# are installed via setup scripts at runtime when user context is available
 RUN rpm-ostree install \
     code \
     podman-docker && \
@@ -29,7 +35,13 @@ RUN rpm --import https://packages.microsoft.com/keys/microsoft.asc && \
     rpm --import https://releases.warp.dev/linux/keys/warp.asc && \
     rpm --import https://downloads.1password.com/linux/keys/1password.asc
 
-# Install software packages
+# Install packages that work well in container builds
+# These packages have simple postinstall scripts with no user-session dependencies:
+# - code: VS Code for development with full host access (needed for devcontainers)
+# - podman-docker: Docker CLI compatibility for VS Code devcontainer support
+# 
+# NOTE: Packages with complex user-session requirements (like 1Password GUI)
+# are installed via setup scripts at runtime when user context is available
 RUN rpm-ostree install \
     code \
     podman-docker && \
