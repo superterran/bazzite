@@ -16,8 +16,9 @@ RUN rpm --import https://packages.microsoft.com/keys/microsoft.asc && \
 # - code: VS Code for development with full host access (needed for devcontainers)
 # - podman-docker: Docker CLI compatibility for VS Code devcontainer support
 # 
-# NOTE: Packages with complex user-session requirements (like 1Password GUI)
-# are installed via setup scripts at runtime when user context is available
+# NOTE: Packages requiring special environment context are installed at runtime:
+# - 1Password GUI: Complex user-session context for PolicyKit setup
+# - Warp Terminal: Simple postinstall but still fails in container builds (reason TBD)
 RUN rpm-ostree install \
     code \
     podman-docker && \
@@ -40,8 +41,9 @@ RUN rpm --import https://packages.microsoft.com/keys/microsoft.asc && \
 # - code: VS Code for development with full host access (needed for devcontainers)
 # - podman-docker: Docker CLI compatibility for VS Code devcontainer support
 # 
-# NOTE: Packages with complex user-session requirements (like 1Password GUI)
-# are installed via setup scripts at runtime when user context is available
+# NOTE: Packages requiring special environment context are installed at runtime:
+# - 1Password GUI: Complex user-session context for PolicyKit setup
+# - Warp Terminal: Simple postinstall but still fails in container builds (reason TBD)
 RUN rpm-ostree install \
     code \
     podman-docker && \
