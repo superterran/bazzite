@@ -1,0 +1,142 @@
+{
+  "folders": [
+    {
+      "name": "Bazzite Custom OS",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.associations": {
+      "justfile": "makefile",
+      "Containerfile": "dockerfile",
+      "*.sh": "shellscript"
+    },
+    "shellcheck.enable": true,
+    "shellformat.effectLanguages": [
+      "shellscript",
+      "dockerfile"
+    ],
+    "files.exclude": {
+      ".git": false
+    },
+    "search.exclude": {
+      ".git": true,
+      "**/.github": false
+    },
+    "editor.rulers": [80, 120],
+    "editor.detectIndentation": true,
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4,
+    "[shellscript]": {
+      "editor.tabSize": 4,
+      "editor.insertSpaces": true
+    },
+    "[dockerfile]": {
+      "editor.tabSize": 4,
+      "editor.insertSpaces": true
+    },
+    "[makefile]": {
+      "editor.insertSpaces": false,
+      "editor.tabSize": 4
+    },
+    "[json]": {
+      "editor.tabSize": 2,
+      "editor.insertSpaces": true
+    },
+    "[markdown]": {
+      "editor.tabSize": 2,
+      "editor.insertSpaces": true,
+      "editor.wordWrap": "on"
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-vscode.vscode-json",
+      "timonwong.shellcheck",
+      "foxundermoon.shell-format",
+      "ms-azuretools.vscode-docker",
+      "skellock.just",
+      "redhat.vscode-yaml",
+      "GitHub.copilot",
+      "GitHub.copilot-chat"
+    ]
+  },
+  "tasks": {    
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Build Desktop",
+        "type": "shell",
+        "command": "just",
+        "args": ["build-desktop"],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Build Handheld", 
+        "type": "shell",
+        "command": "just",
+        "args": ["build-handheld"],
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Build All",
+        "type": "shell", 
+        "command": "just",
+        "args": ["build-all"],
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Run Desktop Setup",
+        "type": "shell",
+        "command": "./setup.sh",
+        "args": ["desktop"],
+        "group": "test",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Test Desktop Packages",
+        "type": "shell",
+        "command": "just",
+        "args": ["test-desktop-packages"],
+        "group": "test",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        },
+        "problemMatcher": []
+      }
+    ]
+  }
+}
