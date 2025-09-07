@@ -23,7 +23,7 @@ The `setup.sh` script automatically discovers and executes all `.sh` files in le
 
 ### System Configuration
 - `display-gamescope.sh` - Configures gamescope to prioritize HDMI over DisplayPort
-- `memory-config.sh` - Installs basic-memory MCP server for VS Code and other tools
+- `basic-memory-mcp.sh` - Installs basic-memory MCP server for VS Code and other tools
 - `shell-config.sh` - Sets up shell configuration and development directories
 - `sleep-fix.sh` - Fixes NVIDIA GPU sleep/wake issues and USB wake-up problems
 
