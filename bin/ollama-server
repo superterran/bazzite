@@ -1,0 +1,128 @@
+#!/bin/bash
+# Ollama Server Management Script
+# Manages Ollama server for Alpaca and other AI chat applications
+
+set -euo pipefail
+
+CONTAINER_NAME="ramalama-ollama"
+PORT="11434"
+DEFAULT_MODEL="tiny"
+
+show_usage() {
+    echo "Usage: $0 {start|stop|restart|status|logs} [model]"
+    echo ""
+    echo "Commands:"
+    echo "  start [model]  - Start RamaLama server (default: $DEFAULT_MODEL)"
+    echo "  stop           - Stop RamaLama server"
+    echo "  restart [model]- Restart RamaLama server"
+    echo "  status         - Show server status"
+    echo "  logs           - Show server logs"
+    echo ""
+    echo "The server runs on port $PORT (Ollama standard) with GPU acceleration."
+    echo "Compatible with Alpaca, Ollama clients, and OpenAI API format."
+    echo ""
+    echo "Alpaca configuration:"
+    echo "  API Endpoint: http://localhost:$PORT/v1/openai/v1"
+    echo "  Model: [model-name]"
+    echo "  Provider: OpenAI Compatible"
+}
+
+start_server() {
+    local model="${1:-$DEFAULT_MODEL}"
+    
+    if podman ps --filter name="$CONTAINER_NAME" --format "{{.Names}}" | grep -q "$CONTAINER_NAME"; then
+        echo "❌ RamaLama server is already running"
+        echo "Use '$0 stop' first, or '$0 restart' to restart with a different model"
+        exit 1
+    fi
+    
+    echo "🚀 Starting RamaLama server..."
+    echo "Model: $model"
+    echo "Port: $PORT"
+    echo "Container: $CONTAINER_NAME"
+    echo ""
+    
+    ramalama serve "$model" --detach --port "$PORT" --name "$CONTAINER_NAME" --api llama-stack
+    
+    echo "⏳ Waiting for server to start..."
+    sleep 5
+    
+    if podman ps --filter name="$CONTAINER_NAME" --format "{{.Names}}" | grep -q "$CONTAINER_NAME"; then
+        echo "✅ RamaLama server started successfully!"
+        echo ""
+        echo "🌐 Available endpoints:"
+        echo "  • Llama Stack API: http://localhost:$PORT"
+        echo "  • OpenAI Compatible: http://localhost:$PORT/v1/openai"
+        echo "  • Models list: http://localhost:$PORT/v1/models"
+        echo ""
+echo "🦙 For Alpaca:"
+        echo "  • API Endpoint: http://localhost:$PORT/v1/openai/v1"
+        echo "  • Model: $model"
+        echo "  • Provider: OpenAI Compatible"
+    else
+        echo "❌ Failed to start server. Check logs with: $0 logs"
+        exit 1
+    fi
+}
+
+stop_server() {
+    if ! podman ps --filter name="$CONTAINER_NAME" --format "{{.Names}}" | grep -q "$CONTAINER_NAME"; then
+        echo "ℹ️  RamaLama server is not running"
+        exit 0
+    fi
+    
+    echo "🛑 Stopping RamaLama server..."
+    ramalama stop "$CONTAINER_NAME"
+    echo "✅ Server stopped"
+}
+
+server_status() {
+    if podman ps --filter name="$CONTAINER_NAME" --format "{{.Names}}" | grep -q "$CONTAINER_NAME"; then
+        echo "✅ RamaLama server is running"
+        echo ""
+        podman ps --filter name="$CONTAINER_NAME"
+        echo ""
+        echo "🌐 Endpoints:"
+        echo "  • http://localhost:$PORT"
+        echo "  • http://localhost:$PORT/v1/openai"
+    else
+        echo "❌ RamaLama server is not running"
+        echo ""
+        echo "Start with: $0 start [model]"
+    fi
+}
+
+show_logs() {
+    if ! podman ps --filter name="$CONTAINER_NAME" --format "{{.Names}}" | grep -q "$CONTAINER_NAME"; then
+        echo "❌ RamaLama server is not running"
+        exit 1
+    fi
+    
+    echo "📋 RamaLama server logs (last 50 lines):"
+    echo "Press Ctrl+C to exit log viewing"
+    echo ""
+    podman logs -f --tail 50 "$CONTAINER_NAME"
+}
+
+case "${1:-}" in
+    start)
+        start_server "${2:-}"
+        ;;
+    stop)
+        stop_server
+        ;;
+    restart)
+        stop_server
+        start_server "${2:-}"
+        ;;
+    status)
+        server_status
+        ;;
+    logs)
+        show_logs
+        ;;
+    *)
+        show_usage
+        exit 1
+        ;;
+esac

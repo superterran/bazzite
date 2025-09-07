@@ -20,7 +20,8 @@ Scripts are named with a numeric prefix to control execution order:
 
 - `02-install-warp-terminal.sh` - Verifies Warp Terminal installation (Warp requires user-session context for proper setup)
 - `10-install-vscode.sh` - Configures VS Code (installed via container build) and podman for optimal devcontainer performance
-- `10-setup-ramalama.sh` - Installs RamaLama via Homebrew for AI model management with GPU acceleration support
+- `10-setup-basic-memory.sh` - Installs basic-memory MCP server for VS Code and other tools
+- `10-setup-ollama.sh` - Installs Ollama via Homebrew for AI model management with GPU acceleration and Alpaca compatibility
 - `10-setup-shell-config.sh` - Sets up shell configuration and development directories
 - `20-setup-openrgb.sh` - Configures OpenRGB with custom profiles and systemd service
 - `20-setup-ssh.sh` - Enables SSH service for remote connections using ujust
