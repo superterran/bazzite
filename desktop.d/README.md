@@ -31,6 +31,7 @@ The `setup.sh` script automatically discovers and executes all `.sh` files in le
 - `openrgb.sh` - Configures OpenRGB with custom profiles and systemd service
 
 ### Network & Remote Access
+- `nfs-exports.sh` - Exports all mounted drives and the home directory via NFS for network sharing
 - `ssh.sh` - Enables SSH service for remote connections using ujust
 - `ssh-stability.sh` - Fixes SSH stability issues and configuration
 - `vscode-tunnel.sh` - Configures VS Code tunnel for remote development
