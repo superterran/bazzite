@@ -106,6 +106,41 @@ overlay.mountopt = "nodev,metacopy=on"
 mount_program = "/usr/bin/fuse-overlayfs"
 EOF_STORAGE
 
+# Backup existing registries.conf if it exists
+if [[ -f ~/.config/containers/registries.conf ]]; then
+    backup_file=~/.config/containers/registries.conf.bak.$(date +%Y%m%d%H%M%S)
+    echo "Backing up existing registries.conf to $backup_file"
+    cp ~/.config/containers/registries.conf "$backup_file"
+fi
+
+# Configure registries.conf to prevent interactive prompts and default to Docker Hub
+echo "Configuring container registries to prevent interactive prompts..."
+cat > ~/.config/containers/registries.conf << 'EOF_REGISTRIES'
+# Container registries configuration for devcontainer compatibility
+# Using registries.conf v2 format only
+
+# Default to Docker Hub for unqualified image names
+# This prevents "Please select an image" interactive prompts
+unqualified-search-registries = ["docker.io"]
+
+# Registry configuration
+[[registry]]
+prefix = "docker.io"
+location = "docker.io"
+
+[[registry]]
+prefix = "registry.fedoraproject.org"
+location = "registry.fedoraproject.org"
+
+[[registry]]
+prefix = "registry.access.redhat.com"
+location = "registry.access.redhat.com"
+
+[[registry]]
+prefix = "quay.io"
+location = "quay.io"
+EOF_REGISTRIES
+
 # Enable and start podman socket for Docker API compatibility
 echo "Setting up podman socket for devcontainer compatibility..."
 systemctl --user enable podman.socket || true
@@ -138,5 +173,6 @@ echo "  • User namespace mapping for bind mounts (userns=keep-id)"
 echo "  • SELinux labeling disabled for containers (label=false)"
 echo "  • fuse-overlayfs for better rootless performance" 
 echo "  • File-based event logging to avoid journald issues"
+echo "  • Docker Hub as default registry (prevents interactive prompts)"
 echo ""
-echo "DevContainer features should now build without permission errors."
+echo "DevContainer features should now build without permission errors or registry prompts."
