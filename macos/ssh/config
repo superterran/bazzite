@@ -1,0 +1,21 @@
+Host desktop desktop.local
+	HostName desktop.local
+	User me
+	ForwardAgent yes
+	ServerAliveInterval 30
+	ServerAliveCountMax 6
+	TCPKeepAlive yes
+	ConnectTimeout 10
+
+Host *
+	IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+	ServerAliveInterval 60
+	ServerAliveCountMax 3
+	TCPKeepAlive yes
+
+
+# BEGIN: Magento Cloud certificate configuration
+Host *.magento.cloud *.magentosite.cloud
+  Include /Users/me/.magento-cloud/ssh/*.config
+Host *
+# END: Magento Cloud certificate configuration
