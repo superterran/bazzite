@@ -43,7 +43,15 @@ echo "Configuring podman for devcontainer performance..."
 
 # Create containers.conf for performance optimizations
 mkdir -p ~/.config/containers
-cat > ~/.config/containers/containers.conf << 'EOF'
+
+# Backup existing config if it exists
+if [[ -f ~/.config/containers/containers.conf ]]; then
+    backup_file=~/.config/containers/containers.conf.bak.$(date +%Y%m%d%H%M%S)
+    echo "Backing up existing containers.conf to $backup_file"
+    cp ~/.config/containers/containers.conf "$backup_file"
+fi
+
+cat > ~/.config/containers/containers.conf << 'EOF_CONF'
 [containers]
 # Use faster storage driver and optimize for performance
 # Enable cgroups v2 for better resource management
@@ -66,22 +74,37 @@ default_capabilities = [
   "SYS_CHROOT"
 ]
 
+# Fix devcontainer feature build issues on rootless + SELinux
+# Prevents permission denied errors during RUN --mount operations
+userns = "keep-id"
+label = false
+
 [engine]
 # Optimize for performance
 runtime = "crun"
-EOF
+events_logger = "file"
+EOF_CONF
+
+# Backup existing storage.conf if it exists
+if [[ -f ~/.config/containers/storage.conf ]]; then
+    backup_file=~/.config/containers/storage.conf.bak.$(date +%Y%m%d%H%M%S)
+    echo "Backing up existing storage.conf to $backup_file"
+    cp ~/.config/containers/storage.conf "$backup_file"
+fi
 
 # Configure storage.conf for performance
-cat > ~/.config/containers/storage.conf << 'EOF'
+cat > ~/.config/containers/storage.conf << 'EOF_STORAGE'
 [storage]
 driver = "overlay"
 runroot = "/run/user/1000/containers"
 graphroot = "/var/home/me/.local/share/containers/storage"
 
 [storage.options]
-# Optimize overlay storage for performance
+# Optimize overlay storage for performance and rootless compatibility
 overlay.mountopt = "nodev,metacopy=on"
-EOF
+# Use fuse-overlayfs for better rootless support
+mount_program = "/usr/bin/fuse-overlayfs"
+EOF_STORAGE
 
 # Enable and start podman socket for Docker API compatibility
 echo "Setting up podman socket for devcontainer compatibility..."
@@ -109,4 +132,11 @@ else
 fi
 
 echo "Visual Studio Code and podman devcontainer setup completed successfully"
-echo "VS Code should now be able to use podman for high-performance devcontainers"
+echo ""
+echo "✓ Podman configured for VS Code devcontainer compatibility with:"
+echo "  • User namespace mapping for bind mounts (userns=keep-id)"
+echo "  • SELinux labeling disabled for containers (label=false)"
+echo "  • fuse-overlayfs for better rootless performance" 
+echo "  • File-based event logging to avoid journald issues"
+echo ""
+echo "DevContainer features should now build without permission errors."
