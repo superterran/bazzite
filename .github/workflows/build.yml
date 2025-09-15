@@ -6,8 +6,11 @@ on:
   pull_request:
     branches: [ main ]
   schedule:
-    # Check for upstream updates every 4 hours (builds only if base images changed)
-    - cron: '0 */4 * * *'
+    # Build images on Friday at 3 PM UTC (before end of work week)
+    # This is approximately 11 AM EST / 8 AM PST / 4 PM CET
+    - cron: '0 15 * * 5'
+  workflow_dispatch:
+    # Allow manual triggers if needed
 
 env:
   REGISTRY: ghcr.io
@@ -32,48 +35,33 @@ jobs:
     - name: Check if build is needed
       id: build-check
       run: |
-        # Always build on push or PR (code changes)
-        if [ "${{ github.event_name }}" = "push" ] || [ "${{ github.event_name }}" = "pull_request" ]; then
+        # Always build on push, PR, or manual dispatch (code changes)
+        if [ "${{ github.event_name }}" = "push" ] || [ "${{ github.event_name }}" = "pull_request" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
           echo "Code changes detected - building regardless of upstream status"
           echo "should-build=true" >> $GITHUB_OUTPUT
           echo "reason=code-changes" >> $GITHUB_OUTPUT
           exit 0
         fi
         
-        # For scheduled runs, check if upstream base images have changed
+        # For scheduled runs (Friday builds), always build to ensure fresh images
         if [ "${{ github.event_name }}" = "schedule" ]; then
-          # Define base images for each variant
+          echo "Friday scheduled build - building fresh images for the week"
+          echo "should-build=true" >> $GITHUB_OUTPUT
+          echo "reason=weekly-scheduled-build" >> $GITHUB_OUTPUT
+          
+          # Define base images for each variant to track in metadata
           if [ "${{ matrix.variant }}" = "desktop" ]; then
             BASE_IMAGE="ghcr.io/ublue-os/bazzite-deck-nvidia-gnome:latest"
           else
             BASE_IMAGE="ghcr.io/ublue-os/bazzite-deck-gnome:latest"
           fi
           
-          echo "Checking upstream base image: $BASE_IMAGE"
+          echo "Base image for tracking: $BASE_IMAGE"
           
-          # Get current digest of upstream base image
-          UPSTREAM_DIGEST=$(docker buildx imagetools inspect "$BASE_IMAGE" --format '{{.Manifest.Digest}}')
+          # Get current digest of upstream base image for metadata
+          UPSTREAM_DIGEST=$(docker buildx imagetools inspect "$BASE_IMAGE" --format '{{.Manifest.Digest}}' 2>/dev/null || echo "unknown")
           echo "Current upstream digest: $UPSTREAM_DIGEST"
-          
-          # Try to get our last built image's base digest from labels
-          LAST_DIGEST=""
-          if docker buildx imagetools inspect "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ matrix.variant }}" >/dev/null 2>&1; then
-            LAST_DIGEST=$(docker buildx imagetools inspect "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ matrix.variant }}" --format '{{index .Manifest.Annotations "org.opencontainers.image.base.digest"}}' 2>/dev/null || echo "")
-          fi
-          
-          echo "Last build base digest: ${LAST_DIGEST:-'none (first build)'}"
-          
-          # Compare digests
-          if [ "$UPSTREAM_DIGEST" != "$LAST_DIGEST" ] || [ -z "$LAST_DIGEST" ]; then
-            echo "Upstream base image has changed - building new image"
-            echo "should-build=true" >> $GITHUB_OUTPUT
-            echo "reason=upstream-update" >> $GITHUB_OUTPUT
-            echo "upstream-digest=$UPSTREAM_DIGEST" >> $GITHUB_OUTPUT
-          else
-            echo "No upstream changes detected - skipping build to save resources"
-            echo "should-build=false" >> $GITHUB_OUTPUT
-            echo "reason=no-changes" >> $GITHUB_OUTPUT
-          fi
+          echo "upstream-digest=$UPSTREAM_DIGEST" >> $GITHUB_OUTPUT
         fi
 
     - name: Log in to Container Registry
@@ -100,6 +88,7 @@ jobs:
           org.opencontainers.image.description=Custom Bazzite variant with VS Code and podman-docker
           org.opencontainers.image.base.digest=${{ steps.build-check.outputs.upstream-digest || 'unknown' }}
           build.trigger=${{ steps.build-check.outputs.reason || 'manual' }}
+          build.schedule=friday-afternoon
 
     - name: Build and push Docker image
       if: steps.build-check.outputs.should-build == 'true'
@@ -118,8 +107,10 @@ jobs:
           echo "✅ Built ${{ matrix.variant }} variant"
           echo "📋 Reason: ${{ steps.build-check.outputs.reason }}"
           echo "🏷️ Tags: ${{ steps.meta.outputs.tags }}"
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "📅 Weekly Friday afternoon build completed"
+          fi
         else
           echo "⏭️ Skipped ${{ matrix.variant }} variant build"
           echo "📋 Reason: ${{ steps.build-check.outputs.reason }}"
-          echo "💡 No upstream changes detected - saving GitHub Actions resources"
         fi
