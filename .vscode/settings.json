@@ -138,5 +138,10 @@
         "problemMatcher": []
       }
     ]
+  },
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#072030",
+    "titleBar.activeBackground": "#072030",
+    "titleBar.activeForeground": "#e6ecfb"
   }
 }
