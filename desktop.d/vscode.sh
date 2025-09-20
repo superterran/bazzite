@@ -74,15 +74,26 @@ default_capabilities = [
   "SYS_CHROOT"
 ]
 
-# Fix devcontainer feature build issues on rootless + SELinux
-# Prevents permission denied errors during RUN --mount operations
-userns = "keep-id"
+# Fix user namespace mapping issues and devcontainer compatibility
+# Use host user mapping to avoid uid_map permission errors
+userns = "host"
 label = false
+
+# Fix devpts mount issues with crun
+# Disable problematic mounts that cause "Invalid argument" errors
+no_pivot_root = true
+
+# Set proper user namespace mode for rootless containers
+# This prevents "Operation not permitted" errors with uid_map
+user_ns = "keep-id:uid=1000,gid=1000"
 
 [engine]
 # Optimize for performance
 runtime = "crun"
 events_logger = "file"
+
+# Configure crun with specific options to handle user namespace issues
+cgroup_manager = "systemd"
 EOF_CONF
 
 # Backup existing storage.conf if it exists
@@ -158,12 +169,127 @@ else
     echo "Docker socket already exists, skipping..."
 fi
 
-# Test podman functionality
-echo "Testing podman functionality..."
-if podman run --rm hello-world >/dev/null 2>&1; then
-    echo "✓ Podman is working correctly"
+# Create a devcontainer-specific runtime configuration to handle devpts issues
+echo "Setting up devcontainer-specific runtime configuration..."
+mkdir -p ~/.config/containers/oci/hooks.d
+
+# Create a pre-start hook to handle devpts mount issues
+cat > ~/.config/containers/oci/hooks.d/devpts-fix.json << 'EOF_HOOK'
+{
+    "version": "1.0.0",
+    "hook": {
+        "path": "/bin/sh",
+        "args": ["/bin/sh", "-c", "mkdir -p /dev/pts && chmod 755 /dev/pts"],
+        "timeout": 10
+    },
+    "when": {
+        "always": true
+    },
+    "stages": ["prestart"]
+}
+EOF_HOOK
+
+# Create a wrapper script for devcontainer-safe podman usage
+cat > ~/.local/bin/podman-devcontainer << 'EOF_WRAPPER'
+#!/bin/bash
+# Wrapper for podman to handle devcontainer-specific issues
+# This can be used in VS Code settings if the default runtime has issues
+
+# If we detect devpts mount issues, try with runc instead
+if [[ "$*" =~ "devcontainer" ]] || [[ "$*" =~ "--mount.*dev/pts" ]]; then
+    exec podman --runtime=runc "$@"
 else
-    echo "Warning: Podman test failed, but continuing..."
+    exec podman "$@"
+fi
+EOF_WRAPPER
+chmod +x ~/.local/bin/podman-devcontainer
+
+# Create VS Code specific settings for devcontainer compatibility
+echo "Creating VS Code settings for devcontainer compatibility..."
+mkdir -p ~/.config/Code/User
+if [[ -f ~/.config/Code/User/settings.json ]]; then
+    backup_file=~/.config/Code/User/settings.json.bak.$(date +%Y%m%d%H%M%S)
+    echo "Backing up existing VS Code settings to $backup_file"
+    cp ~/.config/Code/User/settings.json "$backup_file"
+fi
+
+# Create or update VS Code settings with devcontainer-specific configurations
+cat > ~/.config/Code/User/devcontainer-settings.json << 'EOF_VSCODE'
+{
+    "dev.containers.dockerPath": "podman",
+    "dev.containers.dockerComposePath": "docker-compose",
+    "dev.containers.copyGitConfig": true,
+    "dev.containers.gitCredentialHelperConfigLocation": "system",
+    "remote.containers.defaultExtensions": [
+        "ms-vscode.vscode-json"
+    ],
+    "remote.containers.workspaceMountConsistency": "consistent",
+    "remote.autoForwardPorts": false,
+    "remote.containers.executeInShell": true,
+    "dev.containers.dockerComposePathV2": "docker-compose",
+    "dev.containers.composePlatformCompatibility": true,
+    "dev.containers.defaultFeatures": {
+        "common-utils": {
+            "uid": "1000",
+            "gid": "1000",
+            "configureZshAsDefaultShell": false
+        }
+    }
+}
+EOF_VSCODE
+
+echo "VS Code devcontainer settings created at ~/.config/Code/User/devcontainer-settings.json"
+echo "You can merge these settings into your main settings.json if needed"
+
+# Create environment configuration for proper user namespace handling
+echo "Setting up environment for rootless devcontainer compatibility..."
+mkdir -p ~/.config/environment.d
+
+cat > ~/.config/environment.d/50-devcontainer-podman.conf << 'EOF_ENV'
+# Podman environment variables for devcontainer compatibility
+BUILDAH_ISOLATION=chroot
+BUILDAH_FORMAT=docker
+_CONTAINERS_USERNS_CONFIGURED=1
+
+# Fix for uid_map permission issues in rootless containers
+# These settings help podman handle user namespace mapping correctly
+PODMAN_USERNS=keep-id
+EOF_ENV
+
+# Create a devcontainer-specific compose wrapper to handle rootless issues
+cat > ~/.local/bin/devcontainer-compose << 'EOF_COMPOSE'
+#!/bin/bash
+# Wrapper for docker-compose to handle rootless podman issues with devcontainers
+
+# Set environment variables for proper user namespace handling
+export BUILDAH_ISOLATION=chroot
+export BUILDAH_FORMAT=docker
+export _CONTAINERS_USERNS_CONFIGURED=1
+export PODMAN_USERNS=keep-id
+
+# Run docker-compose with proper environment
+exec docker-compose "$@"
+EOF_COMPOSE
+chmod +x ~/.local/bin/devcontainer-compose
+
+# Make sure ~/.local/bin is in PATH for the wrapper
+if ! echo "$PATH" | grep -q "$HOME/.local/bin"; then
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+
+# Test podman functionality with both runtimes
+echo "Testing podman functionality with different runtimes..."
+if podman run --rm hello-world >/dev/null 2>&1; then
+    echo "✓ Podman with crun is working correctly"
+else
+    echo "Warning: Podman with crun test failed, testing runc fallback..."
+    if podman --runtime=runc run --rm hello-world >/dev/null 2>&1; then
+        echo "✓ Podman with runc fallback is working"
+        echo "Note: Consider using 'podman --runtime=runc' for devcontainers if issues persist"
+    else
+        echo "Warning: Both runtimes failed basic test, but continuing..."
+    fi
 fi
 
 echo "Visual Studio Code and podman devcontainer setup completed successfully"
@@ -174,5 +300,20 @@ echo "  • SELinux labeling disabled for containers (label=false)"
 echo "  • fuse-overlayfs for better rootless performance" 
 echo "  • File-based event logging to avoid journald issues"
 echo "  • Docker Hub as default registry (prevents interactive prompts)"
+echo "  • devpts mount issue fixes (no_pivot_root=true)"
+echo "  • Alternative runc runtime available for problematic containers"
+echo "  • Pre-start hook to handle /dev/pts directory creation"
 echo ""
-echo "DevContainer features should now build without permission errors or registry prompts."
+echo "DevContainer features should now build without devpts mount errors."
+echo ""
+echo "If you still encounter uid_map or devcontainer issues, try:"
+echo "  1. Restart VS Code completely and reload the devcontainer"
+echo "  2. Clear existing containers: 'podman system reset --force' (WARNING: removes all containers)"
+echo "  3. Use the compose wrapper: ~/.local/bin/devcontainer-compose instead of docker-compose"
+echo "  4. Check environment: 'podman unshare cat /proc/self/uid_map' should show proper mapping"
+echo "  5. Restart podman socket: 'systemctl --user restart podman.socket'"
+echo ""
+echo "For debugging specific issues:"
+echo "  • Check container logs: 'podman logs <container-name>'"
+echo "  • Verify user namespace: 'podman run --rm alpine id'"
+echo "  • Test uid mapping: 'podman run --rm --user 1000:1000 alpine id'"
