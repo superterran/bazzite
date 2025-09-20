@@ -33,6 +33,7 @@ The `setup.sh` script automatically discovers and executes all `.sh` files in le
 ### Network & Remote Access
 - `nfs-exports.sh` - Exports all mounted drives and the home directory via NFS for network sharing
 - `ssh.sh` - Enables SSH service for remote connections using ujust
+- `ssh-agent-forwarding.sh` - Implements robust SSH agent forwarding detection and configuration for remote development
 - `ssh-stability.sh` - Fixes SSH stability issues and configuration
 - `vscode-tunnel.sh` - Configures VS Code tunnel for remote development
 
@@ -40,7 +41,7 @@ The `setup.sh` script automatically discovers and executes all `.sh` files in le
 
 To add a new setup script:
 
-1. Create a new `.sh` file with an appropriate numeric prefix
+1. Create a new `.sh` file with a descriptive name
 2. Make it executable: `chmod +x your-script.sh`
 3. Follow the existing pattern:
    - Use `set -euo pipefail` for strict error handling
@@ -61,6 +62,7 @@ You can test individual scripts by running them directly:
 # or any script by name:
 ./desktop.d/vscode.sh
 ./desktop.d/openrgb.sh
+./desktop.d/ssh-agent-forwarding.sh
 ```
 
 Or run the orchestrator (auto-detects target, or pass `desktop` explicitly):
@@ -68,3 +70,15 @@ Or run the orchestrator (auto-detects target, or pass `desktop` explicitly):
 ```bash
 ./setup.sh desktop
 ```
+
+## SSH Agent Forwarding
+
+The `ssh-agent-forwarding.sh` script provides automatic SSH agent detection and forwarding:
+
+- **Automatic Detection**: Detects forwarded SSH agents in SSH sessions
+- **Fallback Support**: Falls back to 1Password agent when forwarded agents are unavailable
+- **Git Integration**: Configures Git hosting services (GitHub, GitLab, Bitbucket) to use forwarded agents
+- **Persistent Configuration**: All settings persist across sessions and reboots
+- **Shell Integration**: Automatically applies settings when starting new shells
+
+This solves common issues with SSH agent forwarding in remote development environments, ensuring seamless Git operations and SSH key authentication.
