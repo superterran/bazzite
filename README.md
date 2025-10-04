@@ -1,22 +1,41 @@
 # Custom Bazzite Variants
 
-This repository contains custom Bazzite variants optimized for my personal setup:
+This repository contains custom Bazzite variants optimized for personal setup:
 
 - **Handheld (ROG Ally X)**: `ghcr.io/superterran/bazzite:handheld`
-- **Desktop**: `ghcr.io/superterran/bazzite:desktop`
+- **Desktop**: `ghcr.io/superterran/bazzite:desktop` (based on Bazzite DX)
 
 ## Features
 
-- **Pre-installed software**: 
-  - **1Password** - Password manager and secure vault
-  - **Visual Studio Code** - Full-featured code editor and IDE
-  - **Docker Compose** - Container orchestration
-  - **GNOME Boxes** - Virtual machine manager
-  - **Podman Docker** - Docker compatibility layer
-  - **Warp Terminal** - Modern terminal emulator
-- **User-level setup**: Script for Flatpaks and services
+### Desktop Variant (DX Base)
+
+The desktop variant is based on **Bazzite DX**, which provides a complete development environment out of the box:
+
+**Inherited from Bazzite DX:**
+- **Visual Studio Code** - Pre-configured with dev containers support
+- **Docker & Podman** - Container development with proper user mapping
+- **Development toolchains** - Node.js, Python, Go, Rust, and more
+- **Distrobox & Toolbox** - Container-based development environments
+- **GitHub CLI & Git** - Version control tools
+
+**Custom additions via container build:**
+- Repository configurations for 1Password and Warp Terminal
+- GPG keys for third-party repositories
+
+**Runtime setup (via setup scripts):**
+- **1Password** - Password manager with SSH agent integration
+- **Warp Terminal** - Modern terminal emulator
+- **OpenRGB** - RGB lighting control with custom profiles
+- **Ollama** - AI/ML tools with CUDA GPU acceleration
+- **SSH enhancements** - Agent forwarding, stability fixes, tunnel services
+- **Flatpak applications** - Slack, Obsidian, GNOME Boxes, utilities
+- **System optimizations** - Sleep fixes, display management, NFS exports
+
+### General Features
+- **Modular setup system**: Automated configuration via bash scripts
 - **Automated builds**: GitHub Actions for continuous integration
 - **Easy deployment**: Works on new installs and existing systems
+- **Hardware optimizations**: NVIDIA GPU support, gaming optimizations
 
 ## Quick Start
 
@@ -26,7 +45,8 @@ For completely new systems, follow these steps:
 
 1. **Install standard Bazzite first**:
    - Download from [bazzite.gg](https://bazzite.gg)
-   - Choose the base variant that matches your hardware
+   - For desktop: Choose **Bazzite DX** variant (NVIDIA for desktop GPUs)
+   - For handheld: Choose the base Bazzite Deck variant
    - Flash to USB and install normally
 
 2. **Switch to custom variant** (after first boot):
@@ -48,7 +68,7 @@ Rebase to the custom variant:
 # For ROG Ally X (handheld)
 sudo rpm-ostree rebase ostree-unverified-registry:ghcr.io/superterran/bazzite:handheld
 
-# For Desktop with NVIDIA
+# For Desktop with NVIDIA (DX-based variant)
 sudo rpm-ostree rebase ostree-unverified-registry:ghcr.io/superterran/bazzite:desktop
 
 # Reboot to apply changes
@@ -73,38 +93,36 @@ curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/setup.sh | 
 curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/setup.sh | bash -s -- handheld
 ```
 
-This will (common modules):
-- Install common Flatpak applications (Slack, Obsidian, etc.)
-- Enable user services (ollama, sunshine) when available
-- Set up shell and development directories
+**Common setup (all variants):**
+- Install 1Password with SSH agent integration
+- Install Warp Terminal
+- Install Flatpak applications (Slack, Obsidian, GNOME Boxes, utilities)
+- Configure shell environment
 
-### Desktop-Specific Setup
-For desktop systems that need OpenRGB configuration:
-
-```bash
-# Download and run the setup script
-curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/setup.sh | bash
-```
-
-This will:
-- Install and configure OpenRGB with the "Ideal" profile (turns off all RGB lights)
-- Set up OpenRGB to start automatically on login
-- Configure the systemd service for RGB control
+**Desktop-specific setup:**
+- Configure OpenRGB with custom lighting profiles
+- Set up Ollama AI with CUDA GPU acceleration
+- Enable SSH services and agent forwarding
+- Configure NFS exports for network sharing
+- Apply system fixes (sleep/wake, display management)
+- Set up VS Code tunnel for remote development
 
 ## Local Development
 
 Build images locally using just commands:
 
 ```bash
-# Build handheld variant
-ujust build-handheld
+# Build handheld variant (based on bazzite-deck-gnome)
+just build-handheld
 
-# Build desktop variant  
-ujust build-desktop
+# Build desktop variant (based on bazzite-dx-nvidia-gnome)
+just build-desktop
 
 # Build both variants
-ujust build-all
+just build-all
 ```
+
+**Note:** The desktop variant inherits all DX features (VS Code, Docker, development tools) from the base image. The container build only adds repository configurations and GPG keys. All software installation happens via runtime setup scripts.
 
 ## Updating
 

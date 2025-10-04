@@ -4,11 +4,17 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 
 ## Project Overview
 
-This repository builds custom Bazzite OS variants (desktop and handheld) using container-based immutable Linux distribution techniques. Bazzite is based on Universal Blue and uses rpm-ostree for system management.
+This repository builds custom Bazzite OS variants using container-based immutable Linux distribution techniques. Bazzite is based on Universal Blue and uses rpm-ostree for system management. The desktop variant is based on **Bazzite DX** for optimal development experience.
 
 **Key variants:**
-- **Desktop**: `ghcr.io/superterran/bazzite:desktop` - NVIDIA GPU optimized desktop system
+- **Desktop**: `ghcr.io/superterran/bazzite:desktop` - Based on Bazzite DX with NVIDIA GPU optimization
 - **Handheld**: `ghcr.io/superterran/bazzite:handheld` - ROG Ally X optimized handheld system
+
+### DX Base Advantages
+- **Development-ready**: VS Code, Docker, development toolchains pre-configured
+- **Container optimization**: Devcontainer support with proper user mapping
+- **Reduced setup complexity**: Core development tools inherited from DX base
+- **Better integration**: Vetted development environment optimizations
 
 ## Essential Development Commands
 
@@ -76,12 +82,13 @@ docker build --target desktop -t bazzite:desktop .
 ## Architecture and Structure
 
 ### Container Build System
-- **Multi-stage Containerfile**: Builds both desktop and handheld variants from different Bazzite base images
+- **Multi-stage Containerfile**: Builds both desktop and handheld variants
 - **Base images**: 
-  - Handheld: `ghcr.io/ublue-os/bazzite-deck-gnome:latest`
-  - Desktop: `ghcr.io/ublue-os/bazzite-deck-nvidia-gnome:latest`
-- **Build-time customization**: Minimal - only repository configurations are added during build
-- **Runtime setup**: All software installation and configuration happens via modular setup scripts
+  - Desktop: `ghcr.io/ublue-os/bazzite-dx-nvidia-gnome:latest` (DX development variant)
+  - Handheld: `ghcr.io/ublue-os/bazzite-deck-gnome:latest` (Gaming variant)
+- **Minimal build-time changes**: Only repository configurations and GPG keys
+- **DX inheritance**: Leverages pre-configured development environment
+- **Runtime setup**: All software installation and configuration via modular scripts
 
 ### Modular Setup System
 The repository uses a sophisticated modular setup system with execution order control:
@@ -204,17 +211,19 @@ This is an immutable Linux distribution using rpm-ostree:
 
 ## Software Installation Philosophy
 
-**Container-first approach**: For optimal compatibility and system integration on immutable systems like Bazzite:
-- **System packages** (RPM): Install via container build process in Containerfile for best integration
-- **User applications** (Flatpak): Use for sandboxed applications that don't need deep system integration
-- **Development tools** (Homebrew): Use as fallback for tools not available as RPMs
-- **Runtime configuration**: Use setup scripts for user-level configuration only, not installation
+**Container-first approach optimized for DX base**:
+- **DX-provided tools**: Use inherited VS Code, Docker, development toolchains (no reinstallation needed)
+- **Additional system packages** (RPM): 1Password, Warp Terminal via rpm-ostree in setup scripts
+- **User applications** (Flatpak): Slack, Obsidian, utilities via setup scripts
+- **Specialized tools**: Ollama, OpenRGB via runtime configuration scripts
+- **Runtime configuration**: User-level setup only, leverage DX foundation
 
 ## Important Notes
 
+- **DX base**: Desktop variant inherits full development environment from Bazzite DX
 - **Immutable base**: The OS layer is immutable; all customizations happen via layered packages or user-space configuration
 - **Modular design**: Setup scripts are designed to be independently executable and idempotent
 - **Hardware detection**: System automatically detects desktop vs handheld and applies appropriate configurations
 - **Container-first**: Development and deployment use container images as the primary artifact
-- **Installation preference**: RPMs via container build > Flatpaks > Homebrew > rpm-ostree install (requires reboot)
+- **Installation preference**: DX-inherited tools > rpm-ostree install > Flatpaks > Homebrew
 - **Customization workflow**: Always use the modular script approach for system changes to maintain consistency and reproducibility

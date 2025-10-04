@@ -2,6 +2,16 @@
 
 This directory contains modular setup scripts that are executed by `setup.sh` when setting up desktop-specific configurations. The orchestrator runs `common.d` first, then this directory when the target is `desktop`.
 
+The desktop variant is based on **Bazzite DX**, inheriting a pre-configured development environment.
+
+## DX Base Integration
+
+The desktop variant leverages Bazzite DX's pre-configured environment:
+- **VS Code**: Pre-installed and optimized for container development
+- **Docker/Podman**: Configured with proper devcontainer support
+- **Development toolchains**: Node.js, Python, Go, Rust ready out-of-box
+- **Container optimization**: User mapping and permissions pre-configured
+
 ## How it Works
 
 The `setup.sh` script automatically discovers and executes all `.sh` files in lexical order (no executable bit required). This allows for modular, maintainable setup scripts.
@@ -17,25 +27,29 @@ The `setup.sh` script automatically discovers and executes all `.sh` files in le
 
 ## Current Scripts
 
-### Core Applications
+### AI/ML and Development
 - `ollama.sh` - Containerized Ollama with CUDA GPU acceleration via Podman
-- `vscode.sh` - Configures VS Code and podman for optimal devcontainer performance
 
-### System Configuration
-- `display-gamescope.sh` - Configures gamescope to prioritize HDMI over DisplayPort
-- `basic-memory-mcp.sh` - Installs basic-memory MCP server for VS Code and other tools
-- `shell-config.sh` - Sets up shell configuration and development directories
-- `sleep-fix.sh` - Fixes NVIDIA GPU sleep/wake issues and USB wake-up problems
-
-### Hardware & Peripherals
+### Hardware & System Configuration
 - `openrgb.sh` - Configures OpenRGB with custom profiles and systemd service
+- `display-gamescope.sh` - Configures gamescope display prioritization (HDMI over DisplayPort)
+- `sleep-fix.sh` - Fixes NVIDIA GPU sleep/wake issues and USB wake-up problems
+- `shell-config.sh` - Sets up shell configuration and development directories
 
 ### Network & Remote Access
-- `nfs-exports.sh` - Exports all mounted drives and the home directory via NFS for network sharing
-- `ssh.sh` - Enables SSH service for remote connections using ujust
-- `ssh-agent-forwarding.sh` - Implements robust SSH agent forwarding detection and configuration for remote development
-- `ssh-stability.sh` - Fixes SSH stability issues and configuration
-- `vscode-tunnel.sh` - Configures VS Code tunnel for remote development
+- `nfs-exports.sh` - Exports mounted drives and home directory via NFS
+- `ssh.sh` - Enables SSH service for remote connections
+- `ssh-agent-forwarding.sh` - Robust SSH agent forwarding for remote development
+- `ssh-stability.sh` - Fixes SSH stability issues (WiFi power saving, keepalives)
+- `vscode-tunnel.sh` - Configures VS Code tunnel service for remote access
+
+## DX Compatibility
+
+Scripts are designed to work with DX's pre-configured environment:
+- **No VS Code installation**: Uses DX-provided VS Code installation
+- **Container integration**: Leverages DX's optimized Docker/Podman setup
+- **Development workflow**: Builds on DX's container development optimizations
+- **User permissions**: Works with DX's pre-configured user mapping
 
 ## Adding New Scripts
 
@@ -60,9 +74,9 @@ You can test individual scripts by running them directly:
 ```bash
 ./desktop.d/ollama.sh
 # or any script by name:
-./desktop.d/vscode.sh
 ./desktop.d/openrgb.sh
 ./desktop.d/ssh-agent-forwarding.sh
+./desktop.d/vscode-tunnel.sh
 ```
 
 Or run the orchestrator (auto-detects target, or pass `desktop` explicitly):

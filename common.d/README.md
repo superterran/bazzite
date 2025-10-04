@@ -2,6 +2,8 @@
 
 This directory contains modular setup scripts that are executed by `setup.sh` for all system types (both desktop and handheld). The orchestrator runs these scripts first, before any target-specific scripts.
 
+**Note:** The desktop variant is based on Bazzite DX and inherits VS Code, Docker, and development toolchains. These scripts focus on additional applications and user-level configuration.
+
 ## How it Works
 
 The `setup.sh` script automatically discovers and executes all `.sh` files in lexical order (no executable bit required). This allows for modular, maintainable setup scripts shared across all variants.
@@ -31,6 +33,13 @@ The `setup.sh` script automatically discovers and executes all `.sh` files in le
 
 ## Why Some Packages Are Here vs Container Build
 
+### DX Base (Desktop Only)
+**VS Code, Docker, Podman, Development Tools** - Inherited from Bazzite DX:
+- Pre-configured development environment
+- Optimized for container development
+- No installation needed in custom build
+- Focus on leveraging what's already provided
+
 ### Runtime Installation (rpm-ostree in user scripts)
 **1Password GUI** - Installed here because:
 - PostInstall script requires live user session context
@@ -39,24 +48,29 @@ The `setup.sh` script automatically discovers and executes all `.sh` files in le
 - Sets up browser integration with proper permissions
 - Container builds don't have the user context needed for proper setup
 
-### Container Build Installation
-**VS Code, podman-docker** - Installed in Containerfile because:
-- Simple installation with no user-session dependencies
-- System-level integration requirements
-- Better performance and reliability when baked into image
-- No complex postinstall scripts requiring user context
+**Warp Terminal** - Installed here because:
+- Requires user session context for proper setup
+- Benefits from runtime installation flexibility
+- Repository configuration provided in container build
+
+### Container Build (Minimal)
+**Repository configurations only** - Added in Containerfile:
+- 1Password repository and GPG keys
+- Warp Terminal repository and GPG keys
+- No actual package installations at build time
+- All installations happen at runtime for better flexibility
 
 ## Adding New Scripts
 
 To add a new setup script:
 
-1. Create a new `.sh` file with an appropriate numeric prefix
+1. Create a new `.sh` file with a descriptive name (e.g., `application-name.sh`)
 2. Make it executable: `chmod +x your-script.sh`
 3. Follow the existing pattern:
    - Use `set -euo pipefail` for strict error handling
    - Include descriptive echo statements
    - Check if tasks are already completed to make scripts idempotent
-   - Use `SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/..\" && pwd)"` to reference the repo root
+   - Use `SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}").." && pwd)"` to reference the repo root
 
 ## Error Handling
 
