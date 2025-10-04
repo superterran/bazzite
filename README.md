@@ -13,7 +13,7 @@ The desktop variant is based on **Bazzite DX**, which provides a complete develo
 
 **Inherited from Bazzite DX:**
 - **Visual Studio Code** - Pre-configured with dev containers support
-- **Docker & Podman** - Container development with proper user mapping
+- **Podman (with Docker CLI)** - Container development with proper user mapping via podman-docker
 - **Development toolchains** - Node.js, Python, Go, Rust, and more
 - **Distrobox & Toolbox** - Container-based development environments
 - **GitHub CLI & Git** - Version control tools

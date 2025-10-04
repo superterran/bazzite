@@ -6,10 +6,13 @@
 # - Needs to discover human users (UID 1000+) for PolicyKit setup
 # - Creates user-specific desktop integration and browser permissions
 # - Container builds lack the user context needed for proper GUI app setup
+# 
+# The 1Password repository and GPG keys are configured in the container build,
+# but the actual package installation happens here at runtime for proper integration.
 
 set -euo pipefail
 
-echo "Installing 1Password..."
+echo "Installing 1Password via rpm-ostree..."
 
 # Ensure repo is present (repo file shipped under config/yum.repos.d/)
 if ! rpm -q 1password &>/dev/null; then

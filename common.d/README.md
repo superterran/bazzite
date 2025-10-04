@@ -20,23 +20,25 @@ The `setup.sh` script automatically discovers and executes all `.sh` files in le
 ## Current Scripts
 
 ### Security & Authentication
-- `onepassword.sh` - Installs 1Password GUI app via rpm-ostree (requires user-session context)
+- `1password.sh` - Installs 1Password GUI app via rpm-ostree (requires user-session context)
 
 ### Development & Productivity
-- `gnome-boxes.sh` - Installs GNOME Boxes virtualization via Flatpak
 - `obsidian.sh` - Installs Obsidian note-taking app via Flatpak
-- `warp.sh` - Verifies Warp Terminal installation (requires user-session context)
+- `warp.sh` - Installs Warp Terminal via rpm-ostree (requires user-session context)
 
 ### Communication & Utilities
 - `slack.sh` - Installs Slack communication app via Flatpak
-- `utility-flatpaks.sh` - Installs various utility applications via Flatpak
+- `utility-flatpaks.sh` - Installs utility applications (Flatseal, Extension Manager, Mission Center, etc.)
+
+### Notes on DX Base
+**GNOME Boxes** is inherited from Bazzite DX base and does not need installation.
 
 ## Why Some Packages Are Here vs Container Build
 
 ### DX Base (Desktop Only)
-**VS Code, Docker, Podman, Development Tools** - Inherited from Bazzite DX:
-- Pre-configured development environment
-- Optimized for container development
+**VS Code, Podman (with Docker CLI), Development Tools** - Inherited from Bazzite DX:
+- Pre-configured development environment with podman-docker for Docker CLI compatibility
+- Optimized for container development (podman and docker commands work interchangeably)
 - No installation needed in custom build
 - Focus on leveraging what's already provided
 

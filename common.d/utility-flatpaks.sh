@@ -1,12 +1,14 @@
 #!/bin/bash
-# Install common Flatpak apps (idempotent)
+# Install utility Flatpak apps (idempotent)
+# 
+# NOTE: Slack and Obsidian are installed by separate scripts (slack.sh and obsidian.sh)
+# This script installs additional utility applications only.
+
 set -euo pipefail
 
-echo "Installing common Flatpaks..."
+echo "Installing utility Flatpaks..."
 
 flatpak install -y flathub \
-  com.slack.Slack \
-  md.obsidian.Obsidian \
   com.github.tchx84.Flatseal \
   com.mattjakeman.ExtensionManager \
   io.missioncenter.MissionCenter \
@@ -15,4 +17,4 @@ flatpak install -y flathub \
   io.github.flattool.Warehouse \
   || echo "Some Flatpaks may have failed to install, continuing..."
 
-echo "Flatpaks step complete"
+echo "Utility Flatpaks step complete"

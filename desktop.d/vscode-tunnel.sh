@@ -1,6 +1,23 @@
 #!/bin/bash
 # Setup VSCode Tunnel Service
 # This script creates a systemd service to keep VSCode tunnel always available
+# 
+# NOTE: VS Code is provided by Bazzite DX base image - this script only configures
+# the tunnel service for remote access, not installation.
+
+set -euo pipefail
+
+echo "Setting up VSCode tunnel service..."
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/..") && pwd)"
+
+# Check if VSCode is available (should be from DX base)
+if ! command -v code >/dev/null 2>&1; then
+    echo "ERROR: VSCode is not installed. It should be provided by Bazzite DX base."
+    echo "If you're not using Bazzite DX, this system may not be compatible."
+    exit 1
+fietup VSCode Tunnel Service
+# This script creates a systemd service to keep VSCode tunnel always available
 
 set -euo pipefail
 

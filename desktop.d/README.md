@@ -8,7 +8,7 @@ The desktop variant is based on **Bazzite DX**, inheriting a pre-configured deve
 
 The desktop variant leverages Bazzite DX's pre-configured environment:
 - **VS Code**: Pre-installed and optimized for container development
-- **Docker/Podman**: Configured with proper devcontainer support
+- **Podman (with Docker CLI)**: Configured with proper devcontainer support via podman-docker
 - **Development toolchains**: Node.js, Python, Go, Rust ready out-of-box
 - **Container optimization**: User mapping and permissions pre-configured
 
@@ -47,7 +47,7 @@ The `setup.sh` script automatically discovers and executes all `.sh` files in le
 
 Scripts are designed to work with DX's pre-configured environment:
 - **No VS Code installation**: Uses DX-provided VS Code installation
-- **Container integration**: Leverages DX's optimized Docker/Podman setup
+- **Container integration**: Leverages DX's Podman with Docker CLI compatibility (podman-docker)
 - **Development workflow**: Builds on DX's container development optimizations
 - **User permissions**: Works with DX's pre-configured user mapping
 

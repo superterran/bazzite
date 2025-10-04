@@ -11,8 +11,8 @@ This repository builds custom Bazzite OS variants using container-based immutabl
 - **Handheld**: `ghcr.io/superterran/bazzite:handheld` - ROG Ally X optimized handheld system
 
 ### DX Base Advantages
-- **Development-ready**: VS Code, Docker, development toolchains pre-configured
-- **Container optimization**: Devcontainer support with proper user mapping
+- **Development-ready**: VS Code, Podman (with Docker CLI compatibility), development toolchains pre-configured
+- **Container optimization**: Devcontainer support with proper user mapping via podman-docker
 - **Reduced setup complexity**: Core development tools inherited from DX base
 - **Better integration**: Vetted development environment optimizations
 

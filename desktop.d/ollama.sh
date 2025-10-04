@@ -2,6 +2,11 @@
 set -euo pipefail
 
 # Install and configure Ollama with GPU support via Podman container
+# 
+# NOTE: Podman (with Docker CLI compatibility) is provided by Bazzite DX base image.
+# This script uses Podman for systemd-managed containers with CUDA GPU acceleration.
+# Podman commands are compatible with Docker thanks to the podman-docker package in DX.
+
 echo "Setting up containerized Ollama with CUDA GPU acceleration..."
 
 # Check if Ollama container service is already running
@@ -21,9 +26,11 @@ else
     nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv,noheader,nounits
 fi
 
-# Check for Podman and container toolkit
+# Check for Podman (should be from DX base with Docker compatibility)
 if ! command -v podman >/dev/null 2>&1; then
-    echo "ERROR: Podman not found. Container support required."
+    echo "ERROR: Podman not found. It should be provided by Bazzite DX base."
+    echo "Bazzite DX includes podman-docker for Docker CLI compatibility."
+    echo "If you're not using Bazzite DX, this system may not be compatible."
     exit 1
 fi
 
