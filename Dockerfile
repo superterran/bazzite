@@ -1,4 +1,4 @@
-# Multi-target Containerfile for custom Bazzite variants
+# Multi-target Dockerfile for custom Bazzite variants
 
 # Handheld target (ROG Ally X)
 FROM ghcr.io/ublue-os/bazzite-deck-gnome:latest AS handheld

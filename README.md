@@ -124,6 +124,76 @@ just build-all
 
 **Note:** The desktop variant inherits all DX features (VS Code, Docker, development tools) from the base image. The container build only adds repository configurations and GPG keys. All software installation happens via runtime setup scripts.
 
+## Utility Scripts
+
+The repository includes helpful utility scripts in the `bin/` directory:
+
+### Quick Mode Switching
+
+#### `gaming-mode.sh` - Switch to Gaming Mode (One Command)
+Automatically configure Gamescope with HDMI display and restart:
+
+```bash
+./bin/gaming-mode.sh          # Prompts before restart
+./bin/gaming-mode.sh -f       # Force restart without prompt
+./bin/gaming-mode.sh --force  # Same as -f
+```
+
+This convenience script:
+1. Detects and configures HDMI display for Gamescope
+2. Switches session to Gamescope (Gaming Mode)
+3. Prompts to restart GDM (or forces with `-f`)
+
+#### `desktop-mode.sh` - Switch to Desktop Mode (One Command)
+Quickly return to GNOME desktop:
+
+```bash
+./bin/desktop-mode.sh          # Prompts before restart
+./bin/desktop-mode.sh -f       # Force restart without prompt
+./bin/desktop-mode.sh --force  # Same as -f
+```
+
+This convenience script:
+1. Switches session to GNOME (Wayland)
+2. Prompts to restart GDM (or forces with `-f`)
+
+### Advanced Session Management
+
+#### `toggle-session.sh` - Switch between GNOME and Gamescope
+Toggle between desktop and gaming mode sessions with more control:
+
+```bash
+# Toggle between sessions (with prompt)
+./bin/toggle-session.sh
+
+# Toggle and restart immediately
+./bin/toggle-session.sh toggle --restart
+
+# Set specific session
+./bin/toggle-session.sh gnome           # Switch to GNOME
+./bin/toggle-session.sh gamescope -r    # Switch to Gamescope and restart
+
+# Check current session
+./bin/toggle-session.sh current
+```
+
+#### `switch-display.sh` - Manage Gamescope displays
+Control which display is used in Gamescope mode:
+
+```bash
+# List connected displays
+./bin/switch-display.sh list
+
+# Toggle between connected displays
+./bin/switch-display.sh toggle
+
+# Set specific display
+./bin/switch-display.sh HDMI-A-2
+
+# Show current configuration
+./bin/switch-display.sh current
+```
+
 ## Updating
 
 Images are automatically built when changes are pushed to main. To update:

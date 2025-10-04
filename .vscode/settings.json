@@ -8,7 +8,7 @@
   "settings": {
     "files.associations": {
       "justfile": "makefile",
-      "Containerfile": "dockerfile",
+      "Dockerfile": "dockerfile",
       "*.sh": "shellscript"
     },
     "shellcheck.enable": true,

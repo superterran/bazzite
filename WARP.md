@@ -82,7 +82,7 @@ docker build --target desktop -t bazzite:desktop .
 ## Architecture and Structure
 
 ### Container Build System
-- **Multi-stage Containerfile**: Builds both desktop and handheld variants
+- **Multi-stage Dockerfile**: Builds both desktop and handheld variants
 - **Base images**: 
   - Desktop: `ghcr.io/ublue-os/bazzite-dx-nvidia-gnome:latest` (DX development variant)
   - Handheld: `ghcr.io/ublue-os/bazzite-deck-gnome:latest` (Gaming variant)

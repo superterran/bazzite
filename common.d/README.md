@@ -56,7 +56,7 @@ The `setup.sh` script automatically discovers and executes all `.sh` files in le
 - Repository configuration provided in container build
 
 ### Container Build (Minimal)
-**Repository configurations only** - Added in Containerfile:
+**Repository configurations only** - Added in Dockerfile:
 - 1Password repository and GPG keys
 - Warp Terminal repository and GPG keys
 - No actual package installations at build time

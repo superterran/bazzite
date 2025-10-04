@@ -36,6 +36,12 @@ The `setup.sh` script automatically discovers and executes all `.sh` files in le
 - `sleep-fix.sh` - Fixes NVIDIA GPU sleep/wake issues and USB wake-up problems
 - `shell-config.sh` - Sets up shell configuration and development directories
 
+### Utilities (in `../bin/`)
+- `gaming-mode.sh` - One-command switch to Gamescope with HDMI and restart
+- `desktop-mode.sh` - One-command switch to GNOME and restart
+- `toggle-session.sh` - Toggle between GNOME and Gamescope sessions (see main README)
+- `switch-display.sh` - Manage display selection for Gamescope mode
+
 ### Network & Remote Access
 - `nfs-exports.sh` - Exports mounted drives and home directory via NFS
 - `ssh.sh` - Enables SSH service for remote connections

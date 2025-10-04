@@ -6,7 +6,7 @@ This repository builds custom Bazzite OS variants (desktop and handheld) using c
 
 ### Architecture Overview
 - **Base OS**: Universal Blue Bazzite (Fedora-based immutable OS)
-- **Build System**: Multi-stage Containerfile with Just automation
+- **Build System**: Multi-stage Dockerfile with Just automation
 - **Variants**: Desktop (NVIDIA-optimized) and Handheld (ROG Ally X-optimized)
 - **Deployment**: rpm-ostree rebase to container images hosted on GitHub Container Registry
 - **Customization**: Modular bash scripts executed post-installation
@@ -113,7 +113,7 @@ just backup-config
 
 #### Adding New Software
 1. **Determine installation method**:
-   - RPM packages with simple postinstall → Add to Containerfile
+   - RPM packages with simple postinstall → Add to Dockerfile
    - Complex packages requiring user session → Create runtime setup script
    - User applications → Prefer Flatpak installation in setup scripts
 
