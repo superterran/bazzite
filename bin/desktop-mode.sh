@@ -17,19 +17,7 @@ echo ""
 
 # Step 1: Switch to GNOME session
 echo "Step 1/2: Switching to GNOME session..."
-steamos-session-select desktop 2>/dev/null || {
-    # steamos-session-select may exit with error due to SDDM not being available, but still works
-    echo "✓ Session updated (ignoring SDDM warning)"
-}
-
-# Configure GDM to use GNOME session for autologin
-echo "Configuring GDM for Desktop Mode autologin..."
-# Remove any existing DefaultSession lines to avoid duplicates
-sudo sed -i '/^DefaultSession=/d' /etc/gdm/custom.conf
-# Add the DefaultSession line after [daemon] section for GNOME
-sudo sed -i '/^\[daemon\]/a DefaultSession=gnome.desktop' /etc/gdm/custom.conf
-
-echo "✓ GDM configured for Desktop Mode"
+"$SCRIPT_DIR/toggle-session.sh" gnome
 
 echo ""
 

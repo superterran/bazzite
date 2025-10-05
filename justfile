@@ -2,11 +2,11 @@
 
 # Build handheld variant (ROG Ally X)
 build-handheld:
-    docker build --target handheld -t bazzite:handheld .
+    docker build --no-cache --target handheld -t bazzite:handheld .
 
 # Build desktop variant (NVIDIA)
 build-desktop:
-    docker build --target desktop -t bazzite:desktop .
+    docker build --no-cache --target desktop -t bazzite:desktop .
 
 # Build both variants
 build-all: build-handheld build-desktop

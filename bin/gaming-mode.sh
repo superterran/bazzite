@@ -56,27 +56,8 @@ echo ""
 
 # Step 2: Switch to Gamescope session
 echo "Step 2/3: Switching to Gamescope session..."
+"$SCRIPT_DIR/toggle-session.sh" gamescope
 
-# Set user session preference
-steamos-session-select gamescope
-
-# Update AccountsService to use the actual session file (not symlink)
-echo "Updating user session preference..."
-sudo tee /var/lib/AccountsService/users/$(whoami) > /dev/null << EOF
-[User]
-Session=gamescope-session-steam.desktop
-XSession=
-SystemAccount=false
-EOF
-
-# Configure GDM to use gamescope session for autologin
-echo "Configuring GDM for Gaming Mode autologin..."
-# Remove any existing DefaultSession lines first to avoid duplicates
-sudo sed -i '/^DefaultSession=/d' /etc/gdm/custom.conf
-# Add the DefaultSession line after [daemon] section (use the actual file, not symlink)
-sudo sed -i '/^\[daemon\]/a DefaultSession=gamescope-session-steam.desktop' /etc/gdm/custom.conf
-
-echo "✓ GDM configured for Gaming Mode"
 echo ""
 
 # Step 3: Restart GDM

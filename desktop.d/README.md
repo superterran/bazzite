@@ -102,3 +102,40 @@ The `ssh-agent-forwarding.sh` script provides automatic SSH agent detection and 
 - **Shell Integration**: Automatically applies settings when starting new shells
 
 This solves common issues with SSH agent forwarding in remote development environments, ensuring seamless Git operations and SSH key authentication.
+
+## Samba File Sharing (`samba.sh`)
+
+The `samba.sh` script installs and configures Samba file sharing service with full macOS compatibility:
+
+- **Package Installation**: Installs Samba server and common tools via rpm-ostree
+- **Server Configuration**: Sets up server with NetBIOS name "Desktop"
+- **Share Setup**: Configures three shares:
+  - `me`: Home directory (`/var/home/me`) 
+  - `fast`: Fast drive (`/var/mnt/fast`)
+  - `slow`: Slow drive (`/var/mnt/slow`)
+- **User Security**: All shares restricted to user "me" with proper permissions
+- **macOS Compatibility**: Includes Apple VFS modules (fruit, catia, streams_xattr)
+- **SELinux Configuration**: Enables home directory sharing and sets proper contexts
+- **Permission Management**: Fixes directory permissions and ownership automatically
+- **Service Management**: Enables and starts SMB and NetBIOS services
+- **Firewall Configuration**: Opens Samba ports in firewall
+- **User Setup**: Creates Samba user "me" and prompts for password setup
+
+**Critical Fix**: Configures SELinux contexts (`samba_share_t`) for mounted drives - this was essential for macOS compatibility.
+
+Access shares via: `smb://Desktop/[share]` or `smb://[IP]/[share]` using username "me".
+
+The `samba.sh` script installs and configures Samba file sharing service:
+
+- **Package Installation**: Installs Samba server and common tools via rpm-ostree
+- **Server Configuration**: Sets up server with NetBIOS name "DESKTOP"
+- **Share Setup**: Configures three shares:
+  - `me`: Home directory (`/var/home/me`) 
+  - `fast`: Fast drive (`/var/mnt/fast`)
+  - `slow`: Slow drive (`/var/mnt/slow`)
+- **User Security**: All shares restricted to user "me" with forced user/group mapping
+- **Service Management**: Enables and starts SMB and NetBIOS services
+- **Firewall Configuration**: Opens Samba ports in firewall
+- **User Setup**: Creates Samba user "me" and prompts for password setup
+
+Access shares via: `smb://desktop/[share]` or `smb://[IP]/[share]` using username "me".
