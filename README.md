@@ -134,28 +134,24 @@ The repository includes helpful utility scripts in the `bin/` directory:
 Automatically configure Gamescope with HDMI display and restart:
 
 ```bash
-./bin/gaming-mode.sh          # Prompts before restart
-./bin/gaming-mode.sh -f       # Force restart without prompt
-./bin/gaming-mode.sh --force  # Same as -f
+./bin/gaming-mode.sh
 ```
 
 This convenience script:
 1. Detects and configures HDMI display for Gamescope
 2. Switches session to Gamescope (Gaming Mode)
-3. Prompts to restart GDM (or forces with `-f`)
+3. Prompts to restart GDM immediately
 
 #### `desktop-mode.sh` - Switch to Desktop Mode (One Command)
 Quickly return to GNOME desktop:
 
 ```bash
-./bin/desktop-mode.sh          # Prompts before restart
-./bin/desktop-mode.sh -f       # Force restart without prompt
-./bin/desktop-mode.sh --force  # Same as -f
+./bin/desktop-mode.sh
 ```
 
 This convenience script:
 1. Switches session to GNOME (Wayland)
-2. Prompts to restart GDM (or forces with `-f`)
+2. Prompts to restart GDM immediately
 
 ### Advanced Session Management
 
