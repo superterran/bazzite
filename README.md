@@ -190,6 +190,31 @@ Control which display is used in Gamescope mode:
 ./bin/switch-display.sh current
 ```
 
+## Remote Access (SSH)
+
+The desktop variant is configured for secure remote access via SSH on a non-standard port with Cloudflare DDNS:
+
+```bash
+ssh -p 2222 desktop.superterran.net
+```
+
+**SSH client config** (`~/.ssh/config`):
+```
+Host desktop
+    HostName desktop.superterran.net
+    Port 2222
+    User doug
+```
+
+**Security hardening** (applied automatically by `desktop.d/ssh-remote-access.sh`):
+- Public key authentication only (passwords disabled)
+- Non-standard port (2222) to reduce noise
+- Root login disabled, max 3 auth attempts
+- SELinux and firewall configured for port 2222
+- Default SSH port (22) removed from firewall
+
+**Cloudflare DDNS** keeps `desktop.superterran.net` pointed at the current public IP, updating every 5 minutes via a systemd timer. Credentials are stored in `/etc/cloudflare/ddns.env`.
+
 ## Updating
 
 Images are automatically built when changes are pushed to main. To update:
