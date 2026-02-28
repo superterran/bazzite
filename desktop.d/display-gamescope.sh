@@ -1,24 +1,38 @@
 #!/bin/bash
 # Setup Gamescope Display Configuration
-# This script configures gamescope to prioritize HDMI over DisplayPort when available
+# This script configures the gamescope output connector.
+# It checks the preferred connector first, then falls back to auto-detection.
 
 set -euo pipefail
 
 echo "Setting up Gamescope display configuration..."
+
+# Preferred gaming display connector — change this if you move cables
+PREFERRED_CONNECTOR="DP-4"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # Create the necessary directories
 mkdir -p ~/.config/environment.d
 
-# Function to get connected HDMI displays
-get_connected_hdmi() {
-    for status_file in /sys/class/drm/card*/card*-HDMI*/status; do
+# Function to check if a specific connector is connected
+is_connected() {
+    local target="$1"
+    for status_file in /sys/class/drm/card*/card*-"${target}"/status; do
+        if [ -f "$status_file" ] && [ "$(cat "$status_file")" = "connected" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+# Function to get first connected display of a given type (HDMI or DP)
+get_first_connected() {
+    local pattern="$1"
+    for status_file in /sys/class/drm/card*/card*-${pattern}*/status; do
         if [ -f "$status_file" ]; then
             local connector=$(basename $(dirname "$status_file"))
-            local status=$(cat "$status_file")
-            if [ "$status" = "connected" ]; then
-                # Convert card2-HDMI-A-2 to HDMI-A-2
+            if [ "$(cat "$status_file")" = "connected" ]; then
                 echo "$connector" | sed 's/^card[0-9]*-//'
                 return 0
             fi
@@ -27,36 +41,26 @@ get_connected_hdmi() {
     return 1
 }
 
-# Function to get connected DisplayPort displays  
-get_connected_dp() {
-    for status_file in /sys/class/drm/card*/card*-DP*/status; do
-        if [ -f "$status_file" ]; then
-            local connector=$(basename $(dirname "$status_file"))
-            local status=$(cat "$status_file")
-            if [ "$status" = "connected" ]; then
-                # Convert card2-DP-2 to DP-2
-                echo "$connector" | sed 's/^card[0-9]*-//'
-                return 0
-            fi
-        fi
-    done
-    return 1
-}
-
-# Check for connected displays and set preference
+# Determine output connector
 PREFERRED_OUTPUT=""
 
-# First priority: HDMI
-if HDMI_OUTPUT=$(get_connected_hdmi); then
-    PREFERRED_OUTPUT="$HDMI_OUTPUT"
-    echo "Found connected HDMI display: $PREFERRED_OUTPUT"
-# Second priority: DisplayPort  
-elif DP_OUTPUT=$(get_connected_dp); then
-    PREFERRED_OUTPUT="$DP_OUTPUT"
-    echo "Found connected DisplayPort display: $PREFERRED_OUTPUT"
+# First: check if the preferred connector is connected
+if is_connected "$PREFERRED_CONNECTOR"; then
+    PREFERRED_OUTPUT="$PREFERRED_CONNECTOR"
+    echo "Preferred connector $PREFERRED_CONNECTOR is connected."
 else
-    echo "No HDMI or DisplayPort displays found connected"
-    exit 0
+    echo "Preferred connector $PREFERRED_CONNECTOR is not connected, auto-detecting..."
+    # Fallback: first connected DP, then HDMI
+    if DP_OUTPUT=$(get_first_connected "DP"); then
+        PREFERRED_OUTPUT="$DP_OUTPUT"
+        echo "Found connected DisplayPort display: $PREFERRED_OUTPUT"
+    elif HDMI_OUTPUT=$(get_first_connected "HDMI"); then
+        PREFERRED_OUTPUT="$HDMI_OUTPUT"
+        echo "Found connected HDMI display: $PREFERRED_OUTPUT"
+    else
+        echo "No HDMI or DisplayPort displays found connected"
+        exit 0
+    fi
 fi
 
 # Create/update the gamescope environment configuration
