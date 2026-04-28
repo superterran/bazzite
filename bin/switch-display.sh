@@ -124,7 +124,13 @@ set_display() {
     local display="$1"
     
     mkdir -p ~/.config/environment.d
-    echo "OUTPUT_CONNECTOR=$display" > "$GAMESCOPE_CONF"
+    cat > "$GAMESCOPE_CONF" << EOF
+OUTPUT_CONNECTOR=$display
+SCREEN_WIDTH=2560
+SCREEN_HEIGHT=1440
+CUSTOM_REFRESH_RATES=60
+ENABLE_GAMESCOPE_HDR=1
+EOF
     echo "Set gamescope display to: $display"
     echo "Restart gamescope session for changes to take effect."
 }
@@ -137,7 +143,7 @@ case "${1:-}" in
         echo "Commands:"
         echo "  list     - Show all available displays"
         echo "  current  - Show current configuration"
-        echo "  auto     - Run automatic display detection (prioritizes HDMI)"
+        echo "  auto     - Run automatic display detection (prioritizes DP)"
         echo "  toggle   - Toggle between connected displays"
         echo "  DISPLAY_NAME - Set specific display (e.g., HDMI-A-2, DP-2)"
         echo ""
@@ -151,7 +157,7 @@ case "${1:-}" in
         ;;
     "auto")
         echo "Running automatic display configuration..."
-        exec "$(dirname "$0")/../desktop.d/25-setup-gamescope-display.sh"
+        exec "$(dirname "$0")/../desktop.d/display-gamescope.sh"
         ;;
     "toggle")
         toggle_display

@@ -8,7 +8,8 @@ set -euo pipefail
 echo "Setting up Gamescope display configuration..."
 
 # Preferred gaming display connector — change this if you move cables
-PREFERRED_CONNECTOR="DP-4"
+# Currently: HDMI-A-2 at 1440p@60 (stable). DP-4 at 4K was tried but HDMI 4K@60 caused flickering.
+PREFERRED_CONNECTOR="HDMI-A-2"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
@@ -69,6 +70,10 @@ GAMESCOPE_CONF="$HOME/.config/environment.d/10-gamescope-session.conf"
 echo "Setting OUTPUT_CONNECTOR=$PREFERRED_OUTPUT"
 cat > "$GAMESCOPE_CONF" << EOF
 OUTPUT_CONNECTOR=$PREFERRED_OUTPUT
+SCREEN_WIDTH=2560
+SCREEN_HEIGHT=1440
+CUSTOM_REFRESH_RATES=60
+ENABLE_GAMESCOPE_HDR=1
 EOF
 
 echo "Gamescope display configuration updated!"

@@ -7,20 +7,23 @@ This repository builds custom Bazzite OS variants (desktop and handheld) using c
 ### Architecture Overview
 - **Base OS**: Universal Blue Bazzite (Fedora-based immutable OS)
 - **Build System**: Multi-stage Dockerfile with Just automation
-- **Variants**: Desktop (NVIDIA-optimized) and Handheld (ROG Ally X-optimized)
+- **Variants**: Desktop (NVIDIA-optimized) and Handheld (ROG Ally X)
 - **Deployment**: rpm-ostree rebase to container images hosted on GitHub Container Registry
 - **Customization**: Modular bash scripts executed post-installation
 
 ### Directory Structure
 ```
-common.d/        # Scripts run on all system types
-desktop.d/       # Desktop-specific scripts (OpenRGB, SSH, development tools)
-handheld.d/      # Handheld-specific scripts (future use)
+common.d/        # Scripts run on all system types (1Password, Syncthing, Claude CLI, Flatpaks)
+desktop.d/       # Desktop-specific scripts (OpenCode, LiteLLM, Cloudflare, Ollama, SSH, OpenRGB, MCP)
+handheld.d/      # Handheld-specific scripts (ROG Ally X Syncthing config)
 config/          # Configuration files and templates
+├── cloudflared/ # Cloudflare Tunnel config template
+├── litellm/     # LiteLLM proxy config (cost-tiered AI routing)
+├── opencode/    # OpenCode config (Ollama providers + MCP servers)
 ├── openrgb/     # RGB lighting profiles
-├── systemd/     # Systemd service files
-└── yum.repos.d/ # Third-party repository configurations
-bin/             # Utility scripts
+├── systemd/user/# Systemd service unit templates
+└── yum.repos.d/ # Third-party repository configurations (1Password)
+bin/             # Utility scripts (display switching, session toggling)
 .github/         # CI/CD workflows
 ```
 
@@ -61,52 +64,44 @@ echo "[Feature] setup completed successfully"
 ```
 
 #### Container Build Philosophy
-- **Minimal container builds**: Only add repository configs and core packages with simple postinstall scripts
+- **Minimal container builds**: Only add repository configs and GPG keys
 - **Runtime customization**: Use modular setup scripts for complex installations requiring user session context
 - **Package hierarchy**: RPMs in container build > Flatpaks > Homebrew > rpm-ostree install (requires reboot)
 
 ### Key Technologies and Tools
 - **Container Runtime**: Podman with Docker CLI compatibility
-- **Package Managers**: rpm-ostree (system), Flatpak (user apps), RPM (container builds)
+- **Package Managers**: rpm-ostree (system), Flatpak (user apps), Linuxbrew (CLI tools)
 - **Build Automation**: Just (justfile) for command automation
-- **Hardware Support**: NVIDIA GPUs (desktop), OpenRGB for RGB devices, ROG Ally X (handheld)
-- **Development**: VS Code with remote development, SSH tunneling, container development
+- **AI Tools**: OpenCode (web UI), Claude CLI, LiteLLM (routing proxy), Ollama (local models)
+- **MCP Servers**: mcpvault, basic-memory, phpstan, context7, playwright, commerce-extensibility
+- **File Sync**: Syncthing (desktop ↔ ROG Ally)
+- **Tunneling**: Cloudflare Tunnel (opencode.superterran.net)
+- **Security**: 1Password with SSH agent integration
+- **Hardware Support**: NVIDIA GPUs (desktop), OpenRGB, ROG Ally X (handheld)
 
 ### Common Commands and Workflows
 
 #### Building and Testing
 ```bash
-# Build variants
 just build-desktop
 just build-handheld
 just build-all
-
-# Interactive testing
 just run-desktop
 just run-handheld
-
-# Package verification
 just test-desktop-packages
 just test-handheld-packages
-
-# Local deployment testing
 just rebase-desktop-local
 just rebase-handheld-local
 ```
 
 #### Setup and Configuration
 ```bash
-# Run modular setup (auto-detects system type)
-./setup.sh
-just setup
-
-# Force specific target
-./setup.sh desktop
-./setup.sh handheld
-just desktop-setup
-
-# Backup current configuration
-just backup-config
+./setup.sh              # Auto-detect and setup
+just setup              # Same via just
+just desktop-setup      # Desktop only
+just handheld-setup     # Handheld only
+just setup-ally         # Run setup on ROG Ally via SSH
+just backup-config      # Backup current configuration
 ```
 
 ### Development Patterns
@@ -116,43 +111,33 @@ just backup-config
    - RPM packages with simple postinstall → Add to Dockerfile
    - Complex packages requiring user session → Create runtime setup script
    - User applications → Prefer Flatpak installation in setup scripts
+   - CLI tools → Prefer Linuxbrew (avoids rpm-ostree layering and reboots)
 
-2. **Create modular script**:
-   - Place in appropriate directory (common.d/, desktop.d/, handheld.d/)
-   - Use numeric prefix for execution order
-   - Follow idempotent pattern with existence checks
-   - Include progress logging and error handling
+2. **Create modular script** in appropriate directory (common.d/, desktop.d/, handheld.d/)
 
-3. **Testing workflow**:
-   - Test script individually: `./desktop.d/XX-feature-name.sh`
-   - Test via orchestrator: `./setup.sh desktop`
-   - Test container build: `just build-desktop`
-   - Test on actual hardware: `just rebase-desktop-local`
+3. **Add config templates** to `config/` if the tool needs configuration files
+
+4. **Add systemd units** to `config/systemd/user/` if the tool runs as a persistent service
 
 #### Configuration Management
-- Add configuration files to appropriate `config/` subdirectory
-- Create corresponding setup script to deploy configuration
-- Handle both initial setup and configuration updates
-- Consider hardware-specific requirements (desktop vs handheld)
+- Config templates live in `config/` subdirectories
+- Setup scripts deploy configs to `~/.config/` on the target machine
+- Secrets (API keys) use environment files (e.g., `proxy.env`) not committed to git
+- Cloudflare Tunnel credentials are per-machine (not in repo)
 
 ### Error Handling Philosophy
 - Scripts should be safe to re-run (idempotent design)
 - Individual script failures don't stop overall setup process
-- Provide clear progress indication and error reporting
 - Graceful degradation when optional features fail
 - Use `set -euo pipefail` for strict error handling in individual scripts
 
-### Hardware-Specific Considerations
-- **Desktop**: NVIDIA drivers, OpenRGB support, multi-monitor setups, development environment
-- **Handheld**: Gaming optimizations, power management, portable form factor considerations
-- **Auto-detection**: System type detected via DMI information in `setup.sh`
-
 ### AI Assistant Guidelines
 When suggesting code changes or new features:
-- Follow the modular script pattern with numeric prefixes
+- Follow the modular script pattern
 - Consider the container vs runtime installation decision
-- Use existing script templates as reference for style and error handling
+- Use existing script templates as reference for style
 - Account for hardware-specific requirements (desktop vs handheld)
 - Make scripts idempotent and include progress feedback
-- Update relevant README.md files when adding new functionality
-- Respect the execution order system and existing conventions
+- Config templates go in `config/`, not inline in scripts
+- Systemd units go in `config/systemd/user/`
+- Never commit secrets or API keys

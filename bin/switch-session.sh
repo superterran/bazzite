@@ -48,6 +48,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 ACCOUNTS_SERVICE_CONFIG="/var/lib/AccountsService/users/$CURRENT_USER"
+GDM_CONFIG="/etc/gdm/custom.conf"
 BACKUP_DIR="/tmp"
 
 # Check if running as root or with sudo
@@ -107,17 +108,23 @@ else
     fi
 fi
 
-# Skip if already set to desired session
+# Skip if already set to desired session (but still sync GDM config)
 if [[ "$CURRENT_SESSION" == "$NEW_SESSION" ]]; then
     echo "Session is already set to the desired state: $NEW_SESSION"
     case "$NEW_SESSION" in
         "gnome")
             echo "✓ Already in GNOME (Desktop Mode)"
+            GDM_SESSION="gnome-wayland.desktop"
             ;;
         "gamescope-session")
             echo "✓ Already in Gamescope (Gaming Mode)"
+            GDM_SESSION="gamescope-session.desktop"
             ;;
     esac
+    if [[ -f "$GDM_CONFIG" ]]; then
+        sed -i "s/^DefaultSession=.*/DefaultSession=$GDM_SESSION/" "$GDM_CONFIG"
+        echo "GDM DefaultSession synced to: $GDM_SESSION"
+    fi
     exit 0
 fi
 
@@ -141,9 +148,27 @@ else
     fi
 fi
 
-# Verify the change
+# Verify the AccountsService change
 NEW_CURRENT_SESSION=$(grep -E "^Session=" "$ACCOUNTS_SERVICE_CONFIG" | cut -d'=' -f2)
 echo "New session for user '$CURRENT_USER': $NEW_CURRENT_SESSION"
+
+# Also update GDM config to match — prevents crash loop when the new
+# session is different from what GDM is trying to autologin to
+if [[ -f "$GDM_CONFIG" ]]; then
+    case "$NEW_SESSION" in
+        "gnome")
+            GDM_SESSION="gnome-wayland.desktop"
+            ;;
+        "gamescope-session")
+            GDM_SESSION="gamescope-session.desktop"
+            ;;
+        *)
+            GDM_SESSION="${NEW_SESSION}.desktop"
+            ;;
+    esac
+    sed -i "s/^DefaultSession=.*/DefaultSession=$GDM_SESSION/" "$GDM_CONFIG"
+    echo "GDM DefaultSession set to: $GDM_SESSION"
+fi
 
 # Show session information
 case "$NEW_CURRENT_SESSION" in

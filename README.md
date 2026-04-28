@@ -2,192 +2,142 @@
 
 This repository contains custom Bazzite variants optimized for personal setup:
 
+- **Desktop**: `ghcr.io/superterran/bazzite:desktop` (based on Bazzite DX with NVIDIA)
 - **Handheld (ROG Ally X)**: `ghcr.io/superterran/bazzite:handheld`
-- **Desktop**: `ghcr.io/superterran/bazzite:desktop` (based on Bazzite DX)
 
 ## Features
 
 ### Desktop Variant (DX Base)
 
-The desktop variant is based on **Bazzite DX**, which provides a complete development environment out of the box:
-
 **Inherited from Bazzite DX:**
-- **Visual Studio Code** - Pre-configured with dev containers support
-- **Podman (with Docker CLI)** - Container development with proper user mapping via podman-docker
-- **Development toolchains** - Node.js, Python, Go, Rust, and more
-- **Distrobox & Toolbox** - Container-based development environments
-- **GitHub CLI & Git** - Version control tools
-
-**Custom additions via container build:**
-- Repository configurations for 1Password and Warp Terminal
-- GPG keys for third-party repositories
+- Visual Studio Code with dev containers support
+- Podman with Docker CLI compatibility (podman-docker)
+- Development toolchains (Node.js, Python, Go, Rust)
+- Distrobox & Toolbox for container-based dev environments
+- GitHub CLI & Git
 
 **Runtime setup (via setup scripts):**
-- **1Password** - Password manager with SSH agent integration
-- **Warp Terminal** - Modern terminal emulator
-- **OpenRGB** - RGB lighting control with custom profiles
-- **Ollama** - AI/ML tools with CUDA GPU acceleration
-- **SSH enhancements** - Agent forwarding, stability fixes, tunnel services
-- **Flatpak applications** - Slack, Obsidian, GNOME Boxes, utilities
-- **System optimizations** - Sleep fixes, display management, NFS exports
+- **1Password** — Password manager with SSH agent integration
+- **Syncthing** — Continuous file sync between desktop and ROG Ally
+- **Claude CLI** — AI coding assistant with MCP server integrations
+- **OpenCode** — AI coding web UI (port 3333) with Ollama, Poe, and LiteLLM providers
+- **Cloudflare Tunnel** — Exposes OpenCode via `opencode.superterran.net`
+- **LiteLLM Proxy** — AI routing gateway with cost-tiered model selection
+- **MCP Servers** — mcpvault, basic-memory, phpstan, context7, playwright, commerce-extensibility
+- **Ollama** — Local AI models with CUDA GPU acceleration (RTX 4070)
+- **OpenRGB** — RGB lighting control with custom profiles
+- **SSH enhancements** — Agent forwarding, stability fixes, VS Code tunnel
+- **Flatpak applications** — Slack, Obsidian, utilities
+
+### Handheld Variant (ROG Ally X)
+
+**Runtime setup:**
+- **1Password** — SSH agent integration
+- **Syncthing** — Game save and config sync with desktop
+- **Flatpak applications** — Obsidian, utilities
 
 ### General Features
-- **Modular setup system**: Automated configuration via bash scripts
-- **Automated builds**: GitHub Actions for continuous integration
-- **Easy deployment**: Works on new installs and existing systems
-- **Hardware optimizations**: NVIDIA GPU support, gaming optimizations
+- Modular setup system with auto-detection (desktop vs handheld)
+- Automated builds via GitHub Actions
+- Config templates for all services (OpenCode, LiteLLM, Cloudflare Tunnel)
+- Systemd unit templates in `config/systemd/user/`
 
 ## Quick Start
 
-### Fresh Installation (New Systems)
+### Fresh Installation
 
-For completely new systems, follow these steps:
+1. **Install standard Bazzite** from [bazzite.gg](https://bazzite.gg)
+   - Desktop: Choose **Bazzite DX** variant (NVIDIA)
+   - Handheld: Choose base Bazzite Deck variant
 
-1. **Install standard Bazzite first**:
-   - Download from [bazzite.gg](https://bazzite.gg)
-   - For desktop: Choose **Bazzite DX** variant (NVIDIA for desktop GPUs)
-   - For handheld: Choose the base Bazzite Deck variant
-   - Flash to USB and install normally
-
-2. **Switch to custom variant** (after first boot):
+2. **Switch to custom variant:**
    ```bash
-   # Auto-detect and rebase (recommended)
    curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/fresh-install.sh | bash
    ```
 
 3. **Complete setup** (after reboot):
    ```bash
-   # Install apps and configure system (auto-detects desktop/handheld)
    curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/setup.sh | bash
    ```
 
-### For Existing Bazzite Systems
-Rebase to the custom variant:
+### Existing Systems
 
 ```bash
-# For ROG Ally X (handheld)
-sudo rpm-ostree rebase ostree-unverified-registry:ghcr.io/superterran/bazzite:handheld
-
-# For Desktop with NVIDIA (DX-based variant)
+# Desktop with NVIDIA
 sudo rpm-ostree rebase ostree-unverified-registry:ghcr.io/superterran/bazzite:desktop
 
-# Reboot to apply changes
+# ROG Ally X (handheld)
+sudo rpm-ostree rebase ostree-unverified-registry:ghcr.io/superterran/bazzite:handheld
+
 sudo systemctl reboot
 ```
 
-### Post-Rebase Setup
-After rebasing and rebooting, run the setup script:
-
+Then run setup:
 ```bash
-# Smart setup - automatically detects desktop vs handheld
 curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/setup.sh | bash
 ```
 
-To force a specific target:
+## Repository Structure
 
-```bash
-# Desktop-specific modules (runs common first)
-curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/setup.sh | bash -s -- desktop
-
-# Handheld-specific modules (runs common first)
-curl -sSL https://raw.githubusercontent.com/superterran/bazzite/main/setup.sh | bash -s -- handheld
 ```
+common.d/           # Scripts for all systems
+├── 1password.sh    # 1Password with SSH agent
+├── claude.sh       # Claude CLI installation
+├── syncthing.sh    # Syncthing file sync service
+├── obsidian.sh     # Obsidian (Flatpak)
+├── slack.sh        # Slack (Flatpak)
+└── utility-flatpaks.sh
 
-**Common setup (all variants):**
-- Install 1Password with SSH agent integration
-- Install Warp Terminal
-- Install Flatpak applications (Slack, Obsidian, GNOME Boxes, utilities)
-- Configure shell environment
+desktop.d/           # Desktop-only scripts
+├── cloudflared.sh   # Cloudflare Tunnel setup
+├── display-gamescope.sh
+├── litellm.sh       # LiteLLM AI routing proxy
+├── mcp-servers.sh   # MCP server installation
+├── nfs-exports.sh
+├── ollama.sh        # Ollama with CUDA GPU
+├── opencode.sh      # OpenCode Web UI
+├── openrgb.sh
+├── samba.sh
+├── shell-config.sh
+├── sleep-fix.sh
+├── ssh.sh
+├── ssh-agent-forwarding.sh
+├── ssh-remote-access.sh
+├── ssh-stability.sh
+└── vscode-tunnel.sh
 
-**Desktop-specific setup:**
-- Configure OpenRGB with custom lighting profiles
-- Set up Ollama AI with CUDA GPU acceleration
-- Enable SSH services and agent forwarding
-- Configure NFS exports for network sharing
-- Apply system fixes (sleep/wake, display management)
-- Set up VS Code tunnel for remote development
+handheld.d/          # Handheld-only scripts (ROG Ally X)
+├── syncthing.sh     # Handheld-specific sync config
+└── README.md
+
+config/              # Configuration templates
+├── cloudflared/     # Cloudflare Tunnel config template
+├── litellm/         # LiteLLM proxy config (cost-tiered routing)
+├── opencode/        # OpenCode config (Ollama + MCP servers)
+├── openrgb/         # RGB lighting profiles
+├── systemd/user/    # Systemd unit templates
+└── yum.repos.d/     # Package repository configs (1Password)
+
+bin/                 # Utility scripts
+├── ollama-server
+├── switch-display.sh
+├── switch-session.sh
+└── toggle-autologin.sh
+```
 
 ## Local Development
 
-Build images locally using just commands:
-
 ```bash
-# Build handheld variant (based on bazzite-deck-gnome)
-just build-handheld
+just build-desktop        # Build desktop image
+just build-handheld       # Build handheld image
+just build-all            # Build both
 
-# Build desktop variant (based on bazzite-dx-nvidia-gnome)
-just build-desktop
+just setup                # Run setup (auto-detects system)
+just desktop-setup        # Desktop setup
+just handheld-setup       # Handheld setup
+just setup-ally           # Run setup on ROG Ally via SSH
 
-# Build both variants
-just build-all
-```
-
-**Note:** The desktop variant inherits all DX features (VS Code, Docker, development tools) from the base image. The container build only adds repository configurations and GPG keys. All software installation happens via runtime setup scripts.
-
-## Utility Scripts
-
-The repository includes helpful utility scripts in the `bin/` directory:
-
-### Quick Mode Switching
-
-#### `gaming-mode.sh` - Switch to Gaming Mode (One Command)
-Automatically configure Gamescope with HDMI display and restart:
-
-```bash
-./bin/gaming-mode.sh
-```
-
-This convenience script:
-1. Detects and configures HDMI display for Gamescope
-2. Switches session to Gamescope (Gaming Mode)
-3. Prompts to restart GDM immediately
-
-#### `desktop-mode.sh` - Switch to Desktop Mode (One Command)
-Quickly return to GNOME desktop:
-
-```bash
-./bin/desktop-mode.sh
-```
-
-This convenience script:
-1. Switches session to GNOME (Wayland)
-2. Prompts to restart GDM immediately
-
-### Advanced Session Management
-
-#### `toggle-session.sh` - Switch between GNOME and Gamescope
-Toggle between desktop and gaming mode sessions with more control:
-
-```bash
-# Toggle between sessions (with prompt)
-./bin/toggle-session.sh
-
-# Toggle and restart immediately
-./bin/toggle-session.sh toggle --restart
-
-# Set specific session
-./bin/toggle-session.sh gnome           # Switch to GNOME
-./bin/toggle-session.sh gamescope -r    # Switch to Gamescope and restart
-
-# Check current session
-./bin/toggle-session.sh current
-```
-
-#### `switch-display.sh` - Manage Gamescope displays
-Control which display is used in Gamescope mode:
-
-```bash
-# List connected displays
-./bin/switch-display.sh list
-
-# Toggle between connected displays
-./bin/switch-display.sh toggle
-
-# Set specific display
-./bin/switch-display.sh HDMI-A-2
-
-# Show current configuration
-./bin/switch-display.sh current
+just backup-config        # Backup current system config
 ```
 
 ## Remote Access (SSH)
@@ -217,7 +167,7 @@ Host desktop
 
 ## Updating
 
-Images are automatically built when changes are pushed to main. To update:
+Images are automatically rebuilt weekly (Fridays) and on every push to main:
 
 ```bash
 sudo rpm-ostree upgrade

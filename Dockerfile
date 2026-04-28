@@ -7,9 +7,8 @@ FROM ghcr.io/ublue-os/bazzite-deck-gnome:latest AS handheld
 COPY config/yum.repos.d/ /etc/yum.repos.d/
 
 # Import GPG keys for third-party repositories
-RUN rpm --import https://packages.microsoft.com/keys/microsoft.asc && \
-    rpm --import https://releases.warp.dev/linux/keys/warp.asc && \
-    rpm --import https://downloads.1password.com/linux/keys/1password.asc
+RUN rpm --import https://downloads.1password.com/linux/keys/1password.asc && \
+    rpm --import https://packages.microsoft.com/keys/microsoft.asc
 
 RUN ostree container commit
 
@@ -20,7 +19,7 @@ FROM ghcr.io/ublue-os/bazzite-dx-nvidia-gnome:latest AS desktop
 COPY config/yum.repos.d/ /etc/yum.repos.d/
 
 # Import GPG keys for third-party repositories
-RUN rpm --import https://releases.warp.dev/linux/keys/warp.asc && \
-    rpm --import https://downloads.1password.com/linux/keys/1password.asc
+RUN rpm --import https://downloads.1password.com/linux/keys/1password.asc && \
+    rpm --import https://packages.microsoft.com/keys/microsoft.asc
 
 RUN ostree container commit
