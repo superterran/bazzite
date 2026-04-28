@@ -1,0 +1,14 @@
+[Unit]
+Description=Plaud Note Sorter (Claude)
+After=network-online.target obsidian-sync.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+Environment=PATH=/home/me/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/me/.nvm/versions/node/v24.14.0/bin:/usr/local/bin:/usr/bin
+Environment=HOME=/home/me
+Environment="VAULT_DIR=/home/me/Documents/Cloud Vault"
+ExecStart=/bin/bash /home/me/Documents/Cloud\x20Vault/Context/skills/plaud-sorter/scripts/plaud-sort-run.sh
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=plaud-sorter

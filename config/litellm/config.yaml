@@ -1,0 +1,148 @@
+# LiteLLM AI Routing Gateway
+# Poe cost tiers (output $/1M tokens):
+#   nano  → gpt-5-nano           $0.36  trivial lookups, yes/no, autocomplete
+#   fast  → grok-4.1-fast        $0.50  quick questions, boilerplate, summaries
+#   mid   → gpt-4.1-mini         $1.40  general coding, explanations
+#   smart → gemini-2.5-pro       $7.00  hard problems, long context, analysis
+#   max   → claude-sonnet-4.6   $13.00  best quality coding and reasoning
+#   apex  → claude-opus-4.6     $21.00  hardest problems only
+#
+# Complexity router `auto` maps:  SIMPLE→nano  MEDIUM→fast  COMPLEX→smart  REASONING→max
+
+model_list:
+
+  # ─── NANO tier: $0.36/M out ─────────────────────────────────────────────────
+  - model_name: nano
+    litellm_params:
+      model: poe/gpt-5-nano
+      api_key: os.environ/POE_API_KEY
+
+  - model_name: nano
+    litellm_params:
+      model: poe/gpt-4.1-nano
+      api_key: os.environ/POE_API_KEY
+
+  # ─── FAST tier: $0.50/M out ─────────────────────────────────────────────────
+  - model_name: fast
+    litellm_params:
+      model: poe/grok-4.1-fast-non-reasoning
+      api_key: os.environ/POE_API_KEY
+
+  - model_name: fast
+    litellm_params:
+      model: poe/gpt-4o-mini
+      api_key: os.environ/POE_API_KEY
+
+  # ─── MID tier: $1.40/M out ──────────────────────────────────────────────────
+  - model_name: mid
+    litellm_params:
+      model: poe/gpt-4.1-mini
+      api_key: os.environ/POE_API_KEY
+
+  - model_name: mid
+    litellm_params:
+      model: poe/gemini-2.5-flash
+      api_key: os.environ/POE_API_KEY
+
+  # ─── SMART tier: $7.00/M out ────────────────────────────────────────────────
+  - model_name: smart
+    litellm_params:
+      model: poe/gemini-2.5-pro
+      api_key: os.environ/POE_API_KEY
+
+  - model_name: smart
+    litellm_params:
+      model: poe/claude-sonnet-4.6
+      api_key: os.environ/POE_API_KEY
+
+  # ─── MAX tier: $13/M out ────────────────────────────────────────────────────
+  - model_name: max
+    litellm_params:
+      model: poe/claude-sonnet-4.6
+      api_key: os.environ/POE_API_KEY
+
+  - model_name: max
+    litellm_params:
+      model: poe/gpt-5.4
+      api_key: os.environ/POE_API_KEY
+
+  # ─── APEX tier: $21/M out ───────────────────────────────────────────────────
+  - model_name: apex
+    litellm_params:
+      model: poe/claude-opus-4.6
+      api_key: os.environ/POE_API_KEY
+
+  - model_name: apex
+    litellm_params:
+      model: poe/gpt-5.4
+      api_key: os.environ/POE_API_KEY
+
+  # ─── LOCAL: free Ollama ─────────────────────────────────────────────────────
+  - model_name: local
+    litellm_params:
+      model: ollama/qwen2.5-coder:7b
+      api_base: http://localhost:11434
+      stream: true
+
+  # ─── AUTO (complexity-routed) ────────────────────────────────────────────────
+  - model_name: auto
+    litellm_params:
+      model: auto_router/complexity_router
+      complexity_router_config:
+        tiers:
+          SIMPLE: nano
+          MEDIUM: fast
+          COMPLEX: smart
+          REASONING: max
+        tier_boundaries:
+          simple_medium: 0.15
+          medium_complex: 0.35
+          complex_reasoning: 0.60
+      complexity_router_default_model: smart
+
+  # ─── NAMED PASSTHROUGH models ───────────────────────────────────────────────
+  - model_name: claude-opus
+    litellm_params:
+      model: poe/claude-opus-4.6
+      api_key: os.environ/POE_API_KEY
+
+  - model_name: claude-sonnet
+    litellm_params:
+      model: poe/claude-sonnet-4.6
+      api_key: os.environ/POE_API_KEY
+
+  - model_name: claude-haiku
+    litellm_params:
+      model: poe/claude-haiku-4.5
+      api_key: os.environ/POE_API_KEY
+
+  - model_name: gemini-pro
+    litellm_params:
+      model: poe/gemini-2.5-pro
+      api_key: os.environ/POE_API_KEY
+
+  - model_name: gpt-4o
+    litellm_params:
+      model: openai/gpt-4o
+      api_key: os.environ/OPENAI_API_KEY
+
+router_settings:
+  routing_strategy: simple-shuffle
+  num_retries: 2
+  retry_after: 5
+  allowed_fails: 1
+  fallbacks:
+    - nano: [fast]
+    - fast: [mid]
+    - mid: [smart]
+    - smart: [max]
+    - max: [apex]
+
+litellm_settings:
+  set_verbose: false
+  drop_params: true
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  disable_spend_logs: true
+  store_model_in_db: false

@@ -1,0 +1,19 @@
+[Unit]
+Description=Wellbeing MCP Server (HTTP/SSE for remote Claude instances)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/home/me/repos/wellbeing-mcp
+EnvironmentFile=/var/home/me/repos/wellbeing-mcp/.env
+Environment=PATH=/home/linuxbrew/.linuxbrew/bin:/home/me/.local/bin:/usr/local/bin:/usr/bin
+ExecStart=/home/linuxbrew/.linuxbrew/bin/uv run python -m wellbeing_mcp.serve_http
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=wellbeing-mcp-http
+
+[Install]
+WantedBy=default.target

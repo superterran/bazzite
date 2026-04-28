@@ -1,0 +1,19 @@
+[Unit]
+Description=Plaud AI Note Processor Watcher
+After=network-online.target obsidian-sync.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+Environment=PATH=/home/linuxbrew/.linuxbrew/bin:/home/me/.nvm/versions/node/v24.14.0/bin:/usr/local/bin:/usr/bin
+Environment=HOME=/home/me
+EnvironmentFile=/home/me/Context/skills/plaud-ai-watch/config.env
+ExecStart=/home/me/Context/skills/plaud-ai-watch/scripts/plaud-ai-watch.sh
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=plaud-ai-watch
+
+[Install]
+WantedBy=default.target

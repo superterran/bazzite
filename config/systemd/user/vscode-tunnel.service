@@ -1,0 +1,15 @@
+[Unit]
+Description=VSCode Tunnel Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/code tunnel --accept-server-license-terms
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+Environment=DISPLAY=:0
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,15 @@
+[Unit]
+Description=OpenClaw Node Host (Bazzite Desktop)
+After=openclaw-tunnel.service
+Requires=openclaw-tunnel.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/docker run --rm --name openclaw-node --network host -v /home/me/repos:/home/node/repos -v /home/me/.openclaw-node:/home/node/.openclaw -e HOME=/home/node -e OPENCLAW_GATEWAY_TOKEN=random-token docker.io/alpine/openclaw:2026.2.22 node openclaw.mjs node run --host 127.0.0.1 --port 30262 --display-name bazzite-desktop
+ExecStop=-/usr/bin/docker stop openclaw-node
+Restart=always
+RestartSec=5
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

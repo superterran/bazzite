@@ -1,0 +1,15 @@
+[Unit]
+Description=Claude Cowork VM Daemon
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+Environment=PATH=/home/linuxbrew/.linuxbrew/bin:/home/me/.nvm/versions/node/v24.14.0/bin:/usr/local/bin:/usr/libexec:/usr/bin
+Environment=HOME=/home/me
+ExecStart=/home/me/.nvm/versions/node/v24.14.0/bin/node /usr/lib/claude-desktop/node_modules/electron/dist/resources/app.asar.unpacked/cowork-vm-service.js
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

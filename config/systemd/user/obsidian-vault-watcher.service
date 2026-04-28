@@ -1,0 +1,20 @@
+[Unit]
+Description=Obsidian Vault Git Backup Watcher
+After=network-online.target obsidian-sync.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+Environment=PATH=/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin
+Environment=HOME=/home/me
+ExecStart=/home/me/repos/bazzite/bin/vault-watch-push.sh
+Restart=on-failure
+RestartSec=10
+
+# Logging goes to journald
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=vault-watcher
+
+[Install]
+WantedBy=default.target

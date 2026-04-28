@@ -1,0 +1,22 @@
+[Unit]
+Description=Claude Remote Control
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/home/me
+Environment=PATH=/home/me/.local/bin:/home/me/.nvm/versions/node/v24.14.0/bin:/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin
+Environment=HOME=/home/me
+Environment=TERM=dumb
+ExecStart=/home/me/.local/bin/claude remote-control --name desktop --debug-file /home/me/.config/Claude/logs/claude-remote-control.log
+StandardInput=null
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=claude-remote-control
+UMask=077
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

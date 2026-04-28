@@ -1,0 +1,16 @@
+[Unit]
+Description=Task Dispatch MCP HTTP Server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/home/me
+EnvironmentFile=/var/home/me/.env
+Environment=PATH=/home/linuxbrew/.linuxbrew/bin:/home/me/.nvm/versions/node/v24.14.0/bin:/home/me/.local/bin:/usr/local/bin:/usr/bin
+ExecStart=/home/linuxbrew/.linuxbrew/bin/uv run --directory /var/home/me/repos/task-dispatch-mcp python -m task_dispatch_mcp.serve_http
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,15 @@
+[Unit]
+Description=Caddy API Proxy (bearer token auth for AI APIs)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=/home/me/.env
+ExecStart=/home/linuxbrew/.linuxbrew/bin/caddy run --config /home/me/.config/caddy/Caddyfile
+ExecReload=/home/linuxbrew/.linuxbrew/bin/caddy reload --config /home/me/.config/caddy/Caddyfile
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

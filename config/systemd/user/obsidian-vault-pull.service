@@ -1,0 +1,13 @@
+[Unit]
+Description=Obsidian Vault Git Pull (periodic sync from upstream)
+After=network-online.target
+
+[Service]
+Type=oneshot
+Environment=HOME=/home/me
+Environment=PATH=/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin
+WorkingDirectory=/home/me/Documents/Cloud Vault
+ExecStart=/usr/bin/git pull --rebase --autostash origin main
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=vault-pull

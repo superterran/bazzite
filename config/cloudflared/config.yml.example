@@ -1,0 +1,18 @@
+# Cloudflare Tunnel configuration
+# Copy to ~/.cloudflared/config.yml and replace TUNNEL_ID with your actual tunnel ID.
+#
+# Setup:
+#   cloudflared login
+#   cloudflared tunnel create desktop
+#   cloudflared tunnel route dns desktop opencode.superterran.net
+
+tunnel: TUNNEL_ID
+credentials-file: /home/me/.cloudflared/TUNNEL_ID.json
+
+ingress:
+  - hostname: opencode.superterran.net
+    service: http://localhost:3333
+    originRequest:
+      connectTimeout: 30s
+      tlsTimeout: 10s
+  - service: http_status:404

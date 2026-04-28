@@ -5,9 +5,8 @@ After=graphical-session.target
 [Service]
 Type=simple
 ExecStart=/usr/bin/flatpak run org.openrgb.OpenRGB --server -p Ideal
-Restart=on-failure
+Restart=always
 RestartSec=5
-SuccessExitStatus=0
 # If running under Wayland + server mode, DISPLAY is typically not needed.
 # Uncomment if required by your environment:
 # Environment=DISPLAY=:0

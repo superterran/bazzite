@@ -1,0 +1,20 @@
+[Unit]
+Description=Ollama AI Model Server (Docker)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStartPre=-/usr/bin/docker rm -f ollama
+ExecStart=/usr/bin/docker run --rm --name ollama \
+  --gpus all \
+  -v /home/me/.ollama:/root/.ollama \
+  -p 11434:11434 \
+  docker.io/ollama/ollama:latest
+ExecStop=/usr/bin/docker stop ollama
+Restart=on-failure
+RestartSec=10
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target

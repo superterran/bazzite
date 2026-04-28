@@ -1,0 +1,14 @@
+[Unit]
+Description=Obsidian Headless Sync (Cloud Vault)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+Environment=PATH=/home/me/.nvm/versions/node/v24.14.0/bin:/usr/local/bin:/usr/bin
+ExecStart=/home/me/.nvm/versions/node/v24.14.0/bin/ob sync --path "/home/me/Documents/Cloud Vault" --continuous
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=default.target

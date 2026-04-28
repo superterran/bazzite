@@ -1,0 +1,13 @@
+[Unit]
+Description=SSH Tunnel to TrueNAS OpenClaw Gateway
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ssh -F /dev/null -i /home/me/.ssh/id_ed25519_truenas -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -o ExitOnForwardFailure=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/home/me/.ssh/known_hosts -N -L 30262:127.0.0.1:30262 root@closet.local
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

@@ -15,7 +15,7 @@ build-all: build-handheld build-desktop
 run-handheld: build-handheld
     docker run -it --rm bazzite:handheld /bin/bash
 
-# Run desktop variant interactively  
+# Run desktop variant interactively
 run-desktop: build-desktop
     docker run -it --rm bazzite:desktop /bin/bash
 
@@ -48,9 +48,49 @@ setup:
 desktop-setup:
     ./setup.sh desktop
 
+# Handheld-specific setup (ROG Ally)
+handheld-setup:
+    ./setup.sh handheld
+
+# Run setup on ROG Ally via SSH
+setup-ally:
+    ssh ally 'cd ~/repos/bazzite && git pull && ./setup.sh handheld'
+
 # Backup current system configuration
 backup-config:
     ./backup-config.sh
+
+# Capture live user systemd units back into the repo (repo ← live)
+capture-services:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    DST="$(pwd)/config/systemd/user"
+    mkdir -p "$DST"
+    count=0
+    for f in ~/.config/systemd/user/*.service ~/.config/systemd/user/*.timer; do
+        [[ -f "$f" ]] || continue
+        cp "$f" "$DST/$(basename "$f")"
+        echo "  captured: $(basename "$f")"
+        count=$((count+1))
+    done
+    echo "Done — $count unit(s) captured to config/systemd/user/"
+
+# Deploy repo service files → live (~/.config/systemd/user/) and reload
+deploy-services:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    SRC="$(pwd)/config/systemd/user"
+    DST="$HOME/.config/systemd/user"
+    mkdir -p "$DST"
+    count=0
+    for f in "$SRC"/*.service "$SRC"/*.timer; do
+        [[ -f "$f" ]] || continue
+        cp "$f" "$DST/$(basename "$f")"
+        echo "  deployed: $(basename "$f")"
+        count=$((count+1))
+    done
+    systemctl --user daemon-reload
+    echo "Done — $count unit(s) deployed and daemon reloaded"
 
 # Rebase to desktop variant (local testing)
 rebase-desktop-local:
@@ -62,8 +102,8 @@ rebase-handheld-local:
 
 # Test what packages are in the built image
 test-desktop-packages:
-    docker run --rm bazzite:desktop rpm -qa | grep -E "(docker-compose|gnome-boxes|podman-docker|warp-terminal|code|1password)" | sort
+    docker run --rm bazzite:desktop rpm -qa | grep -E "(docker-compose|gnome-boxes|podman-docker|code|1password)" | sort
 
 # Test handheld packages
 test-handheld-packages:
-    docker run --rm bazzite:handheld rpm -qa | grep -E "(docker-compose|gnome-boxes|podman-docker|warp-terminal|code|1password)" | sort
+    docker run --rm bazzite:handheld rpm -qa | grep -E "(1password)" | sort
