@@ -11,7 +11,7 @@ Environment=HOME=/home/me
 Environment=TERM=dumb
 ExecStart=/home/me/.local/bin/claude remote-control --name desktop --debug-file /home/me/.config/Claude/logs/claude-remote-control.log
 StandardInput=null
-StandardOutput=journal
+StandardOutput=null
 StandardError=journal
 SyslogIdentifier=claude-remote-control
 UMask=077

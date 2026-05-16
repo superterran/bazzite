@@ -1,0 +1,62 @@
+# Caddy reverse proxy with bearer token auth for local AI APIs
+# Sits between Cloudflare Tunnel and backend services
+# Tunnel → Caddy → Backend
+
+# Ollama API proxy (bearer token required)
+:11435 {
+	@valid_token header Authorization "Bearer {env.OLLAMA_API_TOKEN}"
+
+	handle @valid_token {
+		reverse_proxy localhost:11434
+	}
+
+	handle {
+		respond "Unauthorized" 401
+	}
+}
+
+# Kokoro TTS proxy (bearer token required)
+:8881 {
+	@valid_token header Authorization "Bearer {env.KOKORO_API_KEY}"
+
+	handle @valid_token {
+		reverse_proxy localhost:8880
+	}
+
+	handle {
+		respond "Unauthorized" 401
+	}
+}
+
+# Speaches STT proxy (bearer token required)
+:8001 {
+	@valid_token header Authorization "Bearer {env.SPEACHES_API_KEY}"
+
+	handle @valid_token {
+		reverse_proxy localhost:8000
+	}
+
+	handle {
+		respond "Unauthorized" 401
+	}
+}
+
+# Basic Memory MCP proxy (bearer token required)
+# Backend: basic-memory-mcp-http.service on 127.0.0.1:8767/mcp (streamable-http)
+# Accepts auth as Authorization: Bearer <key>  OR  ?token=<key> (Claude.ai connector compatibility)
+:8003 {
+	@header_auth header Authorization "Bearer {env.BASIC_MEMORY_API_KEY}"
+	@query_auth query token={env.BASIC_MEMORY_API_KEY}
+
+	handle @header_auth {
+		reverse_proxy 127.0.0.1:8767
+	}
+
+	handle @query_auth {
+		reverse_proxy 127.0.0.1:8767
+	}
+
+	handle {
+		respond "Unauthorized" 401
+	}
+}
