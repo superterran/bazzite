@@ -1,0 +1,17 @@
+[Unit]
+Description=Headless GNOME compositor (Wayland socket for Sunshine)
+ConditionPathExists=/usr/bin/gnome-shell
+
+[Service]
+Type=simple
+Environment=PATH=/usr/local/bin:/usr/bin
+ExecStart=/home/me/repos/bazzite/bin/gnome-headless-session.sh
+Restart=on-failure
+RestartSec=10
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=gnome-headless
+
+[Install]
+WantedBy=default.target
