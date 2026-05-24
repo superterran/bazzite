@@ -1,0 +1,13 @@
+[Unit]
+Description=Claude Code session log sweep — every 15 min
+Documentation=Catches Claude Code sessions that didn't trigger SessionEnd (terminal closed, suspend, Ctrl-C, machine reboot). Pairs with ~/.claude/hooks/session-end-log.sh which catches clean exits.
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=15min
+# Don't run if the machine was off when this should have fired.
+Persistent=true
+Unit=claude-session-sweep.service
+
+[Install]
+WantedBy=timers.target

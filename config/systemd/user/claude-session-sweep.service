@@ -1,0 +1,13 @@
+[Unit]
+Description=Claude Code session log sweep — catches dangling sessions
+Documentation=https://code.claude.com/docs/en/hooks
+After=network-online.target
+
+[Service]
+Type=oneshot
+Environment=IDLE_MIN=5
+ExecStart=%h/.claude/hooks/session-sweep.sh
+# Don't restart on failure — the timer will retry on next firing.
+# Logs go to /tmp/claude-session-sweep.log + journal.
+StandardOutput=journal
+StandardError=journal
