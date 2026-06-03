@@ -41,6 +41,29 @@ ssh closet 'docker exec gmail-watcher sh -lc "printf \"SLACK_BOT_TOKEN=%s\nSLACK
 
 `SLACK_TARGET=U0AELPY5KHV` is Doug's Slack user id → alarms arrive as a DM.
 
+## Netdata Cloud (claimed 2026-06-03)
+
+Node `desktop` is claimed to Netdata Cloud (claimed_id `c3905699…`) so the
+Netdata mobile app gets the dashboard + push alerts. This build claims **only
+via env vars at container startup** (no in-agent claim command); the claim then
+persists in the `netdatalib` volume, so it's a one-time step:
+
+```bash
+# token comes from Netdata Cloud → Space → Connect Nodes — NOT committed here
+systemctl --user stop netdata.service
+docker run -d --name netdata \
+  -v netdataconfig:/etc/netdata -v netdatalib:/var/lib/netdata -v netdatacache:/var/cache/netdata \
+  -e NETDATA_CLAIM_TOKEN=<token> \
+  -e NETDATA_CLAIM_ROOMS=6490e817-29ce-4677-88eb-4c3070a92a27 \
+  -e NETDATA_CLAIM_URL=https://app.netdata.cloud \
+  netdata/netdata
+# wait until /var/lib/netdata/cloud.d/claimed_id appears, then:
+docker rm -f netdata && systemctl --user start netdata.service
+# verify: docker exec netdata netdatacli aclk-state | grep Online
+```
+
+Cloud push and the Slack DM notifier run in parallel (redundant on purpose).
+
 ## Reproduce from scratch
 
 ```bash
