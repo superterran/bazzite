@@ -1,0 +1,33 @@
+[Unit]
+Description=Netdata real-time monitoring (CPU/AIO/GPU temps + fans)
+Documentation=https://learn.netdata.cloud/
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStartPre=-/usr/bin/docker rm -f netdata
+# Reads host /sys + /proc so it auto-discovers the nct6799 fans, k10temp,
+# amdgpu and (via --gpus all + nvidia-smi) the RTX 4070. Config + health rules
+# + the Slack notifier token live in the named volumes, so they survive
+# restarts/reboots. See config/netdata/README.md.
+ExecStart=/usr/bin/docker run --rm --name netdata \
+  --hostname desktop \
+  --gpus all \
+  -p 19999:19999 \
+  -v netdataconfig:/etc/netdata \
+  -v netdatalib:/var/lib/netdata \
+  -v netdatacache:/var/cache/netdata \
+  -v /proc:/host/proc:ro \
+  -v /sys:/host/sys:ro \
+  -v /etc/os-release:/host/etc/os-release:ro \
+  --cap-add SYS_PTRACE \
+  --security-opt apparmor=unconfined \
+  netdata/netdata
+ExecStop=/usr/bin/docker stop netdata
+Restart=on-failure
+RestartSec=10
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target

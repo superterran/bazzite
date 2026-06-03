@@ -26,21 +26,27 @@ echo "fan-curve: using $HWMON ($(cat "$HWMON/name"))"
 
 # pwm2 = CPU_FAN header, AIO radiator fan, follows PECI CPU temp.
 # Curve (temp C -> PWM /255):
-#   30C -> 40  (16%)
-#   50C -> 60  (24%)
-#   70C -> 90  (35%)
-#   85C -> 140 (55%)
-#   95C -> 255 (100%)
+#   30C -> 70  (27%)  quiet idle
+#   50C -> 110 (43%)
+#   65C -> 160 (63%)  ramp hard where sustained load lives
+#   75C -> 210 (82%)
+#   85C -> 255 (100%) full tilt 10C below the 95C crit
+#
+# 2026-06-03: replaced the original quiet curve (35% @70C, didn't reach 100%
+# until 95C = crit) after it caused repeated thermal lockups with the AIO
+# radiator running away (radiator hot to the touch, coolant heat-soaking
+# because the fan was held too low to dissipate). Recovery from 97->62C in
+# <1min confirmed the loop/pump are healthy; the curve was the sole problem.
 write_point() {
     local pwm=$1 idx=$2 temp_c=$3 pwm_val=$4
     echo $((temp_c * 1000)) > "$HWMON/pwm${pwm}_auto_point${idx}_temp"
     echo "$pwm_val"          > "$HWMON/pwm${pwm}_auto_point${idx}_pwm"
 }
 
-write_point 2 1 30 40
-write_point 2 2 50 60
-write_point 2 3 70 90
-write_point 2 4 85 140
-write_point 2 5 95 255
+write_point 2 1 30 70
+write_point 2 2 50 110
+write_point 2 3 65 160
+write_point 2 4 75 210
+write_point 2 5 85 255
 
 echo "fan-curve: applied quiet curve to pwm2 (CPU_FAN / AIO radiator)"

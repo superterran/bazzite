@@ -1,6 +1,15 @@
 # Configuration backups (contain potentially sensitive data)
 config-backups/
 
+# Secrets — never commit (Netdata Slack notifier token is sourced at runtime)
+slack-thermal.env
+*slack*.env
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
 # Build artifacts and caches
 .cache/
 .buildah/
