@@ -1,15 +1,17 @@
 [Unit]
-Description=OpenRGB - RGB Lighting Control
+Description=OpenRGB - apply lights-off RGB profile
 After=graphical-session.target
+Wants=graphical-session.target
 
 [Service]
-Type=simple
-ExecStart=/usr/bin/flatpak run org.openrgb.OpenRGB --server -p Ideal
-Restart=always
-RestartSec=5
-# If running under Wayland + server mode, DISPLAY is typically not needed.
-# Uncomment if required by your environment:
-# Environment=DISPLAY=:0
+# Oneshot, not a persistent server: the flatpak'd `--server` escaped the unit
+# cgroup and leaked port 6742 into a restart loop. Nothing consumes the SDK
+# server, so we just detect locally and apply the "Ideal" (lights-off) profile.
+# The script waits for all controllers and retries, so the lights reliably go
+# off at boot instead of the RAM staying on its default rainbow.
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/home/me/repos/bazzite/bin/openrgb-apply.sh
 
 [Install]
 WantedBy=default.target

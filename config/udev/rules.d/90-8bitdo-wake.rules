@@ -1,0 +1,9 @@
+# 8BitDo Ultimate Wireless Controller dongle (2dc8:3106).
+# Arm the USB wake source so pressing the orb (or any button) wakes the host
+# from s2idle/S3. Disable autosuspend so the dongle stays powered and the
+# kernel keeps the wake source armed.
+#
+# BIOS still has to permit USB wake — see scripts/tv-control/README.md.
+
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="2dc8", ATTR{idProduct}=="3106", \
+    ATTR{power/wakeup}="enabled", ATTR{power/control}="on"

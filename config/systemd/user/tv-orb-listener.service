@@ -1,0 +1,15 @@
+[Unit]
+Description=8BitDo orb-button → TV input switch (Livingroom TCL)
+After=default.target
+
+[Service]
+Type=simple
+Environment=PATH=/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/var/home/me/repos/bazzite/scripts/tv-control/orb-listener.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

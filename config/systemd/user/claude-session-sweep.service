@@ -5,7 +5,7 @@ After=network-online.target
 
 [Service]
 Type=oneshot
-Environment=IDLE_MIN=5
+Environment=IDLE_MIN=4320
 ExecStart=%h/.claude/hooks/session-sweep.sh
 # Don't restart on failure — the timer will retry on next firing.
 # Logs go to /tmp/claude-session-sweep.log + journal.

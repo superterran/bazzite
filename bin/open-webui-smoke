@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Smoke test for the bazzite open-webui container.
+#
+# Just hits /api/version on the local container. No auth needed for that
+# endpoint. Used by the weekly closet-update report flow.
+
+set -euo pipefail
+
+URL="${OPENWEBUI_URL:-http://127.0.0.1:3000}"
+
+echo "==> GET $URL/api/version"
+resp=$(curl -fsS --max-time 10 "$URL/api/version")
+version=$(echo "$resp" | jq -r '.version // empty' 2>/dev/null)
+
+if [[ -z "$version" ]]; then
+    echo "✗ /api/version returned no version field" >&2
+    echo "  $resp" | head -c 200 >&2; echo >&2
+    exit 1
+fi
+
+echo "  ✓ Open WebUI version: $version"
+echo "OK"

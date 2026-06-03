@@ -126,8 +126,6 @@ set_display() {
     mkdir -p ~/.config/environment.d
     cat > "$GAMESCOPE_CONF" << EOF
 OUTPUT_CONNECTOR=$display
-SCREEN_WIDTH=2560
-SCREEN_HEIGHT=1440
 CUSTOM_REFRESH_RATES=60
 ENABLE_GAMESCOPE_HDR=1
 EOF

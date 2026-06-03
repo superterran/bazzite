@@ -1,0 +1,23 @@
+[Unit]
+Description=Cloudflare quick tunnel for local preview on port %i
+After=network-online.target
+
+# Quick-tunnel template for sharing a local dev server with a public URL.
+# Usage:   systemctl --user start cf-preview@1313
+# Log:     ~/.local/state/cf-preview-%i.log    (URL is at the top)
+# Why systemd: the Claude Code bash sandbox kills detached processes after
+# ~90s. systemd reparents the process to a user scope and keeps it alive.
+
+[Service]
+Type=simple
+# Empty --config skips ~/.cloudflared/config.yml (whose ingress fallthrough
+# returns http_status:404 and breaks quick tunnels).
+ExecStart=/home/linuxbrew/.linuxbrew/bin/cloudflared tunnel --config %h/.local/state/cf-empty.yml --url http://localhost:%i
+ExecStartPre=/usr/bin/install -m 600 /dev/null %h/.local/state/cf-empty.yml
+Restart=on-failure
+RestartSec=3
+StandardOutput=append:%h/.local/state/cf-preview-%i.log
+StandardError=append:%h/.local/state/cf-preview-%i.log
+
+[Install]
+WantedBy=default.target

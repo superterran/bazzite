@@ -1,0 +1,13 @@
+[Unit]
+Description=Apply quiet AIO radiator fan curve (NCT6799)
+After=systemd-modules-load.service
+Requires=systemd-modules-load.service
+ConditionPathExists=/usr/local/bin/fan-curve.sh
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/fan-curve.sh
+
+[Install]
+WantedBy=multi-user.target
