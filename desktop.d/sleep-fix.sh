@@ -1,6 +1,12 @@
 #!/bin/bash
 # Fix Sleep/Wake Issues on NVIDIA Systems
 # This script addresses NVIDIA driver sleep/resume problems and USB wake-up issues
+#
+# NOTE (2026-06-05): s2idle resume is broken on this AMD 9950X + RTX 4070 box and was
+# causing hard-reset lockups. As a 24/7 server it should never suspend at all, so
+# desktop.d/disable-suspend.sh now masks every sleep target and remaps the power key to
+# poweroff. The NVreg_PreserveVideoMemoryAllocations option below stays (harmless); the
+# set-sleep-mode.service it installs is effectively a no-op now since suspend is blocked.
 
 set -euo pipefail
 

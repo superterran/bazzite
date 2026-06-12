@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# desktop-mode — reliably switch from gamescope game mode into a one-shot GNOME
+# desktop session. Logging out of GNOME drops you straight back into game mode.
+#
+# This is the exact mechanism Steam's "Switch to Desktop" uses
+# (steamos-session-select -> gnome-wayland-oneshot -> gnome-session), wrapped so it
+# can be launched as a Steam library tile / shortcut. Added because the in-Steam
+# button is easy to confuse with "exit Big Picture to windowed Steam", which stays
+# inside gamescope and never actually switches sessions.
+#
+# On a Silverblue-based Bazzite image, `steamos-session-select desktop` resolves to
+# gnome-wayland-oneshot.desktop and writes the consume-once sentinel to
+# ~/.config/steamos-session-select. It pkexecs internally; org.valve.steamos.policy
+# makes that passwordless.
+set -euo pipefail
+exec steamos-session-select desktop

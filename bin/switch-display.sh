@@ -129,6 +129,14 @@ OUTPUT_CONNECTOR=$display
 CUSTOM_REFRESH_RATES=60
 ENABLE_GAMESCOPE_HDR=1
 EOF
+    # HDMI-A-2's (forced) EDID caps at 340 MHz TMDS. 4K@60 needs 594 MHz, so with no
+    # SCREEN_WIDTH/HEIGHT gamescope defaults to the TV's native 4K and the link can't
+    # sustain it -> "static image but bad signal" flicker. The EDID offers no mode
+    # between 1440p and 4K, so pin 1440p: the highest clean (HDR-capable) mode here.
+    # Dropping this pin is exactly what caused the 2026-06-05 flicker regression.
+    if [ "$display" = "HDMI-A-2" ]; then
+        printf 'SCREEN_WIDTH=2560\nSCREEN_HEIGHT=1440\n' >> "$GAMESCOPE_CONF"
+    fi
     echo "Set gamescope display to: $display"
     echo "Restart gamescope session for changes to take effect."
 }
