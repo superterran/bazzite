@@ -1,0 +1,11 @@
+[Unit]
+Description=OpenClaw claude-cli OAuth health watchdog (DM Doug on auth break)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/me/repos/bazzite/bin/openclaw-auth-watch.sh
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=openclaw-auth-watch
