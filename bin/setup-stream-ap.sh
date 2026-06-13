@@ -14,7 +14,7 @@ sudo nmcli radio wifi on || true
 sudo nmcli connection delete desk-stream 2>/dev/null || true
 sudo nmcli connection add type wifi ifname "$IFACE" con-name desk-stream autoconnect yes \
   ssid "$SSID" \
-  802-11-wireless.mode ap 802-11-wireless.band a 802-11-wireless.channel 36 \
+  802-11-wireless.mode ap 802-11-wireless.band a 802-11-wireless.channel 149 \
   wifi-sec.key-mgmt wpa-psk wifi-sec.psk "$PSK" \
   ipv4.method shared ipv6.method ignore
 sudo nmcli connection up desk-stream
