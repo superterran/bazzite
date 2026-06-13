@@ -1,5 +1,5 @@
 [Unit]
-Description=OpenClaw dropped-call watchdog (DM Doug on failovers/failed crons/undelivered)
+Description=OpenClaw dropped-call watchdog (alerts pathfinderbros #my-projects on failovers/failed crons/undelivered)
 After=network-online.target
 Wants=network-online.target
 

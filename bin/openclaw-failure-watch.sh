@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# openclaw-failure-watch.sh — DM Doug when OpenClaw drops calls so failures stop
-# being silent. Watches the gateway log for: model failovers, failed crons (after
-# native retries), and undelivered subagent results. Count-delta based: alerts only
-# on NEW failures since the last check. Runs via openclaw-failure-watch.timer (hourly).
+# openclaw-failure-watch.sh — post to pathfinderbros #my-projects when OpenClaw
+# drops calls so failures stop being silent. Watches the gateway log for: model
+# failovers, failed crons (after native retries), and undelivered subagent results.
+# Count-delta based: alerts only on NEW failures since the last check. Runs via
+# openclaw-failure-watch.timer (hourly).
 set -uo pipefail
 
 SSH="ssh -o ConnectTimeout=8 -o BatchMode=yes -i ${HOME}/.ssh/id_ed25519_truenas root@10.0.0.75"
@@ -24,13 +25,15 @@ if [[ "${1:-}" == "--test" ]]; then delta=1; fi
 
 sample=$($SSH "docker exec $OC sh -c 'F=\$(ls -t /tmp/openclaw/openclaw-*.log 2>/dev/null | head -1); grep -hoE \"($PAT)[^\\\"]{0,90}\" \"\$F\" 2>/dev/null | tail -3'" 2>/dev/null)
 
-read -r token target < <($SSH "docker exec gmail-watcher sh -lc 'printf %s\" \"%s \"\$SLACK_BOT_TOKEN\" \"\$SLACK_TARGET\"'" 2>/dev/null)
-if [[ -z "${token:-}" || -z "${target:-}" ]]; then echo "ERROR: no Slack creds from gmail-watcher" >&2; exit 1; fi
+# Alerts post into pathfinderbros #my-projects via OpenClaw's own hobbs_pb Slack
+# connection (no token juggling). Detection above reads the log file directly over
+# docker exec, so it stays gateway-independent; only delivery uses the gateway.
+CHANNEL="${OPENCLAW_ALERT_CHANNEL:-C0B4CGVBGN6}"   # pathfinderbros #my-projects
+ACCOUNT="${OPENCLAW_ALERT_ACCOUNT:-hobbs_pb}"
 
 msg="⚠️ *OpenClaw dropped ${delta} call(s)* in the last hour (failover / failed cron / undelivered result). Latest:
 ${sample:-（check gateway logs)}
 Bots auto-retry now, but flagging so it's not silent."
-http=$(curl -sS -m 10 -o /dev/null -w '%{http_code}' -X POST https://slack.com/api/chat.postMessage \
-    --data-urlencode "token=${token}" --data-urlencode "channel=${target}" \
-    --data-urlencode "text=${msg}" --data-urlencode "unfurl_links=false")
-echo "alerted Doug: $delta new failures (http=$http)"
+b64=$(printf '%s' "$msg" | base64 -w0)
+out=$($SSH "docker exec $OC sh -c 'm=\$(echo $b64 | base64 -d); openclaw message send --account $ACCOUNT --channel slack --to $CHANNEL --text \"\$m\"'" 2>&1 | tail -2)
+echo "alerted #my-projects: $delta new failures -> ${out:-sent}"

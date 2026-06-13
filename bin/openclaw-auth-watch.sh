@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
-# openclaw-auth-watch.sh — DM Doug on Slack when OpenClaw's claude-cli OAuth
-# (Claude subscription) needs a manual re-login, so bots don't silently fall
-# back to Codex / go quiet.
+# openclaw-auth-watch.sh — post to pathfinderbros #my-projects when OpenClaw's
+# claude-cli OAuth (Claude subscription) needs a manual re-login, so bots don't
+# silently go quiet.
 #
 # Signal: the claude-cli ACCESS token rolls ~hourly and auto-refreshes via the
 # refresh token. There is no clean "expires in N days" for the session, so we
 # watch the two things that actually mean "you must reauth":
 #   1. access-token `expires` is well in the PAST and not advancing (refresh chain broke)
 #   2. recent 401 "Invalid authentication credentials" in the gateway log
-# Delivery reuses the same Slack bot token + DM target that Netdata thermal
-# alerts use (pulled at runtime from the gmail-watcher container — never stored here).
+# Delivery goes through OpenClaw's own hobbs_pb Slack connection to #my-projects
+# (no token stored here; Slack send is independent of the broken model auth).
 #
 # Runs via openclaw-auth-watch.timer (systemd --user). Throttles repeat alerts.
 set -uo pipefail
@@ -60,21 +60,19 @@ if [[ "${1:-}" != "--test" && -f "$STATE" ]]; then
     fi
 fi
 
-read -r token target < <($SSH "docker exec gmail-watcher sh -lc 'printf %s\" \"%s \"\$SLACK_BOT_TOKEN\" \"\$SLACK_TARGET\"'" 2>/dev/null)
-if [[ -z "${token:-}" || -z "${target:-}" ]]; then
-    echo "ERROR: could not read Slack creds from gmail-watcher; cannot alert" >&2
-    exit 1
-fi
+# Alerts post into pathfinderbros #my-projects via OpenClaw's own hobbs_pb Slack
+# connection. Sending a Slack message uses the bot token, not model auth, so this
+# still delivers even when claude-cli auth is the thing that's broken — the gateway
+# process just has to be up.
+CHANNEL="${OPENCLAW_ALERT_CHANNEL:-C0B4CGVBGN6}"   # pathfinderbros #my-projects
+ACCOUNT="${OPENCLAW_ALERT_ACCOUNT:-hobbs_pb}"
 
 msg="⚠️ *OpenClaw model auth needs you.* ${reason}.
 Reauth the Claude subscription (claude-cli):
 \`ssh closet docker exec -it ${OC} openclaw models auth login\`
-Until then, agents fall back to Codex (which can cap) and may go silent."
+The fallback chain is all-Claude now, so until this is fixed *every* bot is down — there is no non-Claude model to fall back to."
 
-http=$(curl -sS -m 10 -o /dev/null -w '%{http_code}' -X POST https://slack.com/api/chat.postMessage \
-    --data-urlencode "token=${token}" \
-    --data-urlencode "channel=${target}" \
-    --data-urlencode "text=${msg}" \
-    --data-urlencode "unfurl_links=false")
-echo "alerted Doug (reason: $reason) http=$http"
+b64=$(printf '%s' "$msg" | base64 -w0)
+out=$($SSH "docker exec $OC sh -c 'm=\$(echo $b64 | base64 -d); openclaw message send --account $ACCOUNT --channel slack --to $CHANNEL --text \"\$m\"'" 2>&1 | tail -2)
+echo "alerted #my-projects (reason: $reason) -> ${out:-sent}"
 mkdir -p "$(dirname "$STATE")"; echo "$now_s" > "$STATE"
