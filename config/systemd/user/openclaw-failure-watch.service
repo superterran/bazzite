@@ -1,0 +1,11 @@
+[Unit]
+Description=OpenClaw dropped-call watchdog (DM Doug on failovers/failed crons/undelivered)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/me/repos/bazzite/bin/openclaw-failure-watch.sh
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=openclaw-failure-watch
