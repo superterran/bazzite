@@ -1,0 +1,11 @@
+[Unit]
+Description=Infra dashboard heartbeat — POSTs bazzite systemd/GPU/temp state to hatcher.ltd
+Documentation=github.com/hatcher-ltd/dashboard
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/repos/bazzite/bin/dashboard-heartbeat.sh
+StandardOutput=journal
+StandardError=journal
