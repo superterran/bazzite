@@ -16,9 +16,10 @@ for s in "${WATCH[@]}"; do
 done
 svc_json="{${svc_json%,}}"
 
-failing=$(systemctl --user list-units --state=failed --no-legend --no-pager 2>/dev/null | awk '{print $1}' | sed 's/\.service$//')
-failed=$(printf '%s\n' "$failing" | grep -c . || true); failed=${failed:-0}
-fjson=$(printf '%s\n' $failing | grep -v '^$' | sed 's/.*/"&"/' | paste -sd, -)
+mapfile -t failing < <(systemctl --user list-units --state=failed --no-legend --no-pager 2>/dev/null | grep -oE '[^ ]+\.service' | sed 's/\.service$//')
+failed=0; fjson=""
+for u in "${failing[@]:-}"; do [ -n "$u" ] && { failed=$((failed+1)); fjson+="\"$u\","; }; done
+fjson="${fjson%,}"
 
 # GPU (nvidia) — nulls if absent.
 read -r vram_used vram_total temp < <(nvidia-smi --query-gpu=memory.used,memory.total,temperature.gpu \
