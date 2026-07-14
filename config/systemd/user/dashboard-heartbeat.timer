@@ -3,8 +3,8 @@ Description=Infra dashboard heartbeat — every minute
 Documentation=Pairs with the hatcher-dashboard Worker; a missing ping = the bazzite tile goes red.
 
 [Timer]
-OnBootSec=1min
-OnUnitActiveSec=1min
+OnBootSec=3min
+OnUnitActiveSec=6h
 Unit=dashboard-heartbeat.service
 
 [Install]
