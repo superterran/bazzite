@@ -9,6 +9,7 @@ set -uo pipefail
 SSH="ssh -o ConnectTimeout=8 -o BatchMode=yes -i ${HOME}/.ssh/id_ed25519_truenas root@10.0.0.75"
 OC=ix-openclaw-openclaw-1
 STATE="${XDG_STATE_HOME:-$HOME/.local/state}/openclaw-failure-watch.count"
+TESTMARK=""
 PAT="FailoverError|job run returned error|Subagent announce give up|All models failed"
 
 cur=$($SSH "docker exec $OC sh -c 'F=\$(ls -t /tmp/openclaw/openclaw-*.log 2>/dev/null | head -1); grep -hcE \"$PAT\" \"\$F\" 2>/dev/null || echo 0'" 2>/dev/null)
@@ -20,7 +21,7 @@ mkdir -p "$(dirname "$STATE")"; echo "$cur" > "$STATE"
 # new log file / day rollover -> rebaseline silently
 if [[ "$cur" -lt "$last" ]]; then echo "rebaselined ($last -> $cur)"; exit 0; fi
 delta=$((cur - last))
-if [[ "${1:-}" == "--test" ]]; then delta=1; fi
+if [[ "${1:-}" == "--test" ]]; then delta=1; TESTMARK="🧪 *TEST — ignore* (verifying the dropped-call alert path delivers). "; fi
 [[ "$delta" -le 0 ]] && { echo "ok: no new failures ($cur total today)"; exit 0; }
 
 sample=$($SSH "docker exec $OC sh -c 'F=\$(ls -t /tmp/openclaw/openclaw-*.log 2>/dev/null | head -1); grep -hoE \"($PAT)[^\\\"]{0,90}\" \"\$F\" 2>/dev/null | tail -3'" 2>/dev/null)
@@ -31,9 +32,20 @@ sample=$($SSH "docker exec $OC sh -c 'F=\$(ls -t /tmp/openclaw/openclaw-*.log 2>
 CHANNEL="${OPENCLAW_ALERT_CHANNEL:-C0B4CGVBGN6}"   # pathfinderbros #my-projects
 ACCOUNT="${OPENCLAW_ALERT_ACCOUNT:-hobbs_pb}"
 
-msg="⚠️ *OpenClaw dropped ${delta} call(s)* in the last hour (failover / failed cron / undelivered result). Latest:
+msg="${TESTMARK:-}⚠️ *OpenClaw dropped ${delta} call(s)* in the last hour (failover / failed cron / undelivered result). Latest:
 ${sample:-（check gateway logs)}
 Bots auto-retry now, but flagging so it's not silent."
 b64=$(printf '%s' "$msg" | base64 -w0)
-out=$($SSH "docker exec $OC sh -c 'm=\$(echo $b64 | base64 -d); openclaw message send --account $ACCOUNT --channel slack --to $CHANNEL --text \"\$m\"'" 2>&1 | tail -2)
-echo "alerted #my-projects: $delta new failures -> ${out:-sent}"
+# --json so delivery is CONFIRMED, not assumed. The previous version piped
+# stderr into `tail -2`, so the gateway's unrelated SQLite chatter could look
+# like a successful send — and when the flags went stale (--to -> --target,
+# --text -> --message in OpenClaw 2026.9.x) the bounce scrolled past unnoticed
+# for months. Report the real deliveryStatus; anything else is a failure.
+out=$($SSH "docker exec $OC sh -c 'm=\$(echo $b64 | base64 -d); openclaw message send --json --account $ACCOUNT --channel slack --target $CHANNEL --message \"\$m\"'" 2>/dev/null)
+status=$(printf '%s' "$out" | grep -o '"deliveryStatus"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*"\([^"]*\)"$/\1/')
+if [[ "$status" == "sent" ]]; then
+    echo "alerted #my-projects: $delta new failures (delivery confirmed: sent)"
+else
+    echo "ALERT DELIVERY FAILED for $delta new failures (status=${status:-none}): $(printf '%s' "$out" | tr -d '\n' | head -c 300)" >&2
+    exit 1
+fi
