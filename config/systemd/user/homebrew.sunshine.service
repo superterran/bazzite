@@ -1,0 +1,9 @@
+[Unit]
+Description=Homebrew generated unit for sunshine
+
+[Install]
+WantedBy=default.target
+
+[Service]
+Type=simple
+ExecStart="/home/linuxbrew/.linuxbrew/opt/sunshine/bin/sunshine" "/home/me/.config/sunshine/sunshine.conf"

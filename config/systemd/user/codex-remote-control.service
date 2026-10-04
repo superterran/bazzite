@@ -1,0 +1,22 @@
+[Unit]
+Description=Codex Remote Control
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/var/home/me
+Environment=HOME=/var/home/me
+Environment=PATH=/var/home/me/.local/bin:/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin
+Environment=TERM=dumb
+ExecStart=/var/home/me/.local/bin/codex remote-control start
+ExecStop=/var/home/me/.local/bin/codex remote-control stop
+StandardInput=null
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=codex-remote-control
+UMask=077
+
+[Install]
+WantedBy=default.target

@@ -124,10 +124,14 @@ set_display() {
     local display="$1"
     
     mkdir -p ~/.config/environment.d
+    # HDR disabled 2026-06-13: Moonlight streaming the gamescope mirror via Sunshine
+    # KMS capture + HDR HEVC NVENC contends with the game's GPU load and triggers
+    # Xid 109 (CTX SWITCH TIMEOUT) at the gameplay transition (e.g. Forza Horizon 6).
+    # SDR capture is lighter/more stable. To restore local HDR set this back to 1.
     cat > "$GAMESCOPE_CONF" << EOF
 OUTPUT_CONNECTOR=$display
 CUSTOM_REFRESH_RATES=60
-ENABLE_GAMESCOPE_HDR=1
+ENABLE_GAMESCOPE_HDR=0
 EOF
     # HDMI-A-2's (forced) EDID caps at 340 MHz TMDS. 4K@60 needs 594 MHz, so with no
     # SCREEN_WIDTH/HEIGHT gamescope defaults to the TV's native 4K and the link can't

@@ -1,0 +1,12 @@
+[Unit]
+Description=WiVRn VR streaming server (headless, for Quest 3 over USB/WiFi)
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/flatpak run --command=wivrn-server io.github.wivrn.wivrn
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

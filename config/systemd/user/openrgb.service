@@ -1,7 +1,6 @@
 [Unit]
 Description=OpenRGB - apply lights-off RGB profile
 After=graphical-session.target
-Wants=graphical-session.target
 
 [Service]
 # Oneshot, not a persistent server: the flatpak'd `--server` escaped the unit

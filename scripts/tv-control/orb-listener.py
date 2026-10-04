@@ -4,15 +4,22 @@
 # dependencies = ["evdev>=1.7"]
 # ///
 """
-Watch the 8BitDo Ultimate Wireless Controller for orb-button (BTN_MODE) presses
-and switch the TV to the PC's HDMI input on each press. Reconnects if the device
+Watch the 8BitDo Ultimate Wireless Controller for a LONG-press of the orb button
+(BTN_MODE) and switch the TV to the PC's HDMI input. Quick taps pass through so the
+orb keeps working as the normal Steam/guide button. Reconnects if the device
 disappears (controller sleep, dongle unplug, etc).
 
-Sequence per press:
+Why long-press: a quick orb tap is the Steam guide button and was firing the TV
+switch by accident. The tiny center/Star button can't be used — it's handled in
+controller firmware and emits no event to Linux (verified 2026-06-19), so the orb
+held for LONG_PRESS_SEC is the trigger instead.
+
+Sequence per long-press:
   1. atv.py pause       (best-effort — preserve Apple TV playback position)
   2. tv-switch.sh hdmi2 (the actual TV input switch via ADB/TIF)
 
-Debounces: ignores a press if one fired in the last DEBOUNCE_SEC.
+Fires on release once the orb has been held >= LONG_PRESS_SEC; debounces repeats
+within DEBOUNCE_SEC.
 """
 from __future__ import annotations
 import asyncio
@@ -26,6 +33,7 @@ DEVICE_BY_ID = Path("/dev/input/by-id/usb-8BitDo_Ultimate_Wireless_Controller_91
 DEVICE_NAME_HINT = "8BitDo Ultimate"
 BTN_ORB = ecodes.BTN_MODE  # 316
 DEBOUNCE_SEC = 1.5
+LONG_PRESS_SEC = 1.5  # hold the orb at least this long to trigger the TV switch
 
 SCRIPT_DIR = Path(__file__).parent
 ATV_SCRIPT = SCRIPT_DIR / "atv.py"
@@ -74,16 +82,26 @@ async def _fire_tv_switch() -> None:
 
 
 async def _watch(dev: InputDevice) -> None:
-    print(f"Watching {dev.path} ({dev.name}) for BTN_MODE", flush=True)
+    print(f"Watching {dev.path} ({dev.name}) for BTN_MODE long-press", flush=True)
     last_fire = 0.0
+    press_at: float | None = None
     async for event in dev.async_read_loop():
-        if event.type != ecodes.EV_KEY or event.code != BTN_ORB or event.value != 1:
+        if event.type != ecodes.EV_KEY or event.code != BTN_ORB:
+            continue
+        if event.value == 1:          # press down — start the hold timer
+            press_at = time.monotonic()
+            continue
+        if event.value != 0 or press_at is None:  # only act on release of a tracked press
+            continue
+        held = time.monotonic() - press_at
+        press_at = None
+        if held < LONG_PRESS_SEC:     # quick tap — leave it to Steam
             continue
         now = time.monotonic()
         if now - last_fire < DEBOUNCE_SEC:
             continue
         last_fire = now
-        print("orb pressed → switching TV", flush=True)
+        print(f"orb long-press ({held:.1f}s) → switching TV", flush=True)
         asyncio.create_task(_fire_tv_switch())
 
 

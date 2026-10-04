@@ -7,7 +7,10 @@ Wants=network-online.target
 Type=simple
 WorkingDirectory=/var/home/me
 Environment=PATH=/home/linuxbrew/.linuxbrew/bin:/home/me/.nvm/versions/node/v24.14.0/bin:/usr/local/bin:/usr/bin
-ExecStart=/home/linuxbrew/.linuxbrew/bin/opencode web --port 3333 --hostname 0.0.0.0
+# Bind loopback only: opencode has shell access, and 0.0.0.0 exposed it
+# unauthenticated to every device on the LAN. Reached via the cloudflared
+# tunnel (opencode.superterran.net -> http://localhost:3333, Cloudflare Access).
+ExecStart=/home/linuxbrew/.linuxbrew/bin/opencode web --port 3333 --hostname 127.0.0.1
 Restart=on-failure
 RestartSec=5
 

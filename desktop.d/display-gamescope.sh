@@ -68,10 +68,13 @@ fi
 GAMESCOPE_CONF="$HOME/.config/environment.d/10-gamescope-session.conf"
 
 echo "Setting OUTPUT_CONNECTOR=$PREFERRED_OUTPUT"
+# HDR disabled 2026-06-13: SDR gamescope plane so Sunshine captures/encodes SDR for
+# Moonlight — HDR HEVC NVENC + KMS capture contends with the game and trips Xid 109
+# (CTX SWITCH TIMEOUT) at gameplay transition. Set back to 1 to restore local HDR.
 cat > "$GAMESCOPE_CONF" << EOF
 OUTPUT_CONNECTOR=$PREFERRED_OUTPUT
 CUSTOM_REFRESH_RATES=60
-ENABLE_GAMESCOPE_HDR=1
+ENABLE_GAMESCOPE_HDR=0
 EOF
 
 echo "Gamescope display configuration updated!"

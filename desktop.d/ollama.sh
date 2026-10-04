@@ -90,21 +90,16 @@ echo "Pulling Ollama container image..."
 podman pull docker.io/ollama/ollama:latest
 echo "✅ Container image pulled"
 
-# Start and enable the systemd service
-echo "Starting Ollama container service..."
+# Service unit is installed but intentionally left DISABLED.
+# Ollama (and the rest of the GPU AI stack: kokoro-tts, speaches-stt,
+# caddy-api-proxy) was disabled 2026-06-19 — unused, and its CUDA context
+# timesharing with games triggered Xid 109 CTX SWITCH TIMEOUT → Forza GPU
+# crashes. Re-enable manually if needed:
+#   systemctl --user enable --now ollama.service
+echo "Reloading systemd (ollama.service left disabled by design)..."
 systemctl --user daemon-reload
-systemctl --user enable ollama.service
-systemctl --user start ollama.service
 
-# Verify service is running
-echo "Verifying Ollama container service..."
-if ! systemctl --user is-active ollama.service >/dev/null 2>&1; then
-    echo "ERROR: Ollama container service failed to start"
-    systemctl --user status ollama.service
-    exit 1
-fi
-
-echo "✅ Ollama container service started successfully!"
+echo "✅ Ollama unit installed (disabled). Start with: systemctl --user enable --now ollama.service"
 podman ps | grep ollama
 
 echo ""

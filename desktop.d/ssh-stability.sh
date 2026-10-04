@@ -69,26 +69,25 @@ if [[ ! -f "$SSH_CONFIG_BACKUP" ]]; then
     echo "✓ SSH config backed up to $SSH_CONFIG_BACKUP"
 fi
 
-# Add SSH stability settings if not already present
-SSH_STABILITY_MARKER="# SSH Stability Settings Added by Bazzite Setup"
-if ! grep -q "$SSH_STABILITY_MARKER" /etc/ssh/sshd_config; then
-    echo "Adding SSH stability configuration..."
-    sudo tee -a /etc/ssh/sshd_config > /dev/null <<SSHEOF
-
-$SSH_STABILITY_MARKER
+# Keepalive settings now live in /etc/ssh/sshd_config.d/02-logging.conf.
+#
+# This block used to append to /etc/ssh/sshd_config guarded by a plain
+# `grep -q` marker check. sshd_config is mode 0600 root-owned, so the unprivileged
+# grep always exited non-zero, the guard always passed, and every `just setup`
+# appended another copy — the live file had accumulated 7 duplicate blocks.
+# Check the *effective* config via `sshd -T` instead: authoritative and idempotent.
+if sudo sshd -T 2>/dev/null | grep -q '^clientaliveinterval 60$'; then
+    echo "✓ SSH stability settings already effective (sshd_config.d/02-logging.conf)"
+else
+    echo "Adding SSH stability configuration to sshd_config.d..."
+    sudo tee /etc/ssh/sshd_config.d/02-logging.conf > /dev/null <<'SSHEOF'
+LogLevel INFO
 ClientAliveInterval 60
 ClientAliveCountMax 3
 TCPKeepAlive yes
 SSHEOF
-    
-    echo "✓ SSH server stability settings added"
-    
-    # Reload SSH daemon
-    echo "Reloading SSH daemon..."
-    sudo systemctl reload sshd.service
-    echo "✓ SSH daemon reloaded with new settings"
-else
-    echo "✓ SSH stability settings already configured"
+    sudo sshd -t && sudo systemctl reload sshd.service
+    echo "✓ SSH server stability settings applied and daemon reloaded"
 fi
 
 # 3. Fix SSH Client Configuration

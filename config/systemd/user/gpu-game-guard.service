@@ -1,0 +1,12 @@
+[Unit]
+Description=Free VRAM for Steam games by toggling the GPU AI stack (kokoro/speaches/ollama)
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/repos/bazzite/bin/gpu-game-guard.sh
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
