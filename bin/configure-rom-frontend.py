@@ -68,6 +68,9 @@ def configure(library,artwork):
    ET.SubElement(s,tag).text=value
   for command in saved_commands.get(es,[]):
    s.find('command').set('label','Shared library default');s.append(command)
+  if system=='gc' and not any(c.get('label')=='Road Rage 16:9' for c in s.findall('command')):
+   s.find('command').set('label','Shared library default')
+   ET.SubElement(s,'command',{'label':'Road Rage 16:9'}).text=str(Path.home()/'Applications/launch-road-rage.py')
   gl=ET.Element('gameList');meta_path=artwork/'es-de/metadata'/(es+'.json')
   metadata=json.loads(meta_path.read_text()) if meta_path.exists() else {}
   # Preserve existing play history while replacing stale ROM paths.
@@ -82,6 +85,8 @@ def configure(library,artwork):
    if not f.is_file() or f.suffix.lower() not in extensions.split(): continue
    g=ET.SubElement(gl,'game');ET.SubElement(g,'path').text=str(f)
    values=dict(metadata.get(f.stem,{'name':f.stem}));values.update(history.get(f.stem,{}))
+   if system=='gc' and 'road' in f.stem.lower() and 'rage' in f.stem.lower():
+    values.update(name='The Simpsons: Road Rage',altemulator='Road Rage 16:9')
    for k,v in values.items():
     if k in ['name','desc','rating','releasedate','developer','publisher','genre','players','playcount','lastplayed','favorite','altemulator']: ET.SubElement(g,k).text=v
   counts[es]=len(gl)

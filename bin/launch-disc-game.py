@@ -4,6 +4,13 @@ import configparser,json,os,shutil,subprocess,sys,xml.etree.ElementTree as ET
 from pathlib import Path
 emulator,game=sys.argv[1:3]
 app='info.cemu.Cemu' if emulator=='cemu' else 'org.DolphinEmu.dolphin-emu'
+if emulator=='dolphin':
+ path=Path.home()/'.var/app'/app/'config/dolphin-emu/Dolphin.ini'
+ path.parent.mkdir(parents=True,exist_ok=True)
+ cfg=configparser.ConfigParser(interpolation=None);cfg.optionxform=str;cfg.read(path)
+ if not cfg.has_section('Analytics'):cfg.add_section('Analytics')
+ cfg['Analytics']['Enabled']='False';cfg['Analytics']['PermissionAsked']='True'
+ with path.open('w') as f:cfg.write(f)
 probe="""import ctypes,json
 class GUID(ctypes.Structure):_fields_=[('data',ctypes.c_ubyte*16)]
 s=ctypes.CDLL('libSDL2-2.0.so.0');s.SDL_Init(0x2000)
