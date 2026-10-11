@@ -1,0 +1,28 @@
+{
+  "updated": "2026-10-11",
+  "esdeTheme": {
+    "ThemeVariantTriggers": "true",
+    "Theme": "alekfull-nx-es-de",
+    "ThemeAspectRatio": "automatic",
+    "ThemeColorScheme": "light-original",
+    "ThemeFontSize": "medium",
+    "ThemeLanguage": "none",
+    "ThemeTransitions": "automatic",
+    "ThemeVariant": "gamelist-metadata-on-miximage",
+    "ThemeSet": "alekfull-nx-es-de"
+  },
+  "deckyStable": "v3.2.10",
+  "deckyPluginsRequired": [
+    "SteamGridDB",
+    "IsThereAnyDeal for Deck",
+    "ProtonDB Badges"
+  ],
+  "protonOptionsVerified": [
+    "Proton 11.0",
+    "Proton Experimental",
+    "GE-Proton10-34"
+  ],
+  "muosFrontend": "Preserved existing muOS frontend and theme",
+  "muosSyncStatusTask": "Task Toolkit/Syncthing Tasks/Sync Status",
+  "saveSync": "Not configured; staged backups preserved"
+}
