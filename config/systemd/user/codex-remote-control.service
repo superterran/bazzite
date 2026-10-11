@@ -1,22 +1,28 @@
 [Unit]
-Description=Codex Remote Control
+Description=Codex Remote Control (supervised app-server daemon)
 After=network-online.target
 Wants=network-online.target
+# Never give up: keep retrying through long network outages.
+StartLimitIntervalSec=0
 
 [Service]
-Type=oneshot
-RemainAfterExit=yes
-WorkingDirectory=/var/home/me
-Environment=HOME=/var/home/me
-Environment=PATH=/var/home/me/.local/bin:/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin
+Type=simple
+WorkingDirectory=%h
+Environment=HOME=%h
+Environment=PATH=%h/.local/bin:%h/.nvm/versions/node/v24.14.0/bin:/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:/usr/bin
 Environment=TERM=dumb
-ExecStart=/var/home/me/.local/bin/codex remote-control start
-ExecStop=/var/home/me/.local/bin/codex remote-control stop
+# Daemon stderr lands in ~/.codex/app-server-daemon/app-server.stderr.log; keep errors
+# plus the remote-control connection status lines (Connecting/Connected/errored).
+Environment=RUST_LOG=error,codex_app_server_transport::transport::remote_control=info
+ExecStart=%h/repos/bazzite/bin/codex-remote-control.sh
 StandardInput=null
 StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=codex-remote-control
 UMask=077
+Restart=always
+RestartSec=10
+TimeoutStopSec=30
 
 [Install]
 WantedBy=default.target

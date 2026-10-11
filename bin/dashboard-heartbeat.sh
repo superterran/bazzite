@@ -8,7 +8,7 @@ URL="${DASHBOARD_URL:-https://hatcher-dashboard.doug-hatcher.workers.dev/dashboa
 TOKEN="${HEARTBEAT_TOKEN:?HEARTBEAT_TOKEN not set in ~/.env}"
 
 # Services that should be active. Edit freely.
-WATCH=(cloudflared opencode-web claude-remote-control obsidian-sync netdata task-dispatch-mcp-http)
+WATCH=(cloudflared opencode-web claude-remote-control codex-remote-control obsidian-sync netdata task-dispatch-mcp-http)
 svc_json=""
 for s in "${WATCH[@]}"; do
   state=$(systemctl --user is-active "$s.service" 2>/dev/null || echo unknown)
