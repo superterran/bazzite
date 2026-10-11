@@ -48,9 +48,11 @@ for section in ['config', 'data']:
             path.write_text(old + '\n[Gecko]\n$Fleet 16:9 Widescreen\n' + code +
                             '\n[Gecko_Enabled]\n$Fleet 16:9 Widescreen\n')
 wrapper = str(home / 'Applications/launch-disc-game.py')
+internal_resolution = '3' if (home / 'rom-library').exists() else '6'
 os.execv(wrapper, [wrapper, 'dolphin', str(game),
                      '-C', 'Dolphin.Core.EnableCheats=True',
                      '-C', 'Dolphin.Display.Fullscreen=True',
                      '-C', 'GFX.Settings.AspectRatio=1',
                      '-C', 'GFX.Settings.Crop=True',
+                     '-C', 'GFX.Settings.InternalResolution=' + internal_resolution,
                      '-C', 'GFX.Enhancements.WideScreenHack=False'])

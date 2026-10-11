@@ -24,5 +24,22 @@
   ],
   "muosFrontend": "Preserved existing muOS frontend and theme",
   "muosSyncStatusTask": "Task Toolkit/Syncthing Tasks/Sync Status",
-  "saveSync": "Not configured; staged backups preserved"
+  "saveSync": "Not configured; staged backups preserved",
+  "dolphin": {
+    "saveShare": "rom-saves",
+    "memoryCards": "Per-game GCI folders; states remain local",
+    "desktopSaveRoot": "/var/mnt/fast/rom-saves",
+    "allySaveRoot": "/home/bazzite/rom-saves",
+    "closetSaveRoot": "/mnt/storage/gaming/rom-saves",
+    "versionHistory": 30,
+    "closetVaultBackupEveryMinutes": 15,
+    "roadRage": {
+      "desktopSteamAppID": 2153068925,
+      "allySteamAppID": 3031883452,
+      "SteamInput": "disabled",
+      "desktopInternalResolution": 6,
+      "allyInternalResolution": 3,
+      "cropTo16by9": true
+    }
+  }
 }
