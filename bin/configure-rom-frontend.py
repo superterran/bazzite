@@ -71,6 +71,9 @@ def configure(library,artwork):
   if system=='gc' and not any(c.get('label')=='Road Rage 16:9' for c in s.findall('command')):
    s.find('command').set('label','Shared library default')
    ET.SubElement(s,'command',{'label':'Road Rage 16:9'}).text=str(Path.home()/'Applications/launch-road-rage.py')
+  if system=='gc' and not any(c.get('label')=='ZooCube High Resolution' for c in s.findall('command')):
+   s.find('command').set('label','Shared library default')
+   ET.SubElement(s,'command',{'label':'ZooCube High Resolution'}).text=str(Path.home()/'Applications/launch-zoocube.py')
   gl=ET.Element('gameList');meta_path=artwork/'es-de/metadata'/(es+'.json')
   metadata=json.loads(meta_path.read_text()) if meta_path.exists() else {}
   # Preserve existing play history while replacing stale ROM paths.
@@ -87,6 +90,8 @@ def configure(library,artwork):
    values=dict(metadata.get(f.stem,{'name':f.stem}));values.update(history.get(f.stem,{}))
    if system=='gc' and 'road' in f.stem.lower() and 'rage' in f.stem.lower():
     values.update(name='The Simpsons: Road Rage',altemulator='Road Rage 16:9')
+   if system=='gc' and f.stem.lower().startswith('zoocube'):
+    values.update(name='ZooCube',altemulator='ZooCube High Resolution')
    for k,v in values.items():
     if k in ['name','desc','rating','releasedate','developer','publisher','genre','players','playcount','lastplayed','favorite','altemulator']: ET.SubElement(g,k).text=v
   counts[es]=len(gl)
@@ -96,6 +101,9 @@ def configure(library,artwork):
  launcher=Path.home()/'.local/share/applications/rom-library-es-de.desktop'
  launcher.parent.mkdir(parents=True,exist_ok=True)
  launcher.write_text('[Desktop Entry]\nType=Application\nName=EmulationStation — Shared ROM Library\nExec='+str(Path.home()/'Applications/ES-DE.AppImage')+'\nIcon=applications-games\nCategories=Game;\nTerminal=false\n')
+ if (library/'systems/gc/ZooCube (USA).rvz').exists():
+  game_entry=launcher.parent/'zoocube.desktop'
+  game_entry.write_text('[Desktop Entry]\nType=Application\nName=ZooCube\nExec='+str(Path.home()/'Applications/launch-zoocube.py')+'\nIcon='+str(artwork/'es-de/media/gc/covers/ZooCube (USA).jpg')+'\nCategories=Game;\nTerminal=false\n')
  print(json.dumps({'systems':counts,'ROMDirectory':str(library),'MediaDirectory':str(artwork/'es-de/media'),'backup':str(backup)}))
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--library',required=True);p.add_argument('--artwork',required=True);a=p.parse_args();configure(a.library,a.artwork)

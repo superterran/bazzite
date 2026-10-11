@@ -40,6 +40,14 @@
       "desktopInternalResolution": 6,
       "allyInternalResolution": 3,
       "cropTo16by9": true
+    },
+    "zooCube": {
+      "desktopSteamAppID": 2288926623,
+      "allySteamAppID": 3773253422,
+      "desktopInternalResolution": 6,
+      "allyInternalResolution": 3,
+      "aspectRatio": "4:3",
+      "SteamInput": "disabled"
     }
   }
 }
