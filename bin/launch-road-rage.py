@@ -52,4 +52,5 @@ os.execv(wrapper, [wrapper, 'dolphin', str(game),
                      '-C', 'Dolphin.Core.EnableCheats=True',
                      '-C', 'Dolphin.Display.Fullscreen=True',
                      '-C', 'GFX.Settings.AspectRatio=1',
+                     '-C', 'GFX.Settings.Crop=True',
                      '-C', 'GFX.Enhancements.WideScreenHack=False'])
