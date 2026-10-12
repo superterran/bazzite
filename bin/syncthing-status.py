@@ -7,8 +7,12 @@ def collect(config):
  root=E.parse(config).getroot();key=root.findtext('gui/apikey')
  address=root.findtext('gui/address','127.0.0.1:8384');port=address.rsplit(':',1)[-1]
  def api(route):
-  req=urllib.request.Request('http://127.0.0.1:'+port+'/rest/'+route,headers={'X-API-Key':key})
-  with urllib.request.urlopen(req,timeout=3) as response:return json.load(response)
+  for candidate in dict.fromkeys([port,'7070']):
+   try:
+    req=urllib.request.Request('http://127.0.0.1:'+candidate+'/rest/'+route,headers={'X-API-Key':key})
+    with urllib.request.urlopen(req,timeout=3) as response:return json.load(response)
+   except urllib.error.URLError as error:last_error=error
+  raise last_error
  folders=api('config/folders');devices={d['deviceID']:d.get('name') or 'Device' for d in api('config/devices')}
  connections=api('system/connections')['connections'];result={'checked':datetime.now().strftime('%H:%M:%S'),'connected':[devices.get(i,'Device') for i,c in connections.items() if c.get('connected')],'folders':{}}
  for folder in folders:
