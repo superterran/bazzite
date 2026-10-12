@@ -97,5 +97,35 @@
       "ColecoVision: colecovision.rom"
     ],
     "atari5200BIOS": "Built-in open-source Altirra alternative; reduced compatibility"
-  }
+  },
+  "additionalCores": [
+    {
+      "core": "a5200_libretro",
+      "architecture": "arm64",
+      "source": "https://buildbot.libretro.com/nightly/linux/aarch64/latest/a5200_libretro.so.zip",
+      "sha256": "7998a4b8c9592efd29502da9f9739e4cbcc58e3ffd6ca2495ca46fe78f630c11",
+      "validation": "Loaded core and verified libretro API version 1"
+    },
+    {
+      "core": "gearcoleco_libretro",
+      "architecture": "arm64",
+      "source": "https://buildbot.libretro.com/nightly/linux/aarch64/latest/gearcoleco_libretro.so.zip",
+      "sha256": "4c581e70505ba639047c1a6bf48aa391d55590324048543a4c08b5d71c070bea",
+      "validation": "Loaded core and verified libretro API version 1"
+    },
+    {
+      "core": "a5200_libretro",
+      "architecture": "x86_64",
+      "source": "https://buildbot.libretro.com/nightly/linux/x86_64/latest/a5200_libretro.so.zip",
+      "sha256": "c4db0b8a6b8f7731d4944bda9c8125d7c074d0494c5201aa78abad1ec003675e",
+      "validation": "Loaded core and verified libretro API version 1"
+    },
+    {
+      "core": "gearcoleco_libretro",
+      "architecture": "x86_64",
+      "source": "https://buildbot.libretro.com/nightly/linux/x86_64/latest/gearcoleco_libretro.so.zip",
+      "sha256": "e17432a9f04ad281242f1140754d9e52c02f7fdc33bb124701642667ad20e145",
+      "validation": "Loaded core and verified libretro API version 1"
+    }
+  ]
 }
