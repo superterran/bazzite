@@ -28,6 +28,11 @@ def render(d):
  lines=['SYNCTHING STATUS  '+d['checked'],'','Connected: '+(', '.join(d['connected']) or 'No peers - offline')]
  for fid,title in [('rom-library','ROMs'),('rom-artwork','Artwork'),('rom-saves','Saves')]:
   lines+=['',title+': '+(summary(d['folders'][fid]) if fid in d['folders'] else 'Not configured')]
+ bridge=Path('/mnt/mmc/MUOS/sync-status/save-alias-status.json')
+ if bridge.exists():
+  try:
+   b=json.loads(bridge.read_text());lines+=['','Save mapping: '+b.get('status','Unknown')]
+  except (OSError,ValueError):pass
  lines+=['','Status refreshes every 5 seconds.','Returns to Task Toolkit after 20 seconds.']
  return '\n'.join(lines)
 if __name__=='__main__':

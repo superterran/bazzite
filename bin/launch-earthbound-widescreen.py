@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Launch verified MaternalBound Redux widescreen with shared in-game saves."""
-import os,shutil,sys,xml.etree.ElementTree as ET
+import os,shutil,sys,subprocess,xml.etree.ElementTree as ET
 from pathlib import Path
 home=Path.home();settings=home/'ES-DE/settings/es_settings.xml'
 tree=ET.fromstring('<settings>'+settings.read_text().split('?>',1)[1]+'</settings>')
@@ -21,11 +21,16 @@ for line in (options.read_text() if options.exists() else base.read_text() if ba
 values.update(bsnes_mode7_wsMode='"all"',bsnes_mode7_widescreen='"16:9"',bsnes_mode7_wsobj='"unsafe"')
 options.parent.mkdir(parents=True,exist_ok=True)
 options.write_text(''.join(k+' = '+v+'\n' for k,v in values.items()))
-(save_root/'retroarch/bsnes-hd beta').mkdir(parents=True,exist_ok=True)
+(save_root/'retroarch/bsnes-hd beta/snes').mkdir(parents=True,exist_ok=True)
 states=retro/'states/widescreen';states.mkdir(parents=True,exist_ok=True)
 cfg=runtime/'earthbound-widescreen.cfg'
-cfg.write_text('savefile_directory = "'+str(save_root/'retroarch')+'"\nsavestate_directory = "'+str(states)+'"\nsort_savefiles_enable = "true"\nsort_savefiles_by_content_enable = "false"\nsavefiles_in_content_dir = "false"\nsavestate_auto_load = "false"\ncore_options_path = "'+str(options)+'"\n')
+cfg.write_text('savefile_directory = "'+str(save_root/'retroarch')+'"\nsavestate_directory = "'+str(states)+'"\nsort_savefiles_enable = "true"\nsort_savefiles_by_content_enable = "true"\nsavefiles_in_content_dir = "false"\nsavestate_auto_load = "false"\ncore_options_path = "'+str(options)+'"\n')
 if '--prepare' in sys.argv:
  print('EarthBound widescreen configuration ready:',cfg)
  raise SystemExit(0)
-os.execvp('flatpak',['flatpak','run','org.libretro.RetroArch','--appendconfig='+str(cfg),'-L',str(core),str(rom)])
+helper=home/'.local/bin/rom-save-alias-sync.py'
+if helper.exists():subprocess.run([sys.executable,str(helper)],stdout=subprocess.DEVNULL)
+try:result=subprocess.run(['/usr/bin/flatpak','run','org.libretro.RetroArch','--appendconfig='+str(cfg),'-L',str(core),str(rom)])
+finally:
+ if helper.exists():subprocess.run([sys.executable,str(helper)],stdout=subprocess.DEVNULL)
+raise SystemExit(result.returncode)

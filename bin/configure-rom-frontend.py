@@ -63,13 +63,15 @@ def configure(library,artwork):
   if system in ['gc','wii','wiiu','n3ds']: romdir.mkdir(parents=True,exist_ok=True)
   if not romdir.exists(): raise RuntimeError('Missing ROM directory: '+str(romdir))
   s=ET.SubElement(root,'system')
-  command=(str(Path.home()/'Applications/azahar-gui.AppImage')+' %ROM%' if system=='n3ds' else '/usr/bin/flatpak run info.cemu.Cemu -f -g %ROM%' if system=='wiiu' else '/usr/bin/flatpak run org.DolphinEmu.dolphin-emu -b -e %ROM%' if system in ['gc','wii'] else '/usr/bin/flatpak run org.libretro.RetroArch -L '+str(cores/(core+'_libretro.so'))+' %ROM%')
+  command=(str(Path.home()/'Applications/azahar-gui.AppImage')+' %ROM%' if system=='n3ds' else '/usr/bin/flatpak run info.cemu.Cemu -f -g %ROM%' if system=='wiiu' else '/usr/bin/flatpak run org.DolphinEmu.dolphin-emu -b -e %ROM%' if system in ['gc','wii'] else str(Path.home()/'Applications/launch-shared-retroarch.py')+' -L '+str(cores/(core+'_libretro.so'))+' %ROM%')
   if system in ['gc','wii','wiiu']:
    command=str(Path.home()/'Applications/launch-disc-game.py')+(' cemu' if system=='wiiu' else ' dolphin')+' %ROM%'
   for tag,value in [('name',es),('fullname',title),('path','%ROMPATH%/'+str(rel)),('extension',extensions+' '+extensions.upper()),('command',command),('platform','snes' if system=='sneswidescreen' else 'atarilynx' if system=='lynx' else es),('theme','snes' if system=='sneswidescreen' else 'atarilynx' if system=='lynx' else es)]:
    ET.SubElement(s,tag).text=value
   for command in saved_commands.get(es,[]):
-   s.find('command').set('label','Shared library default');s.append(command)
+   s.find('command').set('label','Shared library default')
+   if command.text and command.text.startswith('/usr/bin/flatpak run org.libretro.RetroArch '):command.text=command.text.replace('/usr/bin/flatpak run org.libretro.RetroArch ',str(Path.home()/'Applications/launch-shared-retroarch.py')+' ',1)
+   s.append(command)
   if system=='gc' and not any(c.get('label')=='Road Rage 16:9' for c in s.findall('command')):
    s.find('command').set('label','Shared library default')
    ET.SubElement(s,'command',{'label':'Road Rage 16:9'}).text=str(Path.home()/'Applications/launch-road-rage.py')

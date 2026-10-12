@@ -24,7 +24,7 @@
   ],
   "muosFrontend": "Preserved existing muOS frontend and theme",
   "muosSyncStatusTask": "Task Toolkit/Syncthing Tasks/Sync Status",
-  "saveSync": "GameCube in-game saves and EarthBound Redux SRAM shared across Bazzite devices with closet backup; other RetroArch saves and Anbernic migration pending",
+  "saveSync": "Namespaced cartridge battery saves shared across desktop, Ally and muOS Anbernic; GameCube saves shared between Bazzite devices; closet receives versioned backups. Save states remain local.",
   "dolphin": {
     "saveShare": "rom-saves",
     "memoryCards": "Per-game GCI folders; states remain local",
@@ -92,7 +92,7 @@
     "targetCRC32": "94a90934",
     "patchSource": "https://github.com/Raid-rgb/Earthbound-Widescreen-patch-for-BSNES-HD",
     "rom": "variants/widescreen/snes/EarthBound-MBR.smc",
-    "save": "retroarch/bsnes-hd beta/EarthBound-MBR.srm",
+    "save": "retroarch/bsnes-hd beta/snes/EarthBound-MBR.srm",
     "saveSHA256AtMigration": "665b622bddf17b3b2290c260eaa61853bb8f0bd9b333fddf7f1849f40a14aa76",
     "desktopSteamAppID": 3742158449,
     "allySteamAppID": 4099386908,
@@ -105,7 +105,7 @@
   },
   "muosReview": {
     "systems": 17,
-    "sharedROMs": 5884,
+    "sharedROMs": 5883,
     "covers": 4402,
     "previews": 4403,
     "artworkFilesInstalled": 8805,
@@ -113,10 +113,9 @@
     "artworkRefreshSeconds": 300,
     "interface": "Existing muOS theme retained",
     "untested": "Per-game compatibility and N64/arcade performance",
-    "missingBIOS": [
-      "ColecoVision: colecovision.rom"
-    ],
-    "atari5200BIOS": "Built-in open-source Altirra alternative; reduced compatibility"
+    "missingBIOS": [],
+    "atari5200BIOS": "Built-in open-source Altirra alternative; reduced compatibility",
+    "colecoBIOS": "Installed from owned library; MD5 2c66f5911e5b42b8ebe113403548eee7"
   },
   "additionalCores": [
     {
@@ -147,5 +146,17 @@
       "sha256": "e17432a9f04ad281242f1140754d9e52c02f7fdc33bb124701642667ad20e145",
       "validation": "Loaded core and verified libretro API version 1"
     }
-  ]
+  ],
+  "cartridgeSaveBridge": {
+    "selectedMarioWorldExits": 36,
+    "marioCanonical": "cartridge/snes/Super Mario World.srm",
+    "wideSaveBytes": 131072,
+    "standardSaveBytes": 2048,
+    "wideProgressOffset": 114688,
+    "progressBytes": 858,
+    "superMetroidProgress": "1h23m, 599 energy, 55 missiles",
+    "stateAutoload": false,
+    "aliasGroups": 5882,
+    "validation": "Six safety tests passed; actual ARM Snes9x loads Mario save; bidirectional Syncthing conversion probe passed; all four nodes report idle with no outstanding files or errors."
+  }
 }
