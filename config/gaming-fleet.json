@@ -24,7 +24,7 @@
   ],
   "muosFrontend": "Preserved existing muOS frontend and theme",
   "muosSyncStatusTask": "Task Toolkit/Syncthing Tasks/Sync Status",
-  "saveSync": "Namespaced cartridge battery saves shared across desktop, Ally and muOS Anbernic; GameCube saves shared between Bazzite devices; closet receives versioned backups. Save states remain local.",
+  "saveSync": "Namespaced cartridge battery saves shared across desktop, Ally, muOS Anbernic and always-on closet hub; closet save folder is sendreceive with 30 versions and separate snapshot-protected backups. Save states remain local.",
   "dolphin": {
     "saveShare": "rom-saves",
     "memoryCards": "Per-game GCI folders; states remain local",
