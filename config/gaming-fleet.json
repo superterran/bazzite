@@ -62,9 +62,29 @@
     ],
     "timer": "steam-artwork-sync.timer",
     "desktopShortcuts": 28,
-    "allyShortcuts": 47,
+    "allyShortcuts": 30,
     "removed": "Mari0: Community Edition",
-    "fallbackSlots": 38
+    "fallbackSlots": 38,
+    "removedStreamingServices": [
+      "YouTube",
+      "Netflix",
+      "Amazon Luna",
+      "Disney+",
+      "Prime Video",
+      "Apple TV",
+      "CuriosityStream",
+      "NVIDIA GeForce NOW",
+      "HBO Max",
+      "Hulu",
+      "Paramount+",
+      "Peacock",
+      "Sling TV",
+      "Spotify",
+      "Vimeo",
+      "Xbox Cloud Gaming",
+      "YouTube Music"
+    ],
+    "allyEmulationStationLauncher": "/home/bazzite/Applications/ES-DE.AppImage"
   },
   "earthbound": {
     "build": "MaternalBound Redux widescreen",
