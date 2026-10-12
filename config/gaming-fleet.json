@@ -24,7 +24,7 @@
   ],
   "muosFrontend": "Preserved existing muOS frontend and theme",
   "muosSyncStatusTask": "Task Toolkit/Syncthing Tasks/Sync Status",
-  "saveSync": "Not configured; staged backups preserved",
+  "saveSync": "GameCube in-game saves and EarthBound Redux SRAM shared across Bazzite devices with closet backup; other RetroArch saves and Anbernic migration pending",
   "dolphin": {
     "saveShare": "rom-saves",
     "memoryCards": "Per-game GCI folders; states remain local",
@@ -49,5 +49,53 @@
       "aspectRatio": "4:3",
       "SteamInput": "disabled"
     }
+  },
+  "steamArtwork": {
+    "share": "rom-artwork/steam",
+    "matching": "Normalized title across device-specific shortcut IDs",
+    "roles": [
+      "portrait",
+      "landscape",
+      "hero",
+      "logo",
+      "icon"
+    ],
+    "timer": "steam-artwork-sync.timer",
+    "desktopShortcuts": 28,
+    "allyShortcuts": 47,
+    "removed": "Mari0: Community Edition",
+    "fallbackSlots": 38
+  },
+  "earthbound": {
+    "build": "MaternalBound Redux widescreen",
+    "sourceCRC32": "28e2abbb",
+    "targetCRC32": "94a90934",
+    "patchSource": "https://github.com/Raid-rgb/Earthbound-Widescreen-patch-for-BSNES-HD",
+    "rom": "variants/widescreen/snes/EarthBound-MBR.smc",
+    "save": "retroarch/bsnes-hd beta/EarthBound-MBR.srm",
+    "saveSHA256AtMigration": "665b622bddf17b3b2290c260eaa61853bb8f0bd9b333fddf7f1849f40a14aa76",
+    "desktopSteamAppID": 3742158449,
+    "allySteamAppID": 4099386908,
+    "validation": "Exact widescreen ROM and bsnes-hd core: save menu recognizes Level 31; Continue loads the party in a bank.",
+    "saveParty": {
+      "Ness": 31,
+      "Paula": 28,
+      "Jeff": 25
+    }
+  },
+  "muosReview": {
+    "systems": 17,
+    "sharedROMs": 5884,
+    "covers": 4402,
+    "previews": 4403,
+    "artworkFilesInstalled": 8805,
+    "emptyPlaceholderFoldersArchived": 8,
+    "artworkRefreshSeconds": 300,
+    "interface": "Existing muOS theme retained",
+    "untested": "Per-game compatibility and N64/arcade performance",
+    "missingBIOS": [
+      "ColecoVision: colecovision.rom"
+    ],
+    "atari5200BIOS": "Built-in open-source Altirra alternative; reduced compatibility"
   }
 }

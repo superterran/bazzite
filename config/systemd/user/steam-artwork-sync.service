@@ -1,0 +1,8 @@
+[Unit]
+Description=Share Steam artwork across the gaming fleet
+After=syncthing.service
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/steam-artwork-sync.py
+TimeoutStartSec=180

@@ -4,6 +4,8 @@ import argparse, json, shutil, re, xml.etree.ElementTree as ET, subprocess
 from pathlib import Path
 from datetime import datetime
 SYSTEMS={
+'atari5200':('atari5200','Atari 5200','a5200','.a52 .bin .zip'),
+'colecovision':('colecovision','ColecoVision','gearcoleco','.col .cv .bin .rom .zip'),
 'arcade':('arcade','Arcade','fbneo','.zip'),
 'atari2600':('atari2600','Atari 2600','stella','.a26 .bin .rom .zip'),
 'atari7800':('atari7800','Atari 7800','prosystem','.a78 .bin .zip'),
@@ -74,6 +76,11 @@ def configure(library,artwork):
   if system=='gc' and not any(c.get('label')=='ZooCube High Resolution' for c in s.findall('command')):
    s.find('command').set('label','Shared library default')
    ET.SubElement(s,'command',{'label':'ZooCube High Resolution'}).text=str(Path.home()/'Applications/launch-zoocube.py')
+  if system in ['snes','sneswidescreen']:
+   s.find('command').set('label','Shared library default')
+   for c in list(s.findall('command')):
+    if c.get('label')=='EarthBound Redux Widescreen':s.remove(c)
+   ET.SubElement(s,'command',{'label':'EarthBound Redux Widescreen'}).text=str(Path.home()/'Applications/launch-earthbound-widescreen.py')
   gl=ET.Element('gameList');meta_path=artwork/'es-de/metadata'/(es+'.json')
   metadata=json.loads(meta_path.read_text()) if meta_path.exists() else {}
   # Preserve existing play history while replacing stale ROM paths.
@@ -92,6 +99,8 @@ def configure(library,artwork):
     values.update(name='The Simpsons: Road Rage',altemulator='Road Rage 16:9')
    if system=='gc' and f.stem.lower().startswith('zoocube'):
     values.update(name='ZooCube',altemulator='ZooCube High Resolution')
+   if system in ['snes','sneswidescreen'] and f.stem=='EarthBound-MBR':
+    values.update(name='EarthBound — MaternalBound Redux Widescreen',altemulator='EarthBound Redux Widescreen')
    for k,v in values.items():
     if k in ['name','desc','rating','releasedate','developer','publisher','genre','players','playcount','lastplayed','favorite','altemulator']: ET.SubElement(g,k).text=v
   counts[es]=len(gl)
