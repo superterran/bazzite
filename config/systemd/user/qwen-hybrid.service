@@ -1,0 +1,14 @@
+[Unit]
+Description=Qwen local hybrid CPU GPU inference
+After=network.target
+
+[Service]
+Type=simple
+Environment=LD_LIBRARY_PATH=%h/.local/opt/llama-b11588/llama-b11588:%h/.local/opt/llama-b11588/cudart-llama-b11588-bin-ubuntu-cuda-12.8-x64
+ExecStart=%h/.local/opt/llama-b11588/llama-b11588/llama-server -m %h/models/hybrid-test/Qwen3.5-35B-A3B-Q4_K_M.gguf --alias qwen-home -ngl 99 -ncmoe 24 -t 16 -tb 16 -c 8192 -np 1 -b 512 -ub 256 -fa on --fit off --host 127.0.0.1 --port 18080 --reasoning off --no-agent
+MemoryMax=40G
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target
