@@ -10,6 +10,7 @@ ROMS=/mnt/sdcard/ROMS
 [ -d "$LIB" ] || exit 0
 for src in "$LIB"/*/; do
     sys=$(basename "$src")
+    case "$sys" in gc|wii|wiiu|n3ds) continue;; esac  # beyond this handheld
     dest="$ROMS/$sys"
     mkdir -p "$dest"
     mountpoint -q "$dest" || mount --bind "$src" "$dest"

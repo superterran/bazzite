@@ -1,6 +1,6 @@
 from pathlib import Path
 import configparser,json,shutil,tarfile,time
-info=Path('/opt/muos/share/info');storage=Path('/mnt/mmc/MUOS/info');roms=Path('/mnt/sdcard/Roms/!Library/systems');art=storage/'shared-artwork/muos';catalogue=storage/'catalogue'
+info=Path('/opt/muos/share/info');storage=Path('/mnt/mmc/MUOS/info');roms=Path('/mnt/sdcard/.library/systems');art=storage/'shared-artwork/muos';catalogue=storage/'catalogue'
 stamp=time.strftime('%Y%m%d-%H%M%S');backup=storage/'frontend-backups'/stamp;backup.mkdir(parents=True,exist_ok=True)
 with tarfile.open(backup/'configuration.tar','w') as t:
  for p in [info/'core',Path('/opt/muos/config/visual'),storage/'name',storage/'collection']:
@@ -18,7 +18,7 @@ for system,(cat,choice) in mapping.items():
  if system=='atari7800':core='prosystem_libretro.so'
  if not core or not (Path('/opt/muos/share/core')/core).exists():
   report['warnings'].append({'system':system,'reason':'Requested core unavailable','choice':choice});continue
- dest=info/'core/!Library/systems'/system;dest.mkdir(parents=True,exist_ok=True)
+ dest=info/'core'/system;dest.mkdir(parents=True,exist_ok=True)
  (dest/'core.cfg').write_text('\n'.join([core,cat,cat,lookup,choice]))
  (dest/'core.con').write_text('system');(dest/'core.gov').write_text('performance' if system=='n64' else 'ondemand')
  copied=0

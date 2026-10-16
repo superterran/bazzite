@@ -10,9 +10,9 @@ import json,tarfile,time
 from pathlib import Path
 
 INFO=Path('/opt/muos/share/info');STORE=Path('/mnt/mmc/MUOS/info')
-ROMS=Path('/mnt/union/ROMS/!Library/systems/arcade')  # muOS records content by its union-mount path
-REL='!Library/systems/arcade'
-CORE_DIR=INFO/'core/!Library/systems/arcade'
+ROMS=Path('/mnt/union/ROMS/arcade')  # flat layout: library systems are bind-mounted at the ROMS root
+REL='arcade'
+CORE_DIR=INFO/'core/arcade'
 COLLECTION=STORE/'collection/Pac-Man'
 WANT_CORE='mame2003_plus_libretro.so'
 

@@ -208,7 +208,16 @@
  "anbernic": {
   "model": "RG35XX SP (H700, 1 GB), muOS 2508.4 Loose Goose",
   "lan": "10.0.0.40 (DHCP; ally is 10.0.0.79)",
-  "ssh": "root, muOS default password; no key installed"
+  "ssh": "root, muOS default password; no key installed",
+  "layout": {
+   "library": "Syncthing rom-library at hidden /mnt/sdcard/.library; /mnt/mmc/MUOS/init/flatten-library.sh bind-mounts each system to /mnt/sdcard/ROMS/<system> at boot (gc/wii/wiiu/n3ds skipped)",
+   "oldFolders": "pre-flatten duplicate ROM folders + !Synced kept in hidden /mnt/sdcard/.roms-before-flatten (2022 saves migrated: 55 files into shared-saves)",
+   "anbernicRomsShare": "removed from device (only 2 duplicate files)",
+   "names": "folder.json: nes=Nintendo, snes=Super Nintendo, megadrive=Sega Genesis",
+   "favorites": "muOS 2508 has no favourites list; collection \"\u2605 Favorites\" = ROM originals of Steam-curated games (16)",
+   "portSaves": "Syncthing anbernic-port-saves: device /mnt/sdcard/ports sendonly (.stignore whitelists save extensions) -> closet /gaming/anbernic-port-saves receiveonly, 30 versions",
+   "n64LegacySaves": "Mario Kart 64 / Bomberman 64 2nd Attack .eep and Paper Mario .fla not converted (mupen64plus-next combined .srm); kept in backup"
+  }
  },
  "cardGames": {
   "desktopAlly": "Flatpak org.gnome.Aisleriot + org.gnome.Mahjongg (user), Steam non-Steam shortcuts \"Solitaire (Aisleriot)\" and \"Mahjongg\"",
