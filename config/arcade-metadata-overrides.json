@@ -1,0 +1,100 @@
+{
+ "_comment": "Fills gaps left by mame2003-plus history.dat/catver.ini. Keyed by FBNeo/MAME set name; any field here wins over the generated value.",
+ "btlecity": {
+  "desc": "Nintendo's VS. System release of Namco's Battle City. Command a tank through brick-and-steel stages, blasting enemy armour while defending your eagle headquarters. Walls can be shot away to open new routes, and power-ups add armour, speed and stronger shells."
+ },
+ "choko": {
+  "desc": "A late CPS2 mahjong-tile puzzle game released only in Japan. Match identical tiles that can be joined by a short path to clear the board before time runs out."
+ },
+ "dynwar": {
+  "genre": "Beat 'em Up"
+ },
+ "genpeitd": {
+  "desc": "A dark side-scrolling action game set in feudal Japan. The undead samurai Taira no Kagekiyo rises from hell to cut his way through 1,200 years of grudges, switching between side-scrolling, giant-sprite and top-down stages across a branching map of the provinces."
+ },
+ "grobda": {
+  "desc": "A spin-off of Xevious set in a single-screen arena. Steer the Grobda tank, fire at rival tanks and raise a shield against incoming shots, timing it carefully to survive the crossfire."
+ },
+ "hsf2": {
+  "desc": "Capcom's 2004 anniversary edition of Street Fighter II. Choose not just a character but a version of that character from any of the five classic releases, from The World Warrior to Super Turbo, each with its original moves and quirks.",
+  "players": "1-2"
+ },
+ "jyangoku": {
+  "desc": "A Japan-only mahjong game set in the Three Kingdoms era. Play hands against warlords of ancient China to conquer the land.",
+  "players": "1"
+ },
+ "kingball": {
+  "desc": "A Galaxian-style shooter with a twist: balloons swoop down to kidnap the King, who wanders the bottom of the screen. Shoot them before they carry him off, and listen for the King's famous digitised cries for help."
+ },
+ "mappy": {
+  "desc": "Guide Mappy the police mouse through a mansion of trampolines, collecting stolen goods while avoiding the Meowky cats and their boss Goro. Bounce between floors, slam doors to stun pursuers, and use microwave doors to sweep away whole groups."
+ },
+ "mbombrd": {
+  "desc": "The world release of Capcom's tag-team wrestling follow-up to Saturday Night Slam Masters. Up to four players fight two-on-two matches with Mike Haggar and the rest of the Slam Masters roster."
+ },
+ "motos": {
+  "desc": "Pilot a bumper car on floating platforms in space and knock enemy machines off the edge before they do the same to you. Collect power and jump parts to ram harder and leap across gaps."
+ },
+ "mpang": {
+  "desc": "The final Pang game, released in 2000. Fire harpoons upward to split bouncing balloons into ever smaller pieces until they pop, across stages set around the world.",
+  "players": "1-2"
+ },
+ "pnickj": {
+  "desc": "A falling-block puzzle game from Capcom and Compile. Drop and rotate pairs of coloured creatures and link matching colours to clear them, chaining combos to bury your opponent."
+ },
+ "progear": {
+  "desc": "A Cave-developed horizontal bullet-hell shooter for CPS2. Fly a steampunk biplane, collect the gems left by destroyed enemies, and cancel enemy bullets into points by defeating large targets at close range."
+ },
+ "pzloop2": {
+  "desc": "A marble-shooting puzzle game in the same family as Zuma. Fire coloured balls into a chain rolling along a spiral track, match three or more to clear them, and stop the chain before it reaches the centre.",
+  "players": "1-2"
+ },
+ "qad": {
+  "desc": "A fantasy quiz adventure. Pick a hero and fight monsters by answering trivia questions in categories you choose, with stronger attacks for harder questions."
+ },
+ "qndream": {
+  "desc": "A Japanese quiz game with a dating-sim story. Answer trivia questions to spend time with the residents of Nijiirochou and reach a different ending with each heroine."
+ },
+ "rompers": {
+  "desc": "A maze game in which you push walls over onto enemies to squash them. Collect every key in the stage to open the way forward."
+ },
+ "roishtar": {
+  "desc": "The sequel to The Tower of Druaga. Gilgamesh and the priestess Ki escape the tower together, with one player using his sword and the other casting her magic, while the story unfolds over dozens of rooms and a password system."
+ },
+ "sf2hf": {
+  "genre": "Fighter / Versus"
+ },
+ "sfz2al": {
+  "desc": "An Asian-market update of Street Fighter Alpha 2 that adds Cammy, Evil Ryu and Shin Akuma, plus classic Street Fighter II-style versions of several fighters.",
+  "players": "1-2"
+ },
+ "skykiddx": {
+  "desc": "The sequel to Sky Kid. Fly side-scrolling bombing missions in a cartoon biplane, picking up a bomb, flying it to the target and avoiding anti-aircraft fire. Loop the plane to dodge, and fly with a second player."
+ },
+ "spf2t": {
+  "desc": "A falling-gem puzzle game starring super-deformed Street Fighter and Darkstalkers characters. Break same-coloured gems with crash gems to send counter gems to your opponent, with each character having a unique drop pattern."
+ },
+ "ssf2t": {
+  "desc": "The fifth version of Street Fighter II. It adds Super Combo moves, air juggles and the hidden boss Akuma, and speeds up the game, and is still regarded as one of the most competitive fighting games ever made."
+ },
+ "toypop": {
+  "desc": "A top-down maze action game set in a toy world. Pino and Acha collect weapons and fight their way through each toy-box stage to rescue their captured friends."
+ },
+ "valkyrie": {
+  "desc": "An action RPG starring the goddess Valkyrie, sequel to the Famicom game. Explore an overhead world, collect gold to buy magic and weapons, and team up with a friend playing Kurino Sandra."
+ },
+ "varth": {
+  "desc": "A vertical shooter in which your fighter is escorted by two pods. Set the pods to one of several formations and they will absorb bullets, while smart bombs recharge over time."
+ },
+ "wndrmomo": {
+  "desc": "A side-scrolling action game set on a theatre stage. Momo, an idol in a superhero show, kicks her way through monsters and transforms into Wonder Momo for stronger attacks, while camera-wielding fans watch from the audience."
+ },
+ "pacman": {
+  "art_names": [
+   "Puck Man (Japan set 1)"
+  ]
+ },
+ "pang3j": {
+  "desc": "The third Pang game from Mitchell. Two players fire harpoons upward to split bouncing balloons into smaller pieces until they pop, across stages set around the world, with power-ups such as double wires and the time-freezing clock."
+ }
+}

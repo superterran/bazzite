@@ -1,162 +1,208 @@
 {
-  "updated": "2026-10-11",
-  "esdeTheme": {
-    "ThemeVariantTriggers": "true",
-    "Theme": "alekfull-nx-es-de",
-    "ThemeAspectRatio": "automatic",
-    "ThemeColorScheme": "light-original",
-    "ThemeFontSize": "medium",
-    "ThemeLanguage": "none",
-    "ThemeTransitions": "automatic",
-    "ThemeVariant": "gamelist-metadata-on-miximage",
-    "ThemeSet": "alekfull-nx-es-de"
+ "updated": "2026-10-16",
+ "esdeTheme": {
+  "ThemeVariantTriggers": "true",
+  "Theme": "alekfull-nx-es-de",
+  "ThemeAspectRatio": "automatic",
+  "ThemeColorScheme": "light-original",
+  "ThemeFontSize": "medium",
+  "ThemeLanguage": "none",
+  "ThemeTransitions": "automatic",
+  "ThemeVariant": "gamelist-metadata-on-miximage",
+  "ThemeSet": "alekfull-nx-es-de"
+ },
+ "deckyStable": "v3.2.10",
+ "deckyPluginsRequired": [
+  "SteamGridDB",
+  "IsThereAnyDeal for Deck",
+  "ProtonDB Badges"
+ ],
+ "protonOptionsVerified": [
+  "Proton 11.0",
+  "Proton Experimental",
+  "GE-Proton10-34"
+ ],
+ "muosFrontend": "Preserved existing muOS frontend and theme",
+ "muosSyncStatusTask": "Task Toolkit/Syncthing Tasks/Sync Status",
+ "saveSync": "Namespaced cartridge battery saves shared across desktop, Ally, muOS Anbernic and always-on closet hub; closet save folder is sendreceive with 30 versions and separate snapshot-protected backups. Save states remain local.",
+ "dolphin": {
+  "saveShare": "rom-saves",
+  "memoryCards": "Per-game GCI folders; states remain local",
+  "desktopSaveRoot": "/var/mnt/fast/rom-saves",
+  "allySaveRoot": "/home/bazzite/rom-saves",
+  "closetSaveRoot": "/mnt/storage/gaming/rom-saves",
+  "versionHistory": 30,
+  "closetVaultBackupEveryMinutes": 15,
+  "roadRage": {
+   "desktopSteamAppID": 2153068925,
+   "allySteamAppID": 3031883452,
+   "SteamInput": "disabled",
+   "desktopInternalResolution": 6,
+   "allyInternalResolution": 3,
+   "cropTo16by9": true
   },
-  "deckyStable": "v3.2.10",
-  "deckyPluginsRequired": [
-    "SteamGridDB",
-    "IsThereAnyDeal for Deck",
-    "ProtonDB Badges"
-  ],
-  "protonOptionsVerified": [
-    "Proton 11.0",
-    "Proton Experimental",
-    "GE-Proton10-34"
-  ],
-  "muosFrontend": "Preserved existing muOS frontend and theme",
-  "muosSyncStatusTask": "Task Toolkit/Syncthing Tasks/Sync Status",
-  "saveSync": "Namespaced cartridge battery saves shared across desktop, Ally, muOS Anbernic and always-on closet hub; closet save folder is sendreceive with 30 versions and separate snapshot-protected backups. Save states remain local.",
-  "dolphin": {
-    "saveShare": "rom-saves",
-    "memoryCards": "Per-game GCI folders; states remain local",
-    "desktopSaveRoot": "/var/mnt/fast/rom-saves",
-    "allySaveRoot": "/home/bazzite/rom-saves",
-    "closetSaveRoot": "/mnt/storage/gaming/rom-saves",
-    "versionHistory": 30,
-    "closetVaultBackupEveryMinutes": 15,
-    "roadRage": {
-      "desktopSteamAppID": 2153068925,
-      "allySteamAppID": 3031883452,
-      "SteamInput": "disabled",
-      "desktopInternalResolution": 6,
-      "allyInternalResolution": 3,
-      "cropTo16by9": true
-    },
-    "zooCube": {
-      "desktopSteamAppID": 2288926623,
-      "allySteamAppID": 3773253422,
-      "desktopInternalResolution": 6,
-      "allyInternalResolution": 3,
-      "aspectRatio": "4:3",
-      "SteamInput": "disabled"
-    }
-  },
-  "steamArtwork": {
-    "share": "rom-artwork/steam",
-    "matching": "Normalized title across device-specific shortcut IDs",
-    "roles": [
-      "portrait",
-      "landscape",
-      "hero",
-      "logo",
-      "icon"
-    ],
-    "timer": "steam-artwork-sync.timer",
-    "desktopShortcuts": 28,
-    "allyShortcuts": 30,
-    "removed": "Mari0: Community Edition",
-    "fallbackSlots": 38,
-    "removedStreamingServices": [
-      "YouTube",
-      "Netflix",
-      "Amazon Luna",
-      "Disney+",
-      "Prime Video",
-      "Apple TV",
-      "CuriosityStream",
-      "NVIDIA GeForce NOW",
-      "HBO Max",
-      "Hulu",
-      "Paramount+",
-      "Peacock",
-      "Sling TV",
-      "Spotify",
-      "Vimeo",
-      "Xbox Cloud Gaming",
-      "YouTube Music"
-    ],
-    "allyEmulationStationLauncher": "/home/bazzite/Applications/ES-DE.AppImage"
-  },
-  "earthbound": {
-    "build": "MaternalBound Redux widescreen",
-    "sourceCRC32": "28e2abbb",
-    "targetCRC32": "94a90934",
-    "patchSource": "https://github.com/Raid-rgb/Earthbound-Widescreen-patch-for-BSNES-HD",
-    "rom": "variants/widescreen/snes/EarthBound-MBR.smc",
-    "save": "retroarch/bsnes-hd beta/snes/EarthBound-MBR.srm",
-    "saveSHA256AtMigration": "665b622bddf17b3b2290c260eaa61853bb8f0bd9b333fddf7f1849f40a14aa76",
-    "desktopSteamAppID": 3742158449,
-    "allySteamAppID": 4099386908,
-    "validation": "Exact widescreen ROM and bsnes-hd core: save menu recognizes Level 31; Continue loads the party in a bank.",
-    "saveParty": {
-      "Ness": 31,
-      "Paula": 28,
-      "Jeff": 25
-    }
-  },
-  "muosReview": {
-    "systems": 17,
-    "sharedROMs": 5883,
-    "covers": 4402,
-    "previews": 4403,
-    "artworkFilesInstalled": 8805,
-    "emptyPlaceholderFoldersArchived": 8,
-    "artworkRefreshSeconds": 300,
-    "interface": "Existing muOS theme retained",
-    "untested": "Per-game compatibility and N64/arcade performance",
-    "missingBIOS": [],
-    "atari5200BIOS": "Built-in open-source Altirra alternative; reduced compatibility",
-    "colecoBIOS": "Installed from owned library; MD5 2c66f5911e5b42b8ebe113403548eee7"
-  },
-  "additionalCores": [
-    {
-      "core": "a5200_libretro",
-      "architecture": "arm64",
-      "source": "https://buildbot.libretro.com/nightly/linux/aarch64/latest/a5200_libretro.so.zip",
-      "sha256": "7998a4b8c9592efd29502da9f9739e4cbcc58e3ffd6ca2495ca46fe78f630c11",
-      "validation": "Loaded core and verified libretro API version 1"
-    },
-    {
-      "core": "gearcoleco_libretro",
-      "architecture": "arm64",
-      "source": "https://buildbot.libretro.com/nightly/linux/aarch64/latest/gearcoleco_libretro.so.zip",
-      "sha256": "4c581e70505ba639047c1a6bf48aa391d55590324048543a4c08b5d71c070bea",
-      "validation": "Loaded core and verified libretro API version 1"
-    },
-    {
-      "core": "a5200_libretro",
-      "architecture": "x86_64",
-      "source": "https://buildbot.libretro.com/nightly/linux/x86_64/latest/a5200_libretro.so.zip",
-      "sha256": "c4db0b8a6b8f7731d4944bda9c8125d7c074d0494c5201aa78abad1ec003675e",
-      "validation": "Loaded core and verified libretro API version 1"
-    },
-    {
-      "core": "gearcoleco_libretro",
-      "architecture": "x86_64",
-      "source": "https://buildbot.libretro.com/nightly/linux/x86_64/latest/gearcoleco_libretro.so.zip",
-      "sha256": "e17432a9f04ad281242f1140754d9e52c02f7fdc33bb124701642667ad20e145",
-      "validation": "Loaded core and verified libretro API version 1"
-    }
-  ],
-  "cartridgeSaveBridge": {
-    "selectedMarioWorldExits": 36,
-    "marioCanonical": "cartridge/snes/Super Mario World.srm",
-    "wideSaveBytes": 131072,
-    "standardSaveBytes": 2048,
-    "wideProgressOffset": 114688,
-    "progressBytes": 858,
-    "superMetroidProgress": "1h23m, 599 energy, 55 missiles",
-    "stateAutoload": false,
-    "aliasGroups": 5882,
-    "validation": "Six safety tests passed; actual ARM Snes9x loads Mario save; bidirectional Syncthing conversion probe passed; all four nodes report idle with no outstanding files or errors."
+  "zooCube": {
+   "desktopSteamAppID": 2288926623,
+   "allySteamAppID": 3773253422,
+   "desktopInternalResolution": 6,
+   "allyInternalResolution": 3,
+   "aspectRatio": "4:3",
+   "SteamInput": "disabled"
   }
+ },
+ "steamArtwork": {
+  "share": "rom-artwork/steam",
+  "matching": "Normalized title across device-specific shortcut IDs",
+  "roles": [
+   "portrait",
+   "landscape",
+   "hero",
+   "logo",
+   "icon"
+  ],
+  "timer": "steam-artwork-sync.timer",
+  "desktopShortcuts": 28,
+  "allyShortcuts": 30,
+  "removed": "Mari0: Community Edition",
+  "fallbackSlots": 38,
+  "removedStreamingServices": [
+   "YouTube",
+   "Netflix",
+   "Amazon Luna",
+   "Disney+",
+   "Prime Video",
+   "Apple TV",
+   "CuriosityStream",
+   "NVIDIA GeForce NOW",
+   "HBO Max",
+   "Hulu",
+   "Paramount+",
+   "Peacock",
+   "Sling TV",
+   "Spotify",
+   "Vimeo",
+   "Xbox Cloud Gaming",
+   "YouTube Music"
+  ],
+  "allyEmulationStationLauncher": "/home/bazzite/Applications/ES-DE.AppImage"
+ },
+ "earthbound": {
+  "build": "MaternalBound Redux widescreen",
+  "sourceCRC32": "28e2abbb",
+  "targetCRC32": "94a90934",
+  "patchSource": "https://github.com/Raid-rgb/Earthbound-Widescreen-patch-for-BSNES-HD",
+  "rom": "variants/widescreen/snes/EarthBound-MBR.smc",
+  "save": "retroarch/bsnes-hd beta/snes/EarthBound-MBR.srm",
+  "saveSHA256AtMigration": "665b622bddf17b3b2290c260eaa61853bb8f0bd9b333fddf7f1849f40a14aa76",
+  "desktopSteamAppID": 3742158449,
+  "allySteamAppID": 4099386908,
+  "validation": "Exact widescreen ROM and bsnes-hd core: save menu recognizes Level 31; Continue loads the party in a bank.",
+  "saveParty": {
+   "Ness": 31,
+   "Paula": 28,
+   "Jeff": 25
+  }
+ },
+ "muosReview": {
+  "systems": 17,
+  "sharedROMs": 5883,
+  "covers": 4402,
+  "previews": 4403,
+  "artworkFilesInstalled": 8805,
+  "emptyPlaceholderFoldersArchived": 8,
+  "artworkRefreshSeconds": 300,
+  "interface": "Existing muOS theme retained",
+  "untested": "Per-game compatibility and N64/arcade performance",
+  "missingBIOS": [],
+  "atari5200BIOS": "Built-in open-source Altirra alternative; reduced compatibility",
+  "colecoBIOS": "Installed from owned library; MD5 2c66f5911e5b42b8ebe113403548eee7"
+ },
+ "additionalCores": [
+  {
+   "core": "a5200_libretro",
+   "architecture": "arm64",
+   "source": "https://buildbot.libretro.com/nightly/linux/aarch64/latest/a5200_libretro.so.zip",
+   "sha256": "7998a4b8c9592efd29502da9f9739e4cbcc58e3ffd6ca2495ca46fe78f630c11",
+   "validation": "Loaded core and verified libretro API version 1"
+  },
+  {
+   "core": "gearcoleco_libretro",
+   "architecture": "arm64",
+   "source": "https://buildbot.libretro.com/nightly/linux/aarch64/latest/gearcoleco_libretro.so.zip",
+   "sha256": "4c581e70505ba639047c1a6bf48aa391d55590324048543a4c08b5d71c070bea",
+   "validation": "Loaded core and verified libretro API version 1"
+  },
+  {
+   "core": "a5200_libretro",
+   "architecture": "x86_64",
+   "source": "https://buildbot.libretro.com/nightly/linux/x86_64/latest/a5200_libretro.so.zip",
+   "sha256": "c4db0b8a6b8f7731d4944bda9c8125d7c074d0494c5201aa78abad1ec003675e",
+   "validation": "Loaded core and verified libretro API version 1"
+  },
+  {
+   "core": "gearcoleco_libretro",
+   "architecture": "x86_64",
+   "source": "https://buildbot.libretro.com/nightly/linux/x86_64/latest/gearcoleco_libretro.so.zip",
+   "sha256": "e17432a9f04ad281242f1140754d9e52c02f7fdc33bb124701642667ad20e145",
+   "validation": "Loaded core and verified libretro API version 1"
+  }
+ ],
+ "cartridgeSaveBridge": {
+  "selectedMarioWorldExits": 36,
+  "marioCanonical": "cartridge/snes/Super Mario World.srm",
+  "wideSaveBytes": 131072,
+  "standardSaveBytes": 2048,
+  "wideProgressOffset": 114688,
+  "progressBytes": 858,
+  "superMetroidProgress": "1h23m, 599 energy, 55 missiles",
+  "stateAutoload": false,
+  "aliasGroups": 5882,
+  "validation": "Six safety tests passed; actual ARM Snes9x loads Mario save; bidirectional Syncthing conversion probe passed; all four nodes report idle with no outstanding files or errors."
+ },
+ "arcade": {
+  "library": "rom-library/systems/arcade (desktop send-only master)",
+  "games": 70,
+  "defaultCore": "fbneo",
+  "mame2003PlusSets": [
+   "1941",
+   "bombbee",
+   "bosco",
+   "btlecity",
+   "captcomm",
+   "dsaber",
+   "kingball",
+   "kod",
+   "megaman",
+   "pang3j",
+   "polepos",
+   "sf2ce",
+   "willow",
+   "wof"
+  ],
+  "pacManCollection": [
+   "pacman",
+   "mspacman",
+   "jrpacman",
+   "pacnpal",
+   "pacland",
+   "pacmania"
+  ],
+  "policy": "One set per game; arcade originals over ports/remakes; every set boot-tested headless on desktop and Ally cores",
+  "build": "bin/build-arcade-library.py (art: libretro-thumbnails; metadata: FBNeo DAT + mame2003-plus history/catver + config/arcade-metadata-overrides.json)",
+  "muos": "bin/configure-muos-arcade.py (run on device)",
+  "notInstalled": {
+   "cps2NeedKeyFiles": "41 CPS2 sets in rom-original-backups/20261016-arcade-not-bootable lack .key decryption files",
+   "namcoIncomplete": [
+    "galaga",
+    "ordyne",
+    "polepos2a",
+    "cmpacman"
+   ],
+   "notInDrop": [
+    "puckman",
+    "pacplus",
+    "superpac"
+   ]
+  }
+ }
 }
