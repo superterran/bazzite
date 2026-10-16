@@ -10,7 +10,8 @@ import json,tarfile,time
 from pathlib import Path
 
 INFO=Path('/opt/muos/share/info');STORE=Path('/mnt/mmc/MUOS/info')
-ROMS=Path('/mnt/sdcard/Roms/!Library/systems/arcade')
+ROMS=Path('/mnt/union/ROMS/!Library/systems/arcade')  # muOS records content by its union-mount path
+REL='!Library/systems/arcade'
 CORE_DIR=INFO/'core/!Library/systems/arcade'
 COLLECTION=STORE/'collection/Pac-Man'
 WANT_CORE='mame2003_plus_libretro.so'
@@ -33,14 +34,14 @@ def main():
    if p.exists():t.add(p,arcname=str(p).lstrip('/'))
  for g in spec['mame2003_plus']:
   if not (ROMS/(g+'.zip')).exists():report['warnings'].append('missing rom '+g);continue
-  lines=list(base);lines[0]=WANT_CORE
-  if len(lines)>4:lines[4]=choice
-  (CORE_DIR/(g+'.cfg')).write_text('\n'.join(lines));report['core_overrides'].append(g)
+  # muOS 2508 content core file: name, core, system, catalogue, lookup, assign choice, mount, dir, file
+  (CORE_DIR/(g+'.cfg')).write_text('\n'.join([g,WANT_CORE,base[1],base[2],base[3],choice,'/mnt/union/ROMS/',REL,g+'.zip']))
+  report['core_overrides'].append(g)
  COLLECTION.mkdir(parents=True,exist_ok=True)
  for i,g in enumerate(spec['pacman_collection']):
   path=str(ROMS/(g+'.zip'))
   if not Path(path).exists():report['warnings'].append('missing rom '+g);continue
-  (COLLECTION/f'{g}-{fnv(path):08X}.cfg').write_text(f'{path}\n!Library/systems/arcade\n{g}');report['collection'].append(g)
+  (COLLECTION/f'{g}-{fnv(path):08X}.cfg').write_text(f'{path}\n{REL}\n{g}');report['collection'].append(g)
  report['backup']=str(backup);report['choice']=choice
  print(json.dumps(report,indent=1))
 

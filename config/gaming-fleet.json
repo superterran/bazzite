@@ -189,7 +189,7 @@
   ],
   "policy": "One set per game; arcade originals over ports/remakes; every set boot-tested headless on desktop and Ally cores",
   "build": "bin/build-arcade-library.py (art: libretro-thumbnails; metadata: FBNeo DAT + mame2003-plus history/catver + config/arcade-metadata-overrides.json)",
-  "muos": "bin/configure-muos-arcade.py (run on device)",
+  "muos": "bin/configure-muos-arcade.py (run on device; muOS 2508.4 nine-line content core cfg, union-mount collection paths). Device has no mame2003_plus by default: aarch64 buildbot core installed to /opt/muos/share/core + assign/Arcade/mame 2003-plus.ini",
   "notInstalled": {
    "cps2NeedKeyFiles": "41 CPS2 sets in rom-original-backups/20261016-arcade-not-bootable lack .key decryption files",
    "namcoIncomplete": [
@@ -204,5 +204,39 @@
     "superpac"
    ]
   }
+ },
+ "anbernic": {
+  "model": "RG35XX SP (H700, 1 GB), muOS 2508.4 Loose Goose",
+  "lan": "10.0.0.40 (DHCP; ally is 10.0.0.79)",
+  "ssh": "root, muOS default password; no key installed"
+ },
+ "cardGames": {
+  "desktopAlly": "Flatpak org.gnome.Aisleriot + org.gnome.Mahjongg (user), Steam non-Steam shortcuts \"Solitaire (Aisleriot)\" and \"Mahjongg\"",
+  "anbernic": {
+   "pico8_fake08": [
+    "Klondike Solitaire (Frost_byte)",
+    "FreeCell (Frost_byte)",
+    "Shenzhen Solitaire (Hunter X)",
+    "Up-Down Solitaire (Sizigia)",
+    "Mahjong Solitaire (borgar)"
+   ],
+   "tic80": [
+    "Pyramid Solitaire (denis1080)"
+   ],
+   "tic80Setup": "tic80_libretro.so from aarch64 buildbot, assign/TIC-80 + ROMS/TIC80 created",
+   "collection": "Solitaire & Mahjong",
+   "rejected": "Pico Poker Squares crashes in fake-08 (rrect API)"
+  }
+ },
+ "idCollection": {
+  "steam": "Steam collection \"id Collection\" (13 owned titles, cloud-synced to Ally)",
+  "anbernic": {
+   "doom_prboom": "ROMS/DOOM: v1.9 doom/doom2/tnt/plutonia from Steam base/, nerve/sigil/sigil2 from rerelease/ (UMAPINFO supported)",
+   "duke": "PortMaster duke3dawo (EDuke32) + Steam 20th Anniversary World Tour files",
+   "hereticHexen": "PortMaster doomengines (Crispy) + classic WADs from Steam Heretic + Hexen dos/base",
+   "quake": "PortMaster quake (tyrquake) shareware only: Quake/Quake II are NOT owned on Steam",
+   "collection": "id Collection"
+  },
+  "notFeasible": "Simpsons Hit & Run: not owned/dumped anywhere; far beyond H700/1 GB"
  }
 }
