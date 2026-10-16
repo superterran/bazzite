@@ -21,6 +21,18 @@ def save(p,data):
  p=Path(p);p.parent.mkdir(parents=True,exist_ok=True);tmp=p.with_suffix('.tmp')
  tmp.write_text(json.dumps(data,indent=1,sort_keys=True));tmp.replace(p)
 
+def read_gamelist(path):
+ # ES-DE may put an <alternativeEmulator> element before <gameList>: two top-level
+ # elements, so wrap the body to parse it and keep every top-level node when writing.
+ body=re.sub(r'<\?xml[^>]*\?>','',Path(path).read_text(),count=1)
+ wrap=ET.fromstring('<es-root>'+body+'</es-root>')
+ return wrap,wrap.find('gameList')
+
+def write_gamelist(path,wrap):
+ ET.indent(wrap)
+ text='<?xml version="1.0"?>\n'+'\n'.join(ET.tostring(c,encoding='unicode').rstrip() for c in wrap)+'\n'
+ tmp=Path(path).with_suffix('.tmp');tmp.write_text(text);tmp.replace(path)
+
 class ESDE:
  def __init__(s,home,library):
   s.home=Path(home);s.library=Path(library)
@@ -39,7 +51,9 @@ class ESDE:
   fav=set()
   for name,rel,gl in s._games():
    if not gl.exists():continue
-   for g in ET.parse(gl).getroot().findall('game'):
+   wrap,root=read_gamelist(gl)
+   if root is None:continue
+   for g in root.findall('game'):
     if (g.findtext('favorite') or '').strip()=='true':fav.add(s._key(rel,g.findtext('path','')))
   return fav
  def apply(s,want):
@@ -49,7 +63,8 @@ class ESDE:
    if not mine:continue
    if not gl.exists():
     gl.parent.mkdir(parents=True,exist_ok=True);gl.write_text('<?xml version="1.0"?>\n<gameList>\n</gameList>\n')
-   tree=ET.parse(gl);root=tree.getroot();seen=set();dirty=False
+   wrap,root=read_gamelist(gl);seen=set();dirty=False
+   if root is None:continue
    for g in root.findall('game'):
     k=s._key(rel,g.findtext('path',''));seen.add(k)
     if k not in mine:continue
@@ -64,8 +79,7 @@ class ESDE:
     if v and k not in seen and (s.library/rel/f).exists():
      g=ET.SubElement(root,'game');ET.SubElement(g,'path').text='./'+f;ET.SubElement(g,'favorite').text='true'
      dirty=True;changed.append(('+',k))
-   if dirty:
-    ET.indent(tree);tmp=gl.with_suffix('.tmp');tree.write(tmp,encoding='unicode',xml_declaration=True);tmp.replace(gl)
+   if dirty:write_gamelist(gl,wrap)
   return changed
 
 class MuOS:
