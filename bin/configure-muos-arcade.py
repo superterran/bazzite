@@ -13,7 +13,7 @@ INFO=Path('/opt/muos/share/info');STORE=Path('/mnt/mmc/MUOS/info')
 ROMS=Path('/mnt/union/ROMS/arcade')  # flat layout: library systems are bind-mounted at the ROMS root
 REL='arcade'
 CORE_DIR=INFO/'core/arcade'
-COLLECTION=STORE/'collection/Pac-Man'
+COLLECTION=Path('/run/muos/storage/info/collection/Pac-Man')
 WANT_CORE='mame2003_plus_libretro.so'
 
 def fnv(s):
