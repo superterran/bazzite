@@ -1,0 +1,6 @@
+[Unit]
+Description=Sync game favorites between ES-DE, the Ally and the Anbernic
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/repos/bazzite/bin/favorites-sync.py --frontend esde --shared /var/mnt/fast/rom-saves --device desktop --library /var/mnt/fast/rom-library
