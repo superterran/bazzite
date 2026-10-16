@@ -69,7 +69,8 @@ class ESDE:
   return changed
 
 class MuOS:
- COLL=Path('/mnt/mmc/MUOS/info/collection/★ Favorites');ROMS='/mnt/union/ROMS/'
+ # plain ASCII folder name: the exFAT card mangles symbols like the star
+ COLL=Path('/mnt/mmc/MUOS/info/collection/Favorites');ROMS='/mnt/union/ROMS/'
  def can_apply(s):return True
  def _key(s,path):
   rel=path[len(s.ROMS):] if path.startswith(s.ROMS) else path
