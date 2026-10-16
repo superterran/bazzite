@@ -68,7 +68,12 @@ def fetch(item):
  path=DEST/name
  if not path.exists() or path.stat().st_size!=size:
   url=f'https://huggingface.co/unsloth/Qwen3.5-122B-A10B-GGUF/resolve/{REV}/Q3_K_M/{name}'
-  range_download(url,path,size)
+  if size>10000000000:
+   from huggingface_hub import hf_hub_download
+   downloaded=hf_hub_download('unsloth/Qwen3.5-122B-A10B-GGUF',filename='Q3_K_M/'+name,revision=REV,local_dir=DEST/'native',token=False)
+   Path(downloaded).replace(path)
+  else:
+   range_download(url,path,size)
  with path.open('rb') as f:
   actual=hashlib.file_digest(f,'sha256').hexdigest()
  if path.stat().st_size!=size or actual!=digest:
