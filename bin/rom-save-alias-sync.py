@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Reconcile compatible battery-save aliases only while RetroArch is closed."""
-import argparse,fcntl,hashlib,json,os,shutil,socket,struct,subprocess,time
+"""Reconcile compatible battery-save aliases while protecting only the cartridge currently open in RetroArch."""
+import argparse,fcntl,hashlib,json,os,shutil,socket,struct,subprocess,time,unicodedata
 from pathlib import Path
 
 def sha(data):return hashlib.sha256(data).hexdigest()
@@ -19,16 +19,43 @@ def valid_smw(data):
   if (sum(b[:141])+struct.unpack_from('<H',b,141)[0])&65535!=0x5a5a:return False
  return True
 
+def content_key(name):
+ return ''.join(c for c in unicodedata.normalize('NFKC',Path(name).stem).casefold() if c.isalnum())
+
+def active_roms():
+ """Return launched cartridge names; None means an active process is ambiguous."""
+ pids=subprocess.run(['pgrep','-x','retroarch'],stdout=subprocess.PIPE,text=True)
+ if pids.returncode==1:return set()
+ if pids.returncode!=0:return None
+ active=set()
+ excluded={'.so','.dll','.dylib','.cfg','.opt','.log','.mkv','.mp4','.bsv','.png','.state'}
+ for pid in pids.stdout.split():
+  try:
+   args=(Path('/proc')/pid/'cmdline').read_bytes().decode(errors='surrogateescape').split('\0')
+  except FileNotFoundError:continue
+  except OSError:return None
+  # Options with attached values are not content. Ignore known non-ROM arguments.
+  candidates=[arg for arg in args[1:] if arg and not arg.startswith('-') and
+              Path(arg).suffix and Path(arg).suffix.lower() not in excluded]
+  if not candidates:return None
+  active.update(content_key(arg) for arg in candidates)
+ return active
+
 def reconcile(root,state_path,initialize=False,ignore_running=False):
- if not ignore_running and subprocess.run(['pgrep','-x','retroarch'],stdout=subprocess.DEVNULL).returncode==0:
-  status={'status':'Waiting for RetroArch to close','updated':0,'conflicts':[],'errors':[],'checked':time.time()}
+ active=set() if ignore_running else active_roms()
+ if active is None:
+  status={'status':'Waiting: active RetroArch content could not be identified','updated':0,'conflicts':[],'errors':[],'skipped_games':[],'checked':time.time()}
   atomic(state_path.with_name('save-alias-status.json'),json.dumps(status).encode());return status
- spec=json.loads((root/'.save-aliases.json').read_text());state=json.loads(state_path.read_text()) if state_path.exists() else {};updated=0;conflicts=[];errors=[];host=socket.gethostname()
+ spec=json.loads((root/'.save-aliases.json').read_text());state=json.loads(state_path.read_text()) if state_path.exists() else {};updated=0;conflicts=[];errors=[];skipped=[];host=socket.gethostname()
  # Avoid thousands of failed stats on the handheld's memory card.
  present={str(p.relative_to(root)):p for p in root.rglob('*.srm') if '.stversions' not in p.parts and '.bridge-backups' not in p.parts}
  backups=state_path.parent/'save-alias-backups'
  for group in spec['groups']:
   gid=group['id'];rules=[group['canonical']]+group['aliases'];old=state.get(gid,{});values={}
+  names={content_key(rule['path']) for rule in rules}
+  if group.get('name'):names.add(content_key(group['name']))
+  if names & active:
+   skipped.append(group.get('name',gid));continue
   try:
    if group.get('format')=='smw-sa1':
     for rule in rules:
@@ -71,7 +98,7 @@ def reconcile(root,state_path,initialize=False,ignore_running=False):
    new[rel]=digest
   state[gid]=new
  atomic(state_path,json.dumps(state,indent=2).encode())
- status={'status':'Needs review' if conflicts or errors else 'Up to date','updated':updated,'conflicts':conflicts,'errors':errors,'checked':time.time()}
+ status={'status':'Needs review' if conflicts or errors else 'Waiting for active game to close' if skipped else 'Up to date','updated':updated,'conflicts':conflicts,'errors':errors,'skipped_games':skipped,'checked':time.time()}
  atomic(state_path.with_name('save-alias-status.json'),json.dumps(status,indent=2).encode());return status
 
 if __name__=='__main__':

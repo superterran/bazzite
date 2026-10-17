@@ -34,8 +34,29 @@ class SaveBridgeTests(unittest.TestCase):
   g={'id':'smw','format':'smw-sa1','canonical':{'path':'canonical.srm'},'aliases':[{'path':'normal.srm'}]}
   r=self.setup_group(g,{'canonical.srm':b'A'*2048})
   self.assertTrue(r['errors']);self.assertFalse((self.root/'normal.srm').exists())
- def test_running_game_prevents_reconciliation(self):
-  with patch.object(bridge.subprocess,'run') as call:
-   call.return_value.returncode=0;r=bridge.reconcile(self.root,self.state)
+ def test_unrelated_game_does_not_block(self):
+  group={'id':'earthbound','canonical':{'path':'canonical.srm'},'aliases':[{'path':'EarthBound.srm'}]}
+  self.setup_group(group,{'canonical.srm':b'A'*8192})
+  (self.root/'EarthBound.srm').write_bytes(b'B'*8192)
+  with patch.object(bridge,'active_roms',return_value={'mspacman'}):r=bridge.reconcile(self.root,self.state)
+  self.assertEqual((self.root/'canonical.srm').read_bytes(),b'B'*8192)
+  self.assertFalse(r['skipped_games'])
+ def test_active_game_and_its_other_aliases_are_protected(self):
+  group={'id':'earthbound','canonical':{'path':'canonical.srm'},'aliases':[{'path':'EarthBound-MBR.srm'},{'path':'EarthBound.srm'}]}
+  self.setup_group(group,{'canonical.srm':b'A'*8192})
+  (self.root/'EarthBound.srm').write_bytes(b'B'*8192)
+  before=self.state.read_bytes()
+  with patch.object(bridge,'active_roms',return_value={'earthboundmbr'}):r=bridge.reconcile(self.root,self.state)
+  self.assertEqual((self.root/'canonical.srm').read_bytes(),b'A'*8192)
+  self.assertEqual(self.state.read_bytes(),before)
+  self.assertEqual(r['skipped_games'],['earthbound'])
+  with patch.object(bridge,'active_roms',return_value=set()):bridge.reconcile(self.root,self.state)
+  self.assertEqual((self.root/'canonical.srm').read_bytes(),b'B'*8192)
+ def test_unknown_content_remains_protected(self):
+  with patch.object(bridge,'active_roms',return_value=None):r=bridge.reconcile(self.root,self.state)
   self.assertEqual(r['updated'],0);self.assertFalse(self.state.exists())
+ def test_detect_content_from_realistic_command(self):
+  with patch.object(bridge.subprocess,'run') as call, patch.object(Path,'read_bytes',return_value=b'retroarch\0--config=/tmp/cfg\0-L\0/core/fbneo_libretro.so\0/roms/Ms. Pac-Man.zip\0--record=/tmp/video.mkv\0'):
+   call.return_value.returncode=0;call.return_value.stdout='123\n'
+   self.assertEqual(bridge.active_roms(),{'mspacman'})
 if __name__=='__main__':unittest.main()
