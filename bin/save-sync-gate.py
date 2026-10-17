@@ -70,10 +70,16 @@ def main():
  a.add_argument('--config',required=True);a.add_argument('--folder',default='rom-saves')
  a.add_argument('--ui',choices=['muos','zenity','none'],default='none');a.add_argument('--timeout',type=int,default=30)
  a=a.parse_args();ui=UI(a.ui);t0=time.time()
- try:
-  st=Syncthing(a.config);online=peers(st,a.folder)
- except Exception as e:
-  ui.show('Save sync is not running — playing with this device\'s saves.',2);return
+ for attempt in range(3):
+  try:
+   st=Syncthing(a.config);online=peers(st,a.folder);break
+  except Exception as error:
+   print('Save sync check unavailable: '+type(error).__name__,flush=True)
+   if attempt<2:time.sleep(0.5)
+   else:
+    message=('Could not verify save sync — using saves already on this device.' if a.phase=='pre'
+             else 'Could not verify upload — your save is kept on this device.')
+    ui.show(message,2);return
  if not online:
   ui.show('Offline — '+('using the saves on this device.' if a.phase=='pre' else 'your save stays here and syncs when Wi-Fi is back.'),2);return
  st.req(f'/db/scan?folder={a.folder}','POST');time.sleep(0.5)
