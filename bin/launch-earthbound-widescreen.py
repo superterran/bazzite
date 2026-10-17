@@ -28,9 +28,20 @@ cfg.write_text('savefile_directory = "'+str(save_root/'retroarch')+'"\nsavestate
 if '--prepare' in sys.argv:
  print('EarthBound widescreen configuration ready:',cfg)
  raise SystemExit(0)
+sys.path.insert(0,str(home/'.local/bin'))
+from retroarch_session import run_session
+# This core writes SRAM on content unload, not RetroArch's autosave timer.
+with cfg.open('a') as f:
+ f.write('network_cmd_enable = "true"\nnetwork_cmd_port = "55356"\n')
 helper=home/'.local/bin/rom-save-alias-sync.py'
+gate=home/'.local/bin/save-sync-gate.py'
+stconf=next((p for p in [home/'.local/state/syncthing/config.xml',home/'.config/syncthing/config.xml'] if p.exists()),None)
+def gatecheck(phase):
+ if gate.exists() and stconf:subprocess.run([sys.executable,str(gate),phase,'--config',str(stconf),'--ui','zenity'],check=False)
+gatecheck('pre')
 if helper.exists():subprocess.run([sys.executable,str(helper)],stdout=subprocess.DEVNULL)
-try:result=subprocess.run(['/usr/bin/flatpak','run','org.libretro.RetroArch','--appendconfig='+str(cfg),'-L',str(core),str(rom)])
+try:result=run_session(['/usr/bin/flatpak','run','org.libretro.RetroArch','--appendconfig='+str(cfg),'-L',str(core),str(rom)],55356)
 finally:
  if helper.exists():subprocess.run([sys.executable,str(helper)],stdout=subprocess.DEVNULL)
-raise SystemExit(result.returncode)
+ gatecheck('post')
+raise SystemExit(result)
