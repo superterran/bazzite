@@ -21,21 +21,22 @@ def collect(config):
   result['folders'][folder['id']]={k:s.get(k,0) for k in ['state','needFiles','needBytes','pullErrors','receiveOnlyChangedFiles']}
   result['folders'][folder['id']]['paused']=folder.get('paused',False)
  return result
-def summary(s):
+def summary(s,connected=True):
  if s['paused']:return 'Paused'
  if s['pullErrors']:return 'Sync error - check management'
  if s['receiveOnlyChangedFiles']:return 'Local changes need review'
  if s['needFiles']:return str(s['needFiles'])+' files left ('+str(round(s['needBytes']/1048576,1))+' MB)'
- if s['state']=='idle':return 'Up to date'
+ if s['state']=='idle':return 'Up to date' if connected else 'Waiting for connection'
  return s['state'].replace('-',' ').capitalize()
 def render(d):
  lines=['SYNCTHING STATUS  '+d['checked'],'','Connected: '+(', '.join(d['connected']) or 'No peers - offline')]
  for fid,title in [('rom-library','ROMs'),('rom-artwork','Artwork'),('rom-saves','Saves')]:
-  lines+=['',title+': '+(summary(d['folders'][fid]) if fid in d['folders'] else 'Not configured')]
+  lines+=['',title+': '+(summary(d['folders'][fid],bool(d['connected'])) if fid in d['folders'] else 'Not configured')]
  bridge=Path('/mnt/mmc/MUOS/sync-status/save-alias-status.json')
  if bridge.exists():
   try:
    b=json.loads(bridge.read_text());lines+=['','Save mapping: '+b.get('status','Unknown')]
+   if b.get('skipped_games'):lines+=['Playing: '+', '.join(dict.fromkeys(b['skipped_games']))]
   except (OSError,ValueError):pass
  lines+=['','Status refreshes every 5 seconds.','Returns to Task Toolkit after 20 seconds.']
  return '\n'.join(lines)
