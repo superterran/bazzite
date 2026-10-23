@@ -163,3 +163,30 @@ Actual GNOME logout and automatic login into gamescope-session-steam succeeded: 
 ### Private host empty app list correction
 
 2026-10-23 user paired private host but saw noapps. NativeSunshine processparserrequires top-level`env`; templateomitteditand startup logged`No such node (env)`, leavingruntimeapplistemptydespitewebAPIreadingthefile. Added`env:{}`tolive/templateapps. Also fixedboot-timeuinputaccess:privateservicehadstartedbeforephysicalseatloginandloggedmouse/keyboardpermissiondenied;scopedpersistentuinputownershiptome(0600),without grantingrawphysicalinputaccess. RestartedprivateSunshine;app-parserandinput-permissionerrorsgone,encodersready. Pairingretained. Clientmustrefreshapplist;clientplaybackawaitstest.
+# 1Password desktop and SSH agent (2026-10-23)
+
+Native `/usr/bin/1password` runs as the enabled user service
+`onepassword-private.service` on the existing private display `:20`. Its window
+and SSH approval prompts can be viewed through the private Moonlight host or the
+new **1Password** non-Steam entry (appid `4154030664`). Both Steam viewers show
+the same private desktop; they are not isolated app sessions. Launching the
+1Password entry asks the existing app to show its window before opening the
+viewer. Closing the viewer leaves the desktop app and SSH agent running.
+
+Apply with `desktop.d/onepassword-tv.sh`; native 1Password must already be
+installed. The installer backs up shortcut/controller data, creates the entry
+idempotently, and supplies right-stick/touchpad mouse, R2 left click, L2 right
+click, D-pad arrows, X Enter, Square Space, Circle Escape and Triangle Tab.
+
+The pre-existing SSH configuration already uses `~/.1password/agent.sock`,
+with explicit local-key exceptions for GitHub and closet. Those are preserved.
+The agent started successfully and `ssh-add -l` returned public identities.
+The desktop app was locked, so signing/SSH authorization still needs a user
+unlock and an end-to-end approval test. Listing public keys does not prove
+that signing is unlocked. Existing desktop auto-lock settings are preserved.
+
+Chrome remains Flatpak and its extension does not share desktop unlocking.
+No vault credentials were exported or stored in launcher scripts. The private
+desktop service starts on boot and after failure; an app unlock may be required
+after reboot. This is a remote GUI session, not an unattended unlock mechanism.
+

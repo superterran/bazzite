@@ -5,12 +5,17 @@ import os
 import signal
 import subprocess
 import ctypes
+import argparse
 gi.require_version('Gtk','3.0')
 gi.require_version('GtkVnc','2.0')
 from gi.repository import Gtk, GtkVnc, GLib
 from pathlib import Path
 
-window=Gtk.Window(title='Chrome - TV & Automation')
+parser=argparse.ArgumentParser()
+parser.add_argument('--title',default='Chrome - TV & Automation')
+parser.add_argument('--focus-helper',default='focus-chrome-tv.py')
+args=parser.parse_args()
+window=Gtk.Window(title=args.title)
 window.set_default_size(1920,1080)
 window.connect('destroy',Gtk.main_quit)
 display=GtkVnc.Display.new()
@@ -23,9 +28,9 @@ display.set_pointer_force_visible(True)
 display.connect('vnc-disconnected',lambda *_: Gtk.main_quit())
 display.connect('vnc-initialized',lambda *_: display.grab_focus())
 def focus_viewer():
-    subprocess.Popen(['/usr/bin/python3',str(Path.home()/'repos/bazzite/bin/focus-chrome-tv.py')])
+    subprocess.Popen(['/usr/bin/python3',str(Path.home()/'repos/bazzite/bin'/args.focus_helper)])
     return False
-display.connect('vnc-initialized',lambda *_: GLib.timeout_add(500,focus_viewer))
+display.connect('vnc-initialized',lambda *_: GLib.timeout_add(2000 if args.title=='1Password' else 500,focus_viewer))
 window.add(display)
 window.show_all()
 window.fullscreen()
