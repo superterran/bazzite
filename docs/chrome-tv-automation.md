@@ -16,6 +16,8 @@ Run `bash ~/repos/bazzite/desktop.d/chrome-tv.sh` to reapply the launcher, Steam
 
 ## Playwright
 
+Codex now has an additional user-level MCP server named **playwright-tv**. Its wrapper `~/.local/bin/playwright-tv-mcp.sh` attaches to this same CDP endpoint and fails with a clear instruction if Chrome is closed. Select this server for tasks involving the TV browser's signed-in accounts. The existing `playwright` server remains available for separate headless Chromium tasks. The TV wrapper does not enable automatic trace recording. Reapply registration through `desktop.d/chrome-tv.sh`; new Codex sessions load the configured server. It was tested independently using the MCP initialize/list-tools/browser-tabs protocol: 28 tools were exposed and live tab listing succeeded.
+
 With Chrome open:
 
 ```bash
@@ -53,3 +55,9 @@ Native KMS with `WAYLAND_DISPLAY=gamescope-0` initialized H.264, HEVC, AV1 and H
 On 2026-10-23, Steam launched Chrome into Game Mode and Gamescope focused its app ID. Playwright connected to the visible browser, created a disposable test page, clicked its button, verified the result and removed the test tab. The browser stayed open after Playwright disconnected. CDP listener is loopback only. Sunshine now detects the NVIDIA encoders successfully.
 
 TV/controller behavior, actual account login retention and a complete Moonlight client video/input session still require user confirmation. Encoder initialization is not proof of a complete remote stream. The Ally remains offline and this desktop browser setup was not deployed to it.
+
+### Browser sign-in test
+
+Subsequent live test on 2026-10-23 opened Reddit and Gmail in new tabs. Reddit presented a human-verification challenge, left for the user. Gmail was already signed in. The user requested following an Airbnb review email through Playwright; the 1Password extension supplied the saved matching login through its page overlay, and SMS verification completed with user participation. The review form was completed and Airbnb confirmed submission. This demonstrates browser-assisted authentication; no passwords were read or exported.
+
+1Password's browser extension and CLI are separate integrations. `op` is installed (2.39.0), but `op whoami` reported no active CLI session, and the native 1Password app was not running at the time of the audit. Browser-extension sign-in alone does not establish unattended CLI vault access. For CLI access, open and unlock native 1Password, enable system authentication in Security and “Integrate with 1Password CLI” in Developer, then authenticate an `op` command. See [1Password's integration instructions](https://www.1password.dev/cli/app-integration). Do not write session tokens or vault credentials into MCP configuration. The existing browser overlay already works for interactive login assistance.
