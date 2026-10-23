@@ -94,3 +94,7 @@ References: [Playwright CDP attachment](https://playwright.dev/python/docs/api/c
 - Test tabs and duplicate empty windows created during migration were removed; user pages were retained. No 1Password unlock was automated.
 
 Full Moonlight client playback/input and controller usability still await the user's test. Initial 1Password unlock is needed after this migration. The Ally remains offline and this desktop backend was not deployed there.
+
+### Moonlight Steam and Chrome separation
+
+The main host’s Steam Big Picture tile runs `bin/focus-steam-tv.py`: it navigates to Game Mode home and explicitly selects Steam in Gamescope, even if the TV Chrome viewer was previously in front. It does not close Big Picture when the stream ends. The separate **Chrome Browser** host captures only the private browser display; choosing Steam on the main host does not move or restart that browser. The main host’s Chrome tile intentionally opens the Steam viewer on the TV.
