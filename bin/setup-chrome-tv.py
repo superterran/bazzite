@@ -53,6 +53,10 @@ def main():
     settings = {'name':NAME,'appid':appid,'steam_gameid':str((appid<<32)|0x02000000),'endpoint':'http://127.0.0.1:9223','profile':str(Path.home()/'.var/app/com.google.Chrome/config/chrome-tv-automation')}
     (Path.home()/'.config/chrome-tv.json').write_text(json.dumps(settings,indent=2)+'\n')
     icon = Path('/var/lib/flatpak/app/com.google.Chrome/current/active/files/extra/product_logo_256.png')
+    cover = ROOT/'assets/chrome-tv-cover.png'
+    if cover.exists():
+        import base64
+        evaluate('SteamClient.Apps.SetCustomArtworkForApp('+str(appid)+','+json.dumps(base64.b64encode(cover.read_bytes()).decode())+',"png",0)')
     if icon.exists():
         evaluate('SteamClient.Apps.SetShortcutIcon('+str(appid)+','+json.dumps(str(icon))+')')
     # Sunshine's Desktop/Steam entries already mirror this Game Mode session.
@@ -63,7 +67,7 @@ def main():
         data = json.loads(config.read_text())
         shutil.copy2(config,backup/('sunshine-'+str(index)+'-original.json'))
         apps = data.setdefault('apps',[])
-        entry = {'name':NAME,'detached':['python3 '+str(ROOT/'bin/focus-chrome-tv.py')],'image-path':str(icon) if icon.exists() else ''}
+        entry = {'name':NAME,'detached':['python3 '+str(ROOT/'bin/focus-chrome-tv.py')],'image-path':str(cover if cover.exists() else icon)}
         existing = next((a for a in apps if a.get('name')==NAME),None)
         if existing is not None:
             existing.update(entry)

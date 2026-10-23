@@ -1,0 +1,15 @@
+[Unit]
+Description=One persistent Chrome instance for TV, Moonlight and Playwright
+Requires=chrome-private-display.service chrome-private-wm.service chrome-private-audio.service
+After=chrome-private-display.service chrome-private-wm.service chrome-private-audio.service
+BindsTo=chrome-private-display.service
+
+[Service]
+ExecStart=%h/repos/bazzite/bin/chrome-private-session.sh browser
+ExecStop=-/home/linuxbrew/.linuxbrew/bin/uv run --offline --script %h/repos/bazzite/bin/chrome-tv-playwright.py stop
+Restart=always
+RestartSec=3
+TimeoutStopSec=30
+
+[Install]
+WantedBy=default.target

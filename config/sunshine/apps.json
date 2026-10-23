@@ -25,7 +25,7 @@
       "detached": [
         "python3 $(HOME)/repos/bazzite/bin/focus-chrome-tv.py"
       ],
-      "image-path": "/var/lib/flatpak/app/com.google.Chrome/current/active/files/extra/product_logo_256.png"
+      "image-path": "$(HOME)/repos/bazzite/assets/chrome-tv-cover.png"
     }
   ]
 }

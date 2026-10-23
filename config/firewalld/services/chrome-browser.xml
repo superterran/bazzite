@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>Private Chrome Moonlight host</short>
+  <description>Independent browser display on Sunshine's port family 48989.</description>
+  <port protocol="tcp" port="48984"/>
+  <port protocol="tcp" port="48989"/>
+  <port protocol="tcp" port="49010"/>
+  <port protocol="udp" port="48998-49000"/>
+</service>

@@ -1,0 +1,13 @@
+[Unit]
+Description=Private browser Moonlight host
+Requires=chrome-private-display.service chrome-private-browser.service
+After=chrome-private-display.service chrome-private-browser.service
+BindsTo=chrome-private-display.service
+
+[Service]
+ExecStart=%h/repos/bazzite/bin/chrome-private-session.sh sunshine
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

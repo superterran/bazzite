@@ -12,7 +12,7 @@ ENDPOINT = 'http://127.0.0.1:9223'
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=['status','open'], nargs='?', default='status')
+    parser.add_argument('command', choices=['status','open','stop'], nargs='?', default='status')
     parser.add_argument('url', nargs='?')
     args = parser.parse_args()
     if args.command == 'open' and (not args.url or not args.url.startswith(('https://','http://'))):
@@ -23,6 +23,13 @@ def main():
         except Error:
             raise SystemExit('Open "Chrome - TV & Automation" in Steam or Moonlight, then retry.') from None
         context = browser.contexts[0]
+        if args.command == 'stop':
+            session=browser.new_browser_cdp_session()
+            try:
+                session.send('Browser.close')
+            except Error:
+                pass  # The browser may disconnect before acknowledging shutdown.
+            return
         if args.command == 'open':
             page = context.new_page()
             page.goto(args.url, wait_until='domcontentloaded')

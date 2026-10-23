@@ -1,0 +1,11 @@
+[Unit]
+Description=Private browser virtual display and input seat
+Upholds=chrome-private-wm.service chrome-private-audio.service chrome-private-browser.service chrome-private-vnc.service chrome-private-sunshine.service
+
+[Service]
+ExecStart=/usr/bin/python3 %h/repos/bazzite/bin/chrome-private-display.py
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

@@ -258,5 +258,16 @@
   "allyStatus": "Prepared shared bundle; offline, not applied or tested",
   "bindings": "D-pad and left stick arrows; A/Cross Enter; X/Square Space; B/Circle Escape; Y/Triangle F2; RT/RB left-click; LT/LB right-click; right stick pointer",
   "artwork": "Original portrait; generated Windows 95 capsule and hero, shared by title"
+ },
+ "chromeSharedBrowser": {
+  "desktopSteamAppID": 3789767895,
+  "privateMoonlightHost": "Chrome Browser",
+  "moonlightPort": 48989,
+  "display": ":20",
+  "profile": "~/.var/app/com.google.Chrome/config/chrome-tv-automation",
+  "automation": "http://127.0.0.1:9223",
+  "steamEntry": "Fullscreen viewer of the same persistent browser",
+  "onePassword": "One extension/session; manual unlock after Chrome restart",
+  "ally": "Not deployed"
  }
 }

@@ -1,71 +1,96 @@
-# Chrome on the TV and through Moonlight
+# One Chrome browser for Steam, Moonlight and Playwright
 
-Steam entry: **Chrome - TV & Automation**, desktop app ID `3789767895`.
-The matching Moonlight tile launches the same Steam entry, on the same Game Mode screen.
+The persistent browser runs on a private virtual desktop. Steam and Moonlight view that same desktop. There is one Chrome process, one profile, one set of website sessions and one 1Password extension lock state.
 
-This is visible Chrome, with an ordinary persistent profile. Sign in directly using the TV or Moonlight. Playwright attaches to that browser's existing default context over CDP, so it uses those same login sessions. There is no second headless browser, exported cookie file, copied desktop profile or browser-extension dependency. Account authentication is still performed by the user; no accounts were signed in during installation.
+## Use it
 
-- Launcher: `~/.local/bin/launch-chrome-tv.sh`, sourced from `bin/launch-chrome-tv.sh`.
-- Profile: `~/.var/app/com.google.Chrome/config/chrome-tv-automation`, private to this machine.
-- Automation endpoint: `http://127.0.0.1:9223`, verified bound to loopback only. Remote agents can run Playwright over SSH or use a local SSH tunnel; do not expose this port to the LAN or Internet.
-- No forced Proton compatibility on this Steam entry: it launches the installed Chrome Flatpak.
-- Input: right stick or DualSense touchpad pointer; R2 left click, L2 right click; touchpad press left click; R1 zoom in (Ctrl+=), L1 zoom out (Ctrl+-), right-stick press reset zoom (Ctrl+0); D-pad/left stick arrow keys; Cross Enter, Square Space, Circle Escape, Triangle Tab, Options F6 (cycle focus/address bar), Create Backspace. Steam + X opens Steam's keyboard.
-- The separate menu mouse bridge pauses here; Steam Input handles the browser like a game.
+- **Steam / TV:** launch **Chrome - TV & Automation**, app ID `3789767895`. This opens a fullscreen viewer. Closing or stopping this entry closes the viewer and its audio playback, while Chrome and automation continue in the background.
+- **Moonlight / private view:** refresh hosts and choose **Chrome Browser**, then **Chrome - TV & Automation**. This host streams the private desktop independently of the TV. If discovery fails, add `desktop.local:48989` (current LAN address `10.0.0.226:48989`). A client may need to pair with the new host; this is separate from browser/account sign-in.
+- **Automation:** use Codex MCP **playwright-tv**, or `uv run --script ~/repos/bazzite/bin/chrome-tv-playwright.py status`. The endpoint remains `http://127.0.0.1:9223` and attaches to this same Chrome instance.
+- **1Password:** unlock once through either viewer; both show the same extension. Its idle auto-lock is disabled at the user's request. It locks when Chrome restarts, including after PC reboot. No password-based unattended unlock is configured.
 
-Run `bash ~/repos/bazzite/desktop.d/chrome-tv.sh` to reapply the launcher, Steam entry, controller layout and Sunshine app tile. Reuses the shortcut ID and backs up prior configuration under `~/.local/state/chrome-tv-setup/<timestamp>/`. Does not restart Sunshine automatically, so it does not interrupt existing streams during setup. Local app ID and endpoint are recorded in `~/.config/chrome-tv.json`.
+The original desktop Moonlight host still streams the TV/game display. Its Chrome tile opens the TV viewer and therefore changes what the TV shows. Use the separate **Chrome Browser** host for a private view without affecting the TV.
 
-## Playwright
+## Controls in the Steam viewer
 
-Codex now has an additional user-level MCP server named **playwright-tv**. Its wrapper `~/.local/bin/playwright-tv-mcp.sh` attaches to this same CDP endpoint and fails with a clear instruction if Chrome is closed. Select this server for tasks involving the TV browser's signed-in accounts. The existing `playwright` server remains available for separate headless Chromium tasks. The TV wrapper does not enable automatic trace recording. Reapply registration through `desktop.d/chrome-tv.sh`; new Codex sessions load the configured server. It was tested independently using the MCP initialize/list-tools/browser-tabs protocol: 28 tools were exposed and live tab listing succeeded.
+| Control | Action |
+| --- | --- |
+| Right stick / DualSense touchpad | Pointer |
+| R2 / L2 | Left / right mouse click |
+| Touchpad press | Left click |
+| R1 / L1 | Zoom in / out (Ctrl+= / Ctrl+-) |
+| Right-stick press | Reset zoom (Ctrl+0) |
+| D-pad / left stick | Arrow keys |
+| Cross / Square / Circle / Triangle | Enter / Space / Escape / Tab |
+| Options / Create | F6 (focus/address bar) / Backspace |
 
-With Chrome open:
+Steam + X opens Steam's keyboard. Moonlight's native mouse, keyboard and touch-as-mouse input goes to the private input seat. Private-host controller passthrough is disabled; use Moonlight's mouse/keyboard controls or controller mouse mode. The Steam viewer retains the controller-to-mouse layout above.
+
+## Components
+
+| Component | Location / purpose |
+| --- | --- |
+| Browser profile | `~/.var/app/com.google.Chrome/config/chrome-tv-automation` (unchanged) |
+| Private Xorg display | `:20`, dummy driver, input seat `seat-browser`, authenticated local socket, no TCP X11 listener |
+| Window manager | Openbox from Fedora RPMs extracted under `~/.local/opt/chrome-private` |
+| Shared browser | `chrome-private-browser.service`, installed Chrome Flatpak on display :20 |
+| Local viewer transport | Native Fedora x11vnc, localhost-only `127.0.0.1:5905` / `::1:5905` |
+| Steam viewer | `bin/launch-chrome-tv.sh` launches `bin/chrome-private-viewer.py` using GTK-VNC |
+| Private audio | Separate PulseAudio server on `%t/chrome-private/pulse/native`, sink `browser` |
+| Private Moonlight host | `chrome-private-sunshine.service`, X11 capture, NVIDIA NVENC, port family 48989 |
+| Native TV Moonlight host | Existing `app-dev.lizardbyte.app.Sunshine.service`, unchanged KMS capture with display-session wrapper |
+| Moonlight config | `~/.config/sunshine-browser/`, private state/certificates, distinct host UUID |
+| Artwork | `assets/chrome-tv-cover.png`, applied to Steam portrait and Moonlight app entries |
+
+The private host requires encrypted streaming and advertises SDR encoding. Its port family is TCP48984,48989,49010 and UDP48998–49000, enabled through `chrome-browser` firewalld service on the default zone. The private web UI at localhost48990 permits only local administration. CDP and VNC remain loopback-only.
+
+Sunshine's native XDG_SEAT support appends `(seat-browser)` to its virtual input device names. The scoped rule `config/udev/72-chrome-private-seat.rules` assigns only those devices to the private seat and gives the local user access. Private Xorg consumes them; Gamescope's seat0 input remains separate. This uses native libinput routing, not a custom mouse-event bridge.
+
+Audio uses a separate server so remote sessions do not redirect the TV's default audio sink. Chrome's private Flatpak launch disables the default host PulseAudio socket and grants access to the private runtime socket. The Steam viewer forwards the private monitor to the TV only while the viewer is open; its child audio processes terminate with the viewer, including abrupt termination.
+
+## Services and deployment
+
+`desktop.d/chrome-private.sh` installs the scoped input rule, firewall service, config and six enabled user units:
+
+- `chrome-private-display.service`
+- `chrome-private-wm.service`
+- `chrome-private-audio.service`
+- `chrome-private-browser.service`
+- `chrome-private-vnc.service`
+- `chrome-private-sunshine.service`
+
+The display unit upholds dependent units after recovery. The browser restarts automatically when it exits. Its ExecStop sends CDP `Browser.close`: terminating only the Flatpak launcher can leave the browser alive in its separate scope, so explicit shutdown is necessary to avoid duplicate-window restart loops. The existing cached uv/Playwright environment supports this offline stop command.
+
+System Xorg, libinput and GTK-VNC were already available. Openbox, its small missing libraries, x11vnc and the dummy driver are extracted from Fedora RPMs under the user's home, so no OS layering/reboot was needed. Dependency RPMs are cached under `~/.cache/chrome-private-rpms`. Homebrew PulseAudio was already available. A Homebrew x11vnc trial lacked X11 support; the deployment uses the native Fedora binary instead.
+
+Reapply with `bash ~/repos/bazzite/desktop.d/chrome-private.sh`. `--stage` installs without starting services. The first move requires closing the previous direct-on-TV Chrome instance, because one profile cannot run concurrently on two display servers. The existing profile is reused; a local private backup was placed under `~/.local/state/chrome-private-migration/` during the move. Credentials and browser profiles are not committed to the repo.
+
+`desktop.d/chrome-tv.sh` maintains the existing Steam shortcut ID, input layout, cover and Codex MCP registration. `bin/focus-chrome-tv.py` opens or focuses the viewer. If Steam keeps another game's priority above it, the helper updates Gamescope's app-priority control. It does not stop the other game or launch another browser.
+
+## Automation and 1Password
 
 ```bash
 uv run --script ~/repos/bazzite/bin/chrome-tv-playwright.py status
 uv run --script ~/repos/bazzite/bin/chrome-tv-playwright.py open https://example.com
 ```
 
-The script declares its Playwright dependency, so no separate browser download is required. For custom authorized automation:
+For custom requested automation, attach with `playwright.chromium.connect_over_cdp('http://127.0.0.1:9223')` and reuse `browser.contexts[0]`. Do not create a second persistent context using this profile. Do not close the browser/default context at the end of ordinary tasks. The script's `stop` command is reserved for intentional browser shutdown/service management.
 
-```python
-from playwright.sync_api import sync_playwright
+Codex's additional user-level **playwright-tv** MCP server uses `~/.local/bin/playwright-tv-mcp.sh`. The existing **playwright** server remains available for isolated headless Chromium tasks. TV MCP output is private and automatic trace recording is off. MCP initialize, list-tools and live tab listing succeeded with 28 tools. New Codex sessions load the registered server.
 
-with sync_playwright() as p:
-    browser = p.chromium.connect_over_cdp('http://127.0.0.1:9223')
-    context = browser.contexts[0]
-    # Reuse an appropriate existing tab, or create one for the requested task.
-    page = context.new_page()
-    # Perform the requested actions. Do not close the browser/default context.
-```
+The browser extension is signed in, but **1Password CLI access is separate and remains unauthenticated**. Native app integration is configured in the extension but disconnected; Chrome is Flatpak, which 1Password documents as incompatible with desktop native messaging on Linux. Browser overlay autofill worked in the user's live sign-in test. No vault passwords, Secret Keys, session tokens or unattended-unlock credentials were stored in launch scripts.
 
-Stopping Playwright disconnects automation while Chrome remains open. Opening Chrome later reuses the on-disk profile. Only one Chrome instance may own that profile; attach to it rather than launching a concurrent headless process with the same directory. The default everyday desktop Chrome profile is unaffected.
+References: [Playwright CDP attachment](https://playwright.dev/python/docs/api/class-browsertype#browser-type-connect-over-cdp), [Chrome debugging custom-profile requirement](https://developer.chrome.com/blog/remote-debugging-port), [1Password Linux browser integration](https://support.1password.com/connect-1password-browser-app/), [Sunshine configuration](https://docs.lizardbyte.dev/projects/sunshine/latest/md_docs_2configuration.html).
 
-References: [Playwright CDP attachment](https://playwright.dev/python/docs/api/class-browsertype#browser-type-connect-over-cdp), [Chrome's custom-profile requirement for remote debugging](https://developer.chrome.com/blog/remote-debugging-port).
+## Validation on 2026-10-23
 
-## Sunshine startup fix
+- Exactly one main Chrome process, display :20, original profile and CDP9223.
+- Both Moonlight servers respond with distinct host UUIDs/names; private host advertises port48989 on LAN via Avahi. Encoders initialized and firewall rules are active.
+- Synthetic private-seat mouse input moved only :20's pointer; both Gamescope pointers remained unchanged.
+- A click sent to the fullscreen Steam viewer reached a disposable test button in the same tab read by Playwright.
+- Silent Web Audio test created a Chrome stream only on the private PulseAudio server; the TV's default sink remained unchanged.
+- Closing the viewer terminated its audio children and left the browser service/CDP running.
+- Browser/display stop-start and recovery completed with one browser process; restart counters remained zero afterward. Shell syntax and Python compile checks passed.
+- Test tabs and duplicate empty windows created during migration were removed; user pages were retained. No 1Password unlock was automated.
 
-The active service is `app-dev.lizardbyte.app.Sunshine.service`, currently running native `/usr/bin/sunshine` despite its historical unit name. Its active config is `~/.config/sunshine/`; the old Flatpak config also receives the app tile for future migration. Native KMS/NVENC remains selected, with the RTX 4070 at `/dev/dri/renderD129`.
-
-The service previously started without a Wayland display, before Game Mode was ready, and failed to initialize capture/encoders. `bin/launch-sunshine-session.sh` now waits for a Wayland session socket, sets DISPLAY and WAYLAND_DISPLAY, and starts the native binary. Installed through `desktop.d/sunshine-session.sh` and `config/systemd/user/app-dev.lizardbyte.app.Sunshine.service.d/session.conf`. Existing restart policy and pairings are retained.
-
-Native KMS with `WAYLAND_DISPLAY=gamescope-0` initialized H.264, HEVC, AV1 and HDR encoding successfully in an isolated probe and after restarting the actual service. A wlr probe was rejected because this Gamescope session does not expose the required XDG_OUTPUT interface; no wlr configuration was applied. This supersedes older repo comments about a working Flatpak-only capture path.
-
-## Validation and remaining checks
-
-On 2026-10-23, Steam launched Chrome into Game Mode and Gamescope focused its app ID. Playwright connected to the visible browser, created a disposable test page, clicked its button, verified the result and removed the test tab. The browser stayed open after Playwright disconnected. CDP listener is loopback only. Sunshine now detects the NVIDIA encoders successfully.
-
-TV/controller behavior, actual account login retention and a complete Moonlight client video/input session still require user confirmation. Encoder initialization is not proof of a complete remote stream. The Ally remains offline and this desktop browser setup was not deployed to it.
-
-### Browser sign-in test
-
-Subsequent live test on 2026-10-23 opened Reddit and Gmail in new tabs. Reddit presented a human-verification challenge, left for the user. Gmail was already signed in. The user requested following an Airbnb review email through Playwright; the 1Password extension supplied the saved matching login through its page overlay, and SMS verification completed with user participation. The review form was completed and Airbnb confirmed submission. This demonstrates browser-assisted authentication; no passwords were read or exported.
-
-1Password's browser extension and CLI are separate integrations. `op` is installed (2.39.0), but `op whoami` reported no active CLI session, and the native 1Password app was not running at the time of the audit. Browser-extension sign-in alone does not establish unattended CLI vault access. For CLI access, open and unlock native 1Password, enable system authentication in Security and “Integrate with 1Password CLI” in Developer, then authenticate an `op` command. See [1Password's integration instructions](https://www.1password.dev/cli/app-integration). Do not write session tokens or vault credentials into MCP configuration. The existing browser overlay already works for interactive login assistance.
-
-### Browser extension lock preference
-
-At the user's request on 2026-10-23, turned off “Automatically lock 1Password” in this TV Chrome profile, replacing its eight-hour idle timeout. Reloaded extension settings and verified persistence; preset now displays Convenient. The extension reports no active desktop-app integration (General's integration toggle is enabled but shows a connection problem). Therefore it still locks when Chrome exits, including PC reboot. This is not unattended unlocking across restart. No account password or Secret Key was stored in a launcher. Other autofill confirmation and phishing-prevention settings were unchanged.
-
-### Moonlight launcher focus — 2026-10-23
-
-The Chrome tile now invokes bin/focus-chrome-tv.py. It launches the existing Steam shortcut only if its CDP endpoint is absent, then uses SteamUIStore.SetRunningApp and NavigateToRunningApp to select the already-running browser. Tested with Chrome running behind another game: Gamescope focus changed to Chrome app3789767895 without restarting Chrome or terminating the game. This is still display mirroring. Sunshine logs showed the client resuming a Desktop session; end that existing session and launch the Chrome tile to run its launcher. A private browser view independent of the TV would require a separate virtual desktop/capture session, which has not been configured.
+Full Moonlight client playback/input and controller usability still await the user's test. Initial 1Password unlock is needed after this migration. The Ally remains offline and this desktop backend was not deployed there.
