@@ -59,23 +59,20 @@ def main():
         evaluate('SteamClient.Apps.SetCustomArtworkForApp('+str(appid)+','+json.dumps(base64.b64encode(cover.read_bytes()).decode())+',"png",0)')
     if icon.exists():
         evaluate('SteamClient.Apps.SetShortcutIcon('+str(appid)+','+json.dumps(str(icon))+')')
-    # Sunshine's Desktop/Steam entries already mirror this Game Mode session.
-    # Add a convenient launch tile to both known locations; retain all other apps.
+    # The TV host must not offer a misleading standalone Chrome tile: its
+    # capture always mirrors the TV. Private Chrome lives on the separate host.
     for index,config in enumerate([Path.home()/'.config/sunshine/apps.json',Path.home()/'.var/app/dev.lizardbyte.app.Sunshine/config/sunshine/apps.json']):
         if not config.exists():
             continue
-        data = json.loads(config.read_text())
-        shutil.copy2(config,backup/('sunshine-'+str(index)+'-original.json'))
-        apps = data.setdefault('apps',[])
-        entry = {'name':NAME,'detached':['python3 '+str(ROOT/'bin/focus-chrome-tv.py')],'image-path':str(cover if cover.exists() else icon)}
-        existing = next((a for a in apps if a.get('name')==NAME),None)
-        if existing is not None:
-            existing.update(entry)
-        else:
-            apps.append(entry)
-        temporary = config.with_suffix('.tmp')
-        temporary.write_text(json.dumps(data,indent=2)+'\n')
-        temporary.replace(config)
+        data=json.loads(config.read_text())
+        apps=data.get('apps',[])
+        filtered=[a for a in apps if a.get('name')!=NAME]
+        if len(filtered)!=len(apps):
+            shutil.copy2(config,backup/('sunshine-'+str(index)+'-original.json'))
+            data['apps']=filtered
+            temporary=config.with_suffix('.tmp')
+            temporary.write_text(json.dumps(data,indent=2)+'\n')
+            temporary.replace(config)
     print(json.dumps(settings))
 
 if __name__ == '__main__':

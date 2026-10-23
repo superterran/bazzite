@@ -9,7 +9,7 @@ The persistent browser runs on a private virtual desktop. Steam and Moonlight vi
 - **Automation:** use Codex MCP **playwright-tv**, or `uv run --script ~/repos/bazzite/bin/chrome-tv-playwright.py status`. The endpoint remains `http://127.0.0.1:9223` and attaches to this same Chrome instance.
 - **1Password:** unlock once through either viewer; both show the same extension. Its idle auto-lock is disabled at the user's request. It locks when Chrome restarts, including after PC reboot. No password-based unattended unlock is configured.
 
-The original desktop Moonlight host still streams the TV/game display. Its Chrome tile opens the TV viewer and therefore changes what the TV shows. Use the separate **Chrome Browser** host for a private view without affecting the TV.
+The original desktop Moonlight host streams the TV/game display and offers Desktop and Steam only. The misleading duplicate Chrome tile was removed. Use the separate **Chrome Browser** host for private Chrome without affecting the TV; the Steam library still includes its fullscreen Chrome viewer.
 
 ## Controls in the Steam viewer
 
@@ -155,3 +155,7 @@ After a reboot the machine entered GNOME and the Logo Menu Return to Game Mode a
 Fallback `bin/switch-bazzite-session.sh game|desktop [--prepare-only]` validates installed session files, uses AccountsService to select our own user's session, then requests normal GNOME logout (or terminates only local Gamescope seat when switching out). Requires existing passwordless sudo for narrow AccountsService calls. No GDM daemon restart or OS layering. `desktop.d/session-switch.sh` installs the helper, updates existing Desktop Mode launcher and provides a user-local Logo Menu copy changing only Game Mode command plus a desktop launcher override. Native extension is unchanged. User extension loads on the next GNOME login. Once native steamosctl returns, remove the local Logo Menu copy to use the upstream extension again; setup skips creating fallback when native command exists.
 
 Actual GNOME logout and automatic login into gamescope-session-steam succeeded: gamescope-session-plus@steam.service active, Steam process uses-gamepadui, Gamescope focusedappid769. Private Chrome browser and private Sunshine stayedactive. The separate Desktop Mode launcher was updated but the reverse switch was not exercised after returning to Game Mode, to leave the requested session running. Original GNOME and default GDM configuration were not rewritten; only our account's savedsession changed.
+
+### Removed duplicate Moonlight Chrome tile
+
+2026-10-23: user correctly observed standalone Chrome launch changing the TV. Main-host logs showed a client stream while private-host logs showed no connections. Removed the legacy Chrome TV launcher from main Sunshine apps and from setup-chrome-tv.py deployment behavior. Main Moonlight host now exposes Desktop/Steam; separate Chrome Browser host at LAN10.0.0.226:48989 or Tailscale100.119.114.55:48989 exposes independent Chrome. Steam library Chrome viewer remains available. Refresh Moonlight app list and add the private host manually if absent.

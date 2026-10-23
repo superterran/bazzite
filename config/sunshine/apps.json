@@ -13,13 +13,6 @@
         "python3 $(HOME)/repos/bazzite/bin/focus-steam-tv.py"
       ],
       "image-path": "steam.png"
-    },
-    {
-      "name": "Chrome - TV & Automation",
-      "detached": [
-        "python3 $(HOME)/repos/bazzite/bin/focus-chrome-tv.py"
-      ],
-      "image-path": "$(HOME)/repos/bazzite/assets/chrome-tv-cover.png"
     }
   ]
 }
