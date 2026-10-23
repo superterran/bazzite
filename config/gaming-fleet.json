@@ -11,7 +11,7 @@
   "ThemeVariant": "gamelist-metadata-on-miximage",
   "ThemeSet": "alekfull-nx-es-de"
  },
- "deckyStable": "v3.2.10",
+ "deckyStable": "v3.3.0",
  "deckyPluginsRequired": [
   "SteamGridDB",
   "IsThereAnyDeal for Deck",

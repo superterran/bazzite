@@ -1,0 +1,12 @@
+[Unit]
+Description=Update stable Decky Loader and plugins with verified backups
+Wants=network-online.target
+After=network-online.target
+ConditionPathExists=/home/me/homebrew/services/PluginLoader
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /usr/local/libexec/bazzite/decky-maintenance.py
+TimeoutStartSec=15min
+Nice=10
+UMask=0077
