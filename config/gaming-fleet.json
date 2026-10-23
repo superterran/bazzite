@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-16",
+ "updated": "2026-10-23",
  "esdeTheme": {
   "ThemeVariantTriggers": "true",
   "Theme": "alekfull-nx-es-de",
@@ -247,5 +247,16 @@
    "collection": "id Collection"
   },
   "notFeasible": "Simpsons Hit & Run: not owned/dumped anywhere; far beyond H700/1 GB"
+ },
+ "24GamesWindows95": {
+  "desktopSteamAppID": 3616716904,
+  "sharedFolder": "shared-games/24-games-windows95",
+  "launcher": "play.sh",
+  "proton": "Proton 11.0",
+  "localPrefix": "~/.local/share/24-games-windows95/compatdata",
+  "setup": "bin/setup-24-games.py --controller ally",
+  "allyStatus": "Prepared shared bundle; offline, not applied or tested",
+  "bindings": "D-pad and left stick arrows; A/Cross Enter; X/Square Space; B/Circle Escape; Y/Triangle F2; RT/RB left-click; LT/LB right-click; right stick pointer",
+  "artwork": "Original portrait; generated Windows 95 capsule and hero, shared by title"
  }
 }
