@@ -1,0 +1,92 @@
+{
+  "date": "2026-10-23",
+  "office_tv_upstairs_identity": "unconfirmed",
+  "idle_desktop_probes": [
+    {
+      "name": "Office TV",
+      "ip": "10.0.0.11",
+      "payload": 56,
+      "received": 160,
+      "sent": 160,
+      "loss_pct": 0.0,
+      "median_ms": 6.14,
+      "p95_ms": 58.2,
+      "p99_ms": 80.9,
+      "max_ms": 82.4,
+      "over16ms": 22,
+      "over33ms": 18
+    },
+    {
+      "name": "Office TV MTU-size",
+      "ip": "10.0.0.11",
+      "payload": 1400,
+      "received": 160,
+      "sent": 160,
+      "loss_pct": 0.0,
+      "median_ms": 7.56,
+      "p95_ms": 67.7,
+      "p99_ms": 87.5,
+      "max_ms": 88.0,
+      "over16ms": 23,
+      "over33ms": 21
+    },
+    {
+      "name": "gateway MTU-size",
+      "ip": "10.0.0.1",
+      "payload": 1400,
+      "received": 160,
+      "sent": 160,
+      "loss_pct": 0.0,
+      "median_ms": 3.69,
+      "p95_ms": 7.01,
+      "p99_ms": 8.1,
+      "max_ms": 22.8,
+      "over16ms": 1,
+      "over33ms": 0
+    }
+  ],
+  "controlled_udp_to_closet": {
+    "received_packets": 26042,
+    "received_bytes": 31250400,
+    "receive_span_s": 9.903,
+    "arrival_jitter_estimate_ms": 0.288,
+    "sent_packets": 26042,
+    "sent_mbps": 25.0,
+    "loss_pct": 0.0,
+    "loaded_pings": [
+      {
+        "ip": "10.0.0.1",
+        "received": 60,
+        "sent": 60,
+        "median_ms": 3.13,
+        "p95_ms": 8.45,
+        "max_ms": 176.0
+      },
+      {
+        "ip": "10.0.0.11",
+        "received": 60,
+        "sent": 60,
+        "median_ms": 6.96,
+        "p95_ms": 70.6,
+        "max_ms": 177.0
+      },
+      {
+        "ip": "10.0.0.237",
+        "received": 60,
+        "sent": 60,
+        "median_ms": 3.66,
+        "p95_ms": 5.02,
+        "max_ms": 175.0
+      }
+    ]
+  },
+  "closet_to_office_tv_ping": {
+    "sent": 60,
+    "received": 60,
+    "loss_pct": 0,
+    "min_ms": 3.502,
+    "avg_ms": 14.943,
+    "max_ms": 123.071,
+    "mdev_ms": 24.911
+  }
+}

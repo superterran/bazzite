@@ -130,3 +130,20 @@ Later iPad test baseline (client settings not applied remotely):1920x1080,60fps,
 If network drops/jitter rise, lower bitrate first and compare the direct link. If incomingfps is stable but renderedfps is not, inspect client decoding/display pacing; match the requested60fps and client display where controllable. Raise only one setting at a time after a clean baseline. Test cellular/Tailscale separately and check direct versus relay path. Real end-to-end tests, iPad settings and user confirmation remain pending.
 
 References: https://github.com/moonlight-stream/moonlight-docs/wiki/Frequently-Asked-Questions and https://github.com/moonlight-stream/moonlight-docs/wiki/Troubleshooting ; AP channel-width semantics: https://networkmanager.dev/docs/api/latest/settings-802-11-wireless.html .
+
+### Upstairs Apple TV network investigation, 2026-10-23
+
+AirPlay/Companion discovery found two actual Apple TVs (AppleTV14,1): Living Room10.0.0.237 and Office TV10.0.0.11. Office TV is the candidate upstairs client; room identity still needs user confirmation. HomePods/Roku advertisements excluded. No TV was awakened, paired, rebooted or reconfigured. No router settings were changed.
+
+Measured evidence is saved in `docs/diagnostics/moonlight-network-2026-10-23.json`:
+
+- Office TV from desktop,160small pings:0%loss,median6.14ms,p95 58.2ms,max82.4ms.22responses exceeded16.67ms,18exceeded33.33ms.160pings with1400bytepayload:0%loss,median7.56ms,p95 67.7ms,max88ms.
+- Concurrent gateway1400byteprobe:0%loss,median3.69ms,p95 7.01ms,max22.8ms. A preceding120packet gateway test caught a48.8msmaximum.
+- Controlled desktop-to-closet UDP:26042datagrams of1200bytes paced at25Mbps for10seconds. All received,0%loss. Temporary receiver bound only closetLAN10.0.0.75:52019 and exited immediately; no files installed or persistent server/firewall changes. Receiver arrival-jitter EWMA was0.288ms at end, not a worst-case jitter bound. Sender pacing uses Python/Linux scheduling, so this is a useful approximate stream-rate probe rather than calibrated network instrumentation.
+- During that25Mbpsreference transfer:Office TVp95 70.6ms/max177ms, gatewayp95 8.45ms/max176ms, LivingRoomp95 5.02ms/max175ms; no pingloss. Shared single-sample spikes do not prove their cause is the router; host scheduling and shared paths remain possible.
+- Independent closet-to-OfficeTV60packetprobe:0%loss,min3.502/avg14.943/max123.071ms,mdev24.911ms. Spikes therefore also appear from another host, but AppleTVidle Wi-Fi/pingprioritization may contribute.
+- Desktop and closet Ethernet negotiate1Gbpsfull duplex. DesktopEEE is already disabled and NIC error/drop counters remainzero. Xfinity router responds at10.0.0.1. Physical mesh/pod/switch topology and OfficeTVWi-Fiband/RSSI are not available from these observations. Do not confuse a localEthernet1Gbpslink with a fully wired backhaul.
+
+Assessment: intermittent latency is a concrete candidate for choppy playback; sampled loss and25Mbpsreference delivery were good. These short probes cannot establish long-term reliability, AppleTVavailable throughput, video decode/pacing or sustained4Kcapacity. Idleping spikes are not proof of actual media packet jitter. The direct Bazzite hotspot only helps clients connected within its radio range; it is not automatically a better upstairs path.
+
+Next controlled test when home:confirmOfficeTVidentity; launch Moonlight on it overLANusingdesktop10.0.0.226,1080p60/15Mbps/SDR baseline; match AppleTVoutput refresh to60Hz (or a compatible exact rate) for comparison, with originalsettings recorded. Enable available client statistics and compare active-stream ping/framestats. Check clientRSSI/band/APassociation and whetherdesktopEthernet actually terminates at an xFipod. If stillchoppy, temporarily wire AppleTV or test it near the primaryAP to isolate Wi-Fi/backhaul; compare normalnetwork withdirectAPonlyifrangeallows. Increase bitrate/resolution onlyafterbaselineisclean. TailscaleisforoutsideaccessandisnotrequiredforthehomeLANtest. No playbackimprovementclaimeduntiluserverifies.
