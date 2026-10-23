@@ -1,9 +1,9 @@
-# TV Control via 8BitDo Orb Button
+# TV Control via DualSense PS / Controller Home Button
 
-Press the orb (Home) button on the 8BitDo Ultimate Wireless Controller to:
+Tap the PS button on a DualSense, or Home on an 8BitDo Ultimate, to:
 
 1. Pause whatever is playing on the Living Room Apple TV (best-effort — preserves position)
-2. Switch the Living Room TCL Google TV to bazzite's HDMI input (HDMI 3 by default)
+2. Switch the Living Room TCL Google TV to bazzite's HDMI input (HDMI 2)
 
 Also exposes individual scripts that Apple Shortcuts / `ssh` / cron can drive directly (TV power, Apple TV sleep/wake/pause, arbitrary HDMI input).
 
@@ -14,7 +14,7 @@ Also exposes individual scripts that Apple Shortcuts / `ssh` / cron can drive di
 | `tv.py` | Android TV Remote v2 — pair, power on/off, send keycodes (TIF input keys are stubbed by TCL — use `tv-switch.sh` to switch inputs) |
 | `tv-switch.sh` | ADB + TIF passthrough intent — the only working path for HDMI input switching on this TCL |
 | `atv.py` | pyatv Companion — pair, sleep, wake, pause, play-pause |
-| `orb-listener.py` | evdev watcher on `BTN_MODE` → runs `atv.py pause` then `tv-switch.sh <input>` |
+| `orb-listener.py` | evdev watcher on `BTN_MODE` press → runs `atv.py pause` and `tv-switch.sh <input>` concurrently |
 | `diag.py` | Inspection helper for AndroidTVRemote state |
 
 Hardware identifiers:
@@ -53,11 +53,13 @@ Captured from `dumpsys tv_input` on 2026-05-31. Hardware IDs persist across TV r
 | Slug | TIF inputId tail |
 |---|---|
 | `hdmi1` | `HW1413744128` |
-| `hdmi2` | `HW1413744384` |
-| `hdmi3` | `HW1413744640` (bazzite PC) |
+| `hdmi2` | `HW1413744384` (bazzite PC, current) |
+| `hdmi3` | `HW1413744640` |
 | `hdmi4` | `HW1413745664` |
 
-Override the orb-listener's target via service env: `TV_PC_INPUT=hdmi2 systemctl --user restart tv-orb-listener.service`.
+The service explicitly sets `TV_PC_INPUT=hdmi2`, matching the working iOS Steam shortcut. To change it, edit the service environment and reload/restart the unit.
+
+The listener watches all connected supported controllers and reconnects after sleep. A short button-down triggers immediately; release and auto-repeat do not. Two-second debounce and one in-flight switch prevent duplicate actions. It never grabs input, so the usual Steam menu and PS-held mouse shortcuts remain available. Apple TV pause failure does not delay or block HDMI selection.
 
 ## Wake-from-sleep / wake-from-off
 
@@ -102,7 +104,7 @@ This composes with Phase 3 of `Context/projects/bazzite-console-mode-roadmap` (s
 
 ```bash
 journalctl --user -u tv-orb-listener.service -f    # live log
-./tv-switch.sh hdmi3                               # bypass listener, test ADB+TIF path
+./tv-switch.sh hdmi2                               # bypass listener, test ADB+TIF path
 ./atv.py state                                     # confirm Apple TV reachable + paired
 adb devices                                        # see if TV is attached
 ```
