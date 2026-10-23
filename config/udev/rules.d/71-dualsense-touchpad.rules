@@ -1,0 +1,2 @@
+# Give the active local seat access to only the DualSense touchpad event device.
+SUBSYSTEM=="input", KERNEL=="event*", ATTRS{name}=="DualSense Wireless Controller Touchpad", TAG+="uaccess"

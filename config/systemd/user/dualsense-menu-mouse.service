@@ -1,0 +1,12 @@
+[Unit]
+Description=DualSense touchpad mouse with left/right click in Steam Game Mode menus
+After=default.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 %h/repos/bazzite/bin/dualsense-menu-mouse.py
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target
