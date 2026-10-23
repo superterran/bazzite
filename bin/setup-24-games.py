@@ -47,6 +47,7 @@ def main():
     evaluate('(async()=>{'+f'const id={appid};'+
              'await SteamClient.Apps.SetShortcutName(id,'+json.dumps(NAME)+');'+
              'await SteamClient.Apps.SetShortcutExe(id,'+json.dumps(str(launcher))+');'+
+             'await SteamClient.Apps.SetShortcutLaunchOptions(id,"");'+
              'await SteamClient.Apps.SetShortcutStartDir(id,'+json.dumps(str(game/'cd/WIN/PROGRAM'))+');return true;})()')
     evaluate(f'controllerConfiguratorStore.LoadEditingConfiguration({appid},0)')
     for _ in range(40):
