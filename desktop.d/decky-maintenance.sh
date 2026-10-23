@@ -6,4 +6,8 @@ for unit in decky-maintenance.service decky-maintenance.timer; do
     sudo install -Dm644 "$REPO_ROOT/config/systemd/system/$unit" "/etc/systemd/system/$unit"
 done
 sudo systemctl daemon-reload
-sudo systemctl enable --now decky-maintenance.timer
+if systemctl is-enabled --quiet nightly-maintenance.timer; then
+    sudo systemctl disable --now decky-maintenance.timer
+else
+    sudo systemctl enable --now decky-maintenance.timer
+fi

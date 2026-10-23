@@ -1,0 +1,11 @@
+[Unit]
+Description=Update Bazzite, applications and Decky; reboot when idle at 05:00
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /usr/local/libexec/bazzite/nightly-maintenance.py
+TimeoutStartSec=65min
+Nice=10
+UMask=0077
