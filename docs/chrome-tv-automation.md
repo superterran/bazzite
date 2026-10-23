@@ -189,4 +189,3 @@ Chrome remains Flatpak and its extension does not share desktop unlocking.
 No vault credentials were exported or stored in launcher scripts. The private
 desktop service starts on boot and after failure; an app unlock may be required
 after reboot. This is a remote GUI session, not an unattended unlock mechanism.
-
