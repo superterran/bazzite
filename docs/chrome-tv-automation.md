@@ -110,3 +110,5 @@ On phone, tablet, Mac and upstairs computer: install Moonlight and Tailscale, si
 The private browser works without a physical monitor. The TV/Game Mode capture still depends on Gamescope maintaining a physical or emulated display; a monitor-unplugged test is required before claiming the entire workstation is fully headless. Remote access requires the PC awake; Bluetooth wake is not configured.
 
 Post-network-change Playwright verification: attached existing CDP endpoint, created disposable local-content tab, clicked a button, verified DOM change and closed only that test tab. Shared browser remained running.
+
+Enrollment completed via the existing Google browser session on 2026-10-23: desktop Tailscale IPv4 **100.119.114.55**. Both Sunshine serverinfo endpoints respond on that address: add **100.119.114.55** for Steam/TV and **100.119.114.55:48989** for private Chrome. Other clients still require Tailscale sign-in to the same personal account and Moonlight pairing. This local endpoint check does not verify cellular streaming.
