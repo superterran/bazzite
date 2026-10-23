@@ -9,7 +9,7 @@ This is visible Chrome, with an ordinary persistent profile. Sign in directly us
 - Profile: `~/.var/app/com.google.Chrome/config/chrome-tv-automation`, private to this machine.
 - Automation endpoint: `http://127.0.0.1:9223`, verified bound to loopback only. Remote agents can run Playwright over SSH or use a local SSH tunnel; do not expose this port to the LAN or Internet.
 - No forced Proton compatibility on this Steam entry: it launches the installed Chrome Flatpak.
-- Input: right stick or DualSense touchpad pointer; RT/RB left click, LT/LB right click; right-stick/touchpad press left click; D-pad/left stick arrow keys; Cross Enter, Square Space, Circle Escape, Triangle Tab, Options F6 (cycle focus/address bar), Create Backspace. Steam + X opens Steam's keyboard.
+- Input: right stick or DualSense touchpad pointer; R2 left click, L2 right click; touchpad press left click; R1 zoom in (Ctrl+=), L1 zoom out (Ctrl+-), right-stick press reset zoom (Ctrl+0); D-pad/left stick arrow keys; Cross Enter, Square Space, Circle Escape, Triangle Tab, Options F6 (cycle focus/address bar), Create Backspace. Steam + X opens Steam's keyboard.
 - The separate menu mouse bridge pauses here; Steam Input handles the browser like a game.
 
 Run `bash ~/repos/bazzite/desktop.d/chrome-tv.sh` to reapply the launcher, Steam entry, controller layout and Sunshine app tile. Reuses the shortcut ID and backs up prior configuration under `~/.local/state/chrome-tv-setup/<timestamp>/`. Does not restart Sunshine automatically, so it does not interrupt existing streams during setup. Local app ID and endpoint are recorded in `~/.config/chrome-tv.json`.

@@ -40,7 +40,14 @@ def main():
     expression = '''(async()=>{const s=controllerConfiguratorStore,id=APP;
     for(const [source,mode] of [[3,1],[13,1],[4,3],[5,16],[6,10],[7,10],[12,7],[11,4]]){s.SetControllerSourceMode(id,{action_set_key:'Default',source_binding_key:source,new_mode:mode,enable_virtual_menu_support:true});await s.m_updatingEditingConfigurationPromise;}
     for(const [source,input,mode,key] of [[3,1,1,82],[3,5,1,81],[3,3,1,79],[3,7,1,80],[13,1,1,82],[13,5,1,81],[13,3,1,79],[13,7,1,80],[4,12,3,40],[4,11,3,44],[4,10,3,41],[4,9,3,43],[5,52,16,63],[5,51,16,42]]){s.SetControllerInputBinding(id,{action_set_key:'Default',source_binding_key:source,input_key:input,activator_index:0,binding_index:0,source_mode:mode,new_binding:{type:1,keyboard_key:{key}}});await s.m_updatingEditingConfigurationPromise;}
-    for(const [source,input,mode,button] of [[7,15,10,0],[6,15,10,1],[5,54,16,0],[5,53,16,1],[12,13,7,0],[11,13,4,0]]){s.SetControllerInputBinding(id,{action_set_key:'Default',source_binding_key:source,input_key:input,activator_index:0,binding_index:0,source_mode:mode,new_binding:{type:2,mouse_button:{button}}});await s.m_updatingEditingConfigurationPromise;}
+    for(const [source,input,mode,button] of [[7,15,10,0],[6,15,10,1],[11,13,4,0]]){s.SetControllerInputBinding(id,{action_set_key:'Default',source_binding_key:source,input_key:input,activator_index:0,binding_index:0,source_mode:mode,new_binding:{type:2,mouse_button:{button}}});await s.m_updatingEditingConfigurationPromise;}
+    // Steam's keyboard enum uses 103 for left Control (not USB HID 224).
+    for(const [source,input,mode,key] of [[5,54,16,46],[5,53,16,45],[12,13,7,39]]){
+      const address={action_set_key:'Default',source_binding_key:source,input_key:input,activator_index:0,source_mode:mode};
+      s.SetControllerInputBinding(id,{...address,binding_index:0,new_binding:{type:1,keyboard_key:{key:103}}});await s.m_updatingEditingConfigurationPromise;
+      const bindings=s.EditedConfiguration.sets[0].source_bindings.find(x=>x.key===source).active_group.inputs.find(i=>i.key===input).activators[0].bindings;
+      s.SetControllerInputBinding(id,{...address,binding_index:bindings.length>1?1:-1,new_binding:{type:1,keyboard_key:{key}}});await s.m_updatingEditingConfigurationPromise;
+    }
     s.SaveEditingConfiguration(id);return JSON.stringify(s.EditedConfiguration);})()'''.replace('APP',str(appid))
     (backup/'controller-after.json').write_text(evaluate(expression,timeout=60)+'\n')
     settings = {'name':NAME,'appid':appid,'steam_gameid':str((appid<<32)|0x02000000),'endpoint':'http://127.0.0.1:9223','profile':str(Path.home()/'.var/app/com.google.Chrome/config/chrome-tv-automation')}
