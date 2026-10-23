@@ -159,3 +159,7 @@ Actual GNOME logout and automatic login into gamescope-session-steam succeeded: 
 ### Removed duplicate Moonlight Chrome tile
 
 2026-10-23: user correctly observed standalone Chrome launch changing the TV. Main-host logs showed a client stream while private-host logs showed no connections. Removed the legacy Chrome TV launcher from main Sunshine apps and from setup-chrome-tv.py deployment behavior. Main Moonlight host now exposes Desktop/Steam; separate Chrome Browser host at LAN10.0.0.226:48989 or Tailscale100.119.114.55:48989 exposes independent Chrome. Steam library Chrome viewer remains available. Refresh Moonlight app list and add the private host manually if absent.
+
+### Private host empty app list correction
+
+2026-10-23 user paired private host but saw noapps. NativeSunshine processparserrequires top-level`env`; templateomitteditand startup logged`No such node (env)`, leavingruntimeapplistemptydespitewebAPIreadingthefile. Added`env:{}`tolive/templateapps. Also fixedboot-timeuinputaccess:privateservicehadstartedbeforephysicalseatloginandloggedmouse/keyboardpermissiondenied;scopedpersistentuinputownershiptome(0600),without grantingrawphysicalinputaccess. RestartedprivateSunshine;app-parserandinput-permissionerrorsgone,encodersready. Pairingretained. Clientmustrefreshapplist;clientplaybackawaitstest.

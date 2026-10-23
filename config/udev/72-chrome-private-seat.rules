@@ -1,2 +1,5 @@
 # Sunshine names these devices using XDG_SEAT=seat-browser. Keep them off seat0.
 SUBSYSTEM=="input", ATTRS{name}=="* (seat-browser)*", ENV{ID_SEAT}="seat-browser", TAG+="seat", OWNER="@USER@", MODE="0600"
+
+# Persistent access for this user service before a physical seat logs in.
+KERNEL=="uinput", SUBSYSTEM=="misc", OWNER="@USER@", MODE="0600"

@@ -1,3 +1,9 @@
 {
-  "apps": [{"name": "Chrome - TV & Automation", "image-path": "@COVER@"}]
+  "env": {},
+  "apps": [
+    {
+      "name": "Chrome - TV & Automation",
+      "image-path": "@COVER@"
+    }
+  ]
 }
