@@ -98,3 +98,15 @@ Full Moonlight client playback/input and controller usability still await the us
 ### Moonlight Steam and Chrome separation
 
 The main host’s Steam Big Picture tile runs `bin/focus-steam-tv.py`: it navigates to Game Mode home and explicitly selects Steam in Gamescope, even if the TV Chrome viewer was previously in front. It does not close Big Picture when the stream ends. The separate **Chrome Browser** host captures only the private browser display; choosing Steam on the main host does not move or restart that browser. The main host’s Chrome tile intentionally opens the Steam viewer on the TV.
+
+### Remote clients over Tailscale
+
+Tailscale is installed and enabled at boot. Enrollment requires the user's Tailscale account sign-in; it is currently pending, so internet access is not yet verified. Run `sudo tailscale up --hostname=bazzite-desktop --accept-routes=false --accept-dns=false` to obtain the current login URL. No router port forwards are needed for this design. UPnP is explicitly disabled on both streaming hosts, encrypted streams required, and management UIs restricted to the local PC.
+
+`desktop.d/moonlight-remote.sh` installs a dedicated firewalld zone for tailscale0 allowing both streaming port families, excluding management ports. Tailscale also applies its own packet filtering and account access policy; the zone is not a substitute for tailnet policy review. Keep Chrome CDP9223 and VNC5905 localhost-only.
+
+On phone, tablet, Mac and upstairs computer: install Moonlight and Tailscale, sign into the same personal tailnet, then manually add the desktop Tailscale IPv4 address twice: default port for Steam/TV and `:48989` for private Chrome. Pair each host if prompted. Verify custom-port support on each client. First test LAN playback/input on both hosts, then cellular on phone with Wi-Fi off, then Mac/upstairs computer. Check `tailscale status` and `tailscale ping CLIENT` for direct versus relay path if performance is poor. Client setup, account enrollment and internet streaming remain untested.
+
+The private browser works without a physical monitor. The TV/Game Mode capture still depends on Gamescope maintaining a physical or emulated display; a monitor-unplugged test is required before claiming the entire workstation is fully headless. Remote access requires the PC awake; Bluetooth wake is not configured.
+
+Post-network-change Playwright verification: attached existing CDP endpoint, created disposable local-content tab, clicked a button, verified DOM change and closed only that test tab. Shared browser remained running.
