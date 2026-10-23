@@ -63,7 +63,7 @@ def main():
         data = json.loads(config.read_text())
         shutil.copy2(config,backup/('sunshine-'+str(index)+'-original.json'))
         apps = data.setdefault('apps',[])
-        entry = {'name':NAME,'detached':['steam steam://rungameid/'+settings['steam_gameid']],'image-path':str(icon) if icon.exists() else ''}
+        entry = {'name':NAME,'detached':['python3 '+str(ROOT/'bin/focus-chrome-tv.py')],'image-path':str(icon) if icon.exists() else ''}
         existing = next((a for a in apps if a.get('name')==NAME),None)
         if existing is not None:
             existing.update(entry)

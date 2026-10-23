@@ -65,3 +65,7 @@ Subsequent live test on 2026-10-23 opened Reddit and Gmail in new tabs. Reddit p
 ### Browser extension lock preference
 
 At the user's request on 2026-10-23, turned off “Automatically lock 1Password” in this TV Chrome profile, replacing its eight-hour idle timeout. Reloaded extension settings and verified persistence; preset now displays Convenient. The extension reports no active desktop-app integration (General's integration toggle is enabled but shows a connection problem). Therefore it still locks when Chrome exits, including PC reboot. This is not unattended unlocking across restart. No account password or Secret Key was stored in a launcher. Other autofill confirmation and phishing-prevention settings were unchanged.
+
+### Moonlight launcher focus — 2026-10-23
+
+The Chrome tile now invokes bin/focus-chrome-tv.py. It launches the existing Steam shortcut only if its CDP endpoint is absent, then uses SteamUIStore.SetRunningApp and NavigateToRunningApp to select the already-running browser. Tested with Chrome running behind another game: Gamescope focus changed to Chrome app3789767895 without restarting Chrome or terminating the game. This is still display mirroring. Sunshine logs showed the client resuming a Desktop session; end that existing session and launch the Chrome tile to run its launcher. A private browser view independent of the TV would require a separate virtual desktop/capture session, which has not been configured.

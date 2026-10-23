@@ -23,7 +23,7 @@
     {
       "name": "Chrome - TV & Automation",
       "detached": [
-        "steam steam://rungameid/16276929168489316352"
+        "python3 $(HOME)/repos/bazzite/bin/focus-chrome-tv.py"
       ],
       "image-path": "/var/lib/flatpak/app/com.google.Chrome/current/active/files/extra/product_logo_256.png"
     }
