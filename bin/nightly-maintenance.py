@@ -74,6 +74,9 @@ def main():
     failure = None
     try:
         subprocess.run(['systemctl', 'start', 'uupd.service'], check=True, timeout=2700)
+        # uupd refreshes Homebrew metadata but can leave installed upgrades pending.
+        subprocess.run(['runuser', '-u', 'me', '--', '/home/linuxbrew/.linuxbrew/bin/brew', 'upgrade'],
+                       check=True, timeout=2700)
         reason = decky.busy_reason()
         if not reason:
             subprocess.run(['/usr/bin/python3', str(Path(__file__).with_name('decky-maintenance.py'))], check=True, timeout=900)

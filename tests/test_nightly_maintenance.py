@@ -39,6 +39,12 @@ class NightlyTests(unittest.TestCase):
         self.assertNotIn(['systemctl', 'reboot'], commands)
         self.assertIn(['systemctl', 'start', 'uupd.service'], commands)
 
+    def test_homebrew_upgrades_installed_packages_after_distribution_update(self):
+        commands = self.cycle([None, None], pending=False)
+        self.assertLess(commands.index(['systemctl', 'start', 'uupd.service']),
+                        commands.index(['runuser', '-u', 'me', '--',
+                                        '/home/linuxbrew/.linuxbrew/bin/brew', 'upgrade']))
+
     def test_no_update_means_no_reboot(self):
         self.assertNotIn(['systemctl', 'reboot'], self.cycle([None, None], pending=False))
 
