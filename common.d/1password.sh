@@ -22,6 +22,20 @@ else
     echo "1Password packages already installed"
 fi
 
+# Use the vendor RPM so desktop-app verification receives its required group
+# and setgid permissions. Homebrew's user-owned CLI cannot provide these.
+if ! rpm -q 1password-cli &>/dev/null; then
+    key_file=$(mktemp)
+    curl -fsSL https://downloads.1password.com/linux/keys/1password.asc -o "$key_file"
+    sudo install -m 644 "$key_file" /etc/pki/rpm-gpg/RPM-GPG-KEY-1password
+    rm -f "$key_file"
+    sudo rpm-ostree install --apply-live 1password-cli
+fi
+if [[ -x /usr/bin/op ]]; then
+    mkdir -p "$HOME/.local/bin"
+    ln -sfn /usr/bin/op "$HOME/.local/bin/op"
+fi
+
 # Configure 1Password SSH Agent environment
 echo "Setting up 1Password SSH Agent integration..."
 BASHRC="$HOME/.bashrc"
