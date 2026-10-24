@@ -8,7 +8,8 @@ import ctypes
 import argparse
 gi.require_version('Gtk','3.0')
 gi.require_version('GtkVnc','2.0')
-from gi.repository import Gtk, GtkVnc, GLib
+gi.require_version('GdkX11','3.0')
+from gi.repository import Gtk, GtkVnc, GLib, GdkX11
 from pathlib import Path
 
 parser=argparse.ArgumentParser()
@@ -33,6 +34,12 @@ def focus_viewer():
 display.connect('vnc-initialized',lambda *_: GLib.timeout_add(2000 if args.title=='1Password' else 500,focus_viewer))
 window.add(display)
 window.show_all()
+steam_appid=os.environ.get('SteamAppId','')
+if steam_appid.isdigit():
+    # Attribute the native viewer explicitly when Steam's overlay is disabled.
+    xid=GdkX11.X11Window.get_xid(window.get_window())
+    subprocess.run(['xprop','-id',str(xid),'-f','STEAM_GAME','32c',
+                    '-set','STEAM_GAME',steam_appid],check=True)
 window.fullscreen()
 display.open_host('127.0.0.1','5905')
 runtime=os.environ.get('XDG_RUNTIME_DIR',f'/run/user/{os.getuid()}')
