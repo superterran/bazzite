@@ -38,14 +38,14 @@ for proto in tcp udp; do
 done
 
 # --- 2. Ports that must stay reachable from the internet ---
-# 2222/tcp  : SSH (pubkey-only, PerSourcePenalties enabled — see sshd_config.d/03-bruteforce.conf)
+# SSH2222 is restricted to LAN/Tailscale by ssh-private-access.sh.
 # 22000     : Syncthing sync protocol (authenticated + encrypted; direct beats relay)
 # 21027/udp : Syncthing local discovery
 # NOTE: do not guard these with --query-port. While the blanket 1025-65535 range
 # is still present, query-port reports these as already open (range containment),
 # so the explicit entries never get added — and step 4 then removes the range,
 # closing SSH from the internet. --add-port is idempotent, so just always run it.
-for p in 2222/tcp 22000/tcp 22000/udp 21027/udp; do
+for p in 22000/tcp 22000/udp 21027/udp; do
     fw --add-port="$p"
     echo "  + port $p open (internet-facing, intentional)"
 done
@@ -82,3 +82,6 @@ sudo firewall-cmd --reload >/dev/null
 echo "Done."
 echo
 sudo firewall-cmd --zone="$ZONE" --list-all
+
+# Preserve the retired WAN-SSH policy on every full setup run.
+bash "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/ssh-private-access.sh"
