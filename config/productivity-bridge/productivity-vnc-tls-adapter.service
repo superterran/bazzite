@@ -1,0 +1,13 @@
+[Unit]
+Description=Loopback GNOME VNC TLS adapter for xrdp
+After=gnome-remote-desktop-headless.service
+Requires=gnome-remote-desktop-headless.service
+
+[Service]
+ExecStart=/usr/bin/python3 /usr/local/libexec/productivity-vnc-tls-adapter.py
+Restart=on-failure
+NoNewPrivileges=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=default.target

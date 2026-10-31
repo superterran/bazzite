@@ -1,0 +1,14 @@
+[Unit]
+Description=Independent GNOME productivity RDP bridge
+After=network-online.target tailscaled.service firewalld.service
+Wants=network-online.target tailscaled.service firewalld.service
+
+[Service]
+ExecStart=/usr/bin/podman start --attach productivity-xrdp
+ExecStop=/usr/bin/podman stop --time 10 productivity-xrdp
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target

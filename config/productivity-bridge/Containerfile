@@ -1,0 +1,4 @@
+FROM docker.io/library/debian:stable
+RUN apt-get update && apt-get install -y --no-install-recommends xrdp ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+ENTRYPOINT ["/usr/sbin/xrdp", "--nodaemon", "--config", "/etc/xrdp/productivity.ini"]

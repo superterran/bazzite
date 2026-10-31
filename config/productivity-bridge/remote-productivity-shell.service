@@ -1,0 +1,15 @@
+[Unit]
+Description=Independent headless GNOME productivity desktop
+Wants=graphical-session.target
+Before=gnome-remote-desktop-headless.service
+
+[Service]
+Environment=XDG_SESSION_TYPE=wayland
+Environment=XDG_CURRENT_DESKTOP=GNOME
+Environment=WAYLAND_DISPLAY=wayland-productivity
+ExecStart=/usr/bin/gnome-shell --headless --wayland-display=wayland-productivity
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target
