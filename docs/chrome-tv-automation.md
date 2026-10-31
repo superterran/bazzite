@@ -1,40 +1,43 @@
 # One Chrome browser for Steam, Moonlight and Playwright
 
-## Moonlight session entries and productivity access
+## Moonlight stream entries and session switching rollback
 
-Updated 2026-10-31. The main desktop host has three entries:
+Updated 2026-10-31 after a failed client session transition. The main desktop
+host exposes **Display Mode** and **Steam Big Picture**. Both are passive streams
+of the current display: no launch, focus, logout, preparation or undo commands.
+The redundant Desktop tile has been removed. Selecting Steam during a game
+leaves the game running and focused.
 
-| Entry | Behavior |
-| --- | --- |
-| Desktop | Keep GNOME if already running; otherwise select GNOME and log out of Game Mode. |
-| Steam Big Picture | Keep the current Game Mode display, including a running game, without focusing or launching Steam. From GNOME, select Game Mode and log out. |
-| Display Mode | Stream the current display without session commands. |
+Automatic GNOME/Game Mode switching is disabled. Compatibility invocations of
+`bin/moonlight-session.py`, including old `--worker` commands, now return without
+changing any session. `status` remains available for diagnosis. Setup merges the
+two passive entries into Sunshine and removes the legacy managed Desktop entry,
+while preserving unrelated apps and environment settings.
 
-Cross-session changes close the current local session and interrupt the stream.
-Reconnect Moonlight after the new login completes. Selecting Desktop during a game
-ends that Game Mode session; use Steam or Display Mode to view the running game.
-Disconnecting a client does not undo the session choice.
+The failed Desktop hook logged out of Game Mode at09:12. GNOME's session init
+then aborted repeatedly with "A graphical session is already running!"; the
+transition worker timed out and restarted Sunshine against the GDM greeter.
+The original mocked tests did not validate an actual logout/relogin. Do not
+restore switching hooks until the GNOME/session-manager lifecycle and actual
+Moonlight playback have been tested with an independent recovery route.
 
-`bin/moonlight-session.py` detects the current mode, refuses ambiguous states,
-and queues transitions in an independent user service named
-`moonlight-session-switch.service`. It prepares the existing AccountsService
-selection, stops the main Sunshine host, requests logout through the existing
-session helper, waits up to 100 seconds for a replacement local session, and
-starts Sunshine again. The private Chrome host is not changed. Inspect transition
-failures with `journalctl --user -u moonlight-session-switch.service`.
+Recovery selected the existing Game Mode account session and restarted GDM only
+after confirming there was no remaining logged-in seat0 user session. Game Mode
+logged in successfully, and the main Sunshine host was restarted against that
+compositor. Five rollback tests pass, including inert legacy hooks and removal
+of the old Desktop app during deployment. Actual client playback awaits user
+confirmation; encoder initialization/serverinfo alone is not playback validation.
 
-Deploy app entries with `python3 bin/setup-moonlight-apps.py` or
-`desktop.d/sunshine-session.sh`. Deployment preserves unrelated apps/environment
-and backs up the previous live apps file beside it as
-`apps.json.before-session-entries-TIMESTAMP`. General setup defers the Sunshine
-restart; restart only when no client is streaming. Restore a backup to roll back
-the entries, then restart the main host.
+Deploy with `python3 bin/setup-moonlight-apps.py` or
+`desktop.d/sunshine-session.sh`. Live apps backups are stored alongside apps.json
+as `apps.json.before-session-entries-TIMESTAMP`. Do not restore a backup containing
+session-changing hooks as a streaming recovery step.
 
-Validation: seven session/deployment tests pass; live mode detection reports game;
-requesting game returned without changing the Game Mode service PID (2978).
-Sunshine restarted with no established RTSP client connection and its serverinfo
-endpoint responded. GNOME logout/relogin and actual Moonlight playback/input
-across a transition still require a client test.
+The separate private Chrome host retains its configuration, identity and
+pairings. Both Sunshine instances advertise hostname-based mDNS names, producing
+`desktop` and `desktop #2` in Avahi; serverinfo distinguishes the main host at
+port47989 from **Chrome Browser** at48989. The two services have different UUIDs;
+this is separate from the removed duplicate desktop app tile.
 
 ### Productivity rollout plan
 
