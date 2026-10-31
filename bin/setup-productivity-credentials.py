@@ -15,11 +15,18 @@ def run(*args, **kwargs):
                           check=True, text=True, capture_output=True, **kwargs)
 
 
-status = subprocess.check_output(['/usr/bin/grdctl', 'status', '--show-credentials'], text=True)
-match = re.search(r'Password:\s*([^\n]+)', status.split('VNC:')[0])
-if not match or len(match[1].strip()) < 8:
-    raise SystemExit('Existing GNOME RDP credential is required.')
-run('vnc', 'set-password', input=match[1].strip()[:8] + '\n')
+# Keep this endpoint's password stable, even if the main RDP password changes.
+# GNOME owns the on-disk storage; status output stays private in memory.
+existing = run('status', '--show-credentials').stdout
+vnc = existing.split('VNC:', 1)[-1]
+saved = re.search(r'Password:\s*([^\n]+)', vnc)
+missing = ('', '(empty)', '(null)', '(none)', 'not set')
+if not saved or saved[1].strip().lower() in missing:
+    status = subprocess.check_output(['/usr/bin/grdctl', 'status', '--show-credentials'], text=True)
+    match = re.search(r'Password:\s*([^\n]+)', status.split('VNC:')[0])
+    if not match or len(match[1].strip()) < 8:
+        raise SystemExit('Existing GNOME RDP credential is required for initial setup.')
+    run('vnc', 'set-password', input=match[1].strip()[:8] + '\n')
 for args in [('set-port', '5902'), ('set-auth-method', 'password'),
              ('disable-view-only',), ('disable-port-negotiation',), ('enable',)]:
     run('vnc', *args)

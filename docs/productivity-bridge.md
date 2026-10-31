@@ -85,3 +85,16 @@ user manager stop/disable `productivity-vnc-tls-adapter.service`,
 Disable lingering for `desktop-remote` if retiring the account. Preserve its
 home/application data until reviewed. These actions do not require stopping
 the main user's Sunshine/GNOME services or deleting the existing5901 fallback.
+
+
+## Persistence follow-up
+
+User confirmed Jump opens GNOME and fills the iPad screen. Server/system and
+account services verified enabled, linger enabled; compositor remained alive
+through several test disconnects. No cold-boot test performed. Headless backend
+credential file is owned by desktop-remote with mode0600. Initial password is
+seeded from the original RDP credential; subsequent setup preserves the saved
+backend password exactly, even if the main RDP password changes. Before/after
+credential comparison passed without logging its value. Jump's iPad Save
+Credentials option must be enabled client-side; this session cannot control
+the iPad UI. Saved documents survive reboot; open application processes do not.
