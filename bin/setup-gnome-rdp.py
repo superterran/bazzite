@@ -40,7 +40,7 @@ def main():
     run('grdctl', 'rdp', 'set-port', '3389')
     run('grdctl', 'rdp', 'disable-port-negotiation')
     run('grdctl', 'rdp', 'disable-view-only')
-    run('gsettings', 'set', 'org.gnome.desktop.remote-desktop.rdp', 'screen-share-mode', 'extend')
+    run('/usr/bin/gsettings', 'set', 'org.gnome.desktop.remote-desktop.rdp', 'screen-share-mode', 'extend')
     run('grdctl', 'rdp', 'enable')
     run('systemctl', '--user', 'enable', '--now', 'gnome-remote-desktop.service')
     metadata = {'configured_at': datetime.now(timezone.utc).isoformat(),

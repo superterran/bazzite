@@ -94,3 +94,31 @@ References:
 - [Jump game controllers](https://docs.jumpdesktop.com/viewer/session/game-controllers/)
 - [GL.iNet Comet VNC discussion](https://forum.gl-inet.com/t/enable-vnc-server-on-comet-kvm/59347)
 - [JetKVM VNC request](https://github.com/jetkvm/kvm/issues/117)
+
+
+## Jump compatibility and VNC alternative — 2026-10-31
+
+Jump RDP failed first at NTLM negotiation. An isolated WinPR experiment passed
+that stage, but actual Jump attempts then failed GNOME's mandatory graphics
+pipeline capability check. RDP through Jump is not working.
+
+GNOME's packaged VNC backend is now enabled in `extend` mode on port5901.
+Connect in Jump using VNC to100.119.114.55:5901, username blank, with the first
+eight characters of the existing GNOME RDP password. The credential remains in
+GNOME keyring and is never printed or passed in arguments. Classic VNC has an
+eight-byte password limit. Transport encryption is supplied by Tailscale;
+firewall rules drop5901 on physical LAN, hotspot and Docker zones and allow the
+tailnet zone. The pre-existing loopback-only5900 listener is preserved.
+
+Deploy with `bash desktop.d/gnome-vnc.sh`. Setup uses `/usr/bin/gsettings`:
+Linuxbrew's gsettings writes a separate backend and did not configure the
+native daemon. Fixed the RDP setup to use the native command as well.
+
+Verified VNC password challenge/authentication, ServerInit and an actual raw
+framebuffer pixel response over the desktop's tailnet address. Native setting
+reads `extend`. Client-side picture, input and resize remain pending user
+validation; a preliminary protocol resize probe did not establish resizing.
+Requires an unlocked GNOME session, as with the RDP assistance service.
+
+The user confirmed the Mini's Jump Fluid connection and scaled resolution work;
+Mini VNC had already been user-confirmed. No changes to the Mini for this test.
