@@ -17,7 +17,11 @@ sudo install -m 0644 "$SCRIPT_DIR/config/systemd/system/fan-curve.service" /etc/
 sudo modprobe nct6775 || true
 
 sudo systemctl daemon-reload
-sudo systemctl enable --now fan-curve.service
+if python3 -c 'import json,sys; sys.exit(json.load(open(sys.argv[1]))["source"] != "Kraken liquid temperature")' "$SCRIPT_DIR/config/motherboard-fan-profile.json"; then
+    sudo python3 "$SCRIPT_DIR/bin/apply-coolant-fans.py"
+else
+    sudo systemctl enable --now fan-curve.service
+fi
 
 echo
 echo "Done. Verify with:"

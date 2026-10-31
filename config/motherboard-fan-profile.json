@@ -1,0 +1,42 @@
+{
+  "controller": "CoolerControl coolant-based software control",
+  "headers": {
+    "CPU_FAN": "pwm2/fan2",
+    "CHA_FAN": "pwm7/fan7"
+  },
+  "source": "Kraken liquid temperature",
+  "points_c_percent": [
+    [
+      20,
+      25
+    ],
+    [
+      30,
+      30
+    ],
+    [
+      33,
+      40
+    ],
+    [
+      35,
+      60
+    ],
+    [
+      37,
+      85
+    ],
+    [
+      38,
+      100
+    ],
+    [
+      60,
+      100
+    ]
+  ],
+  "saved_in_bios": false,
+  "boot_restore": "coolercontrold apply_on_boot; standalone fan-curve.service disabled",
+  "pump": "Existing CPU-responsive quiet-idle profile unchanged",
+  "fallback": "coolercontrold ExecStopPost restores autonomous source8 CPU curve"
+}

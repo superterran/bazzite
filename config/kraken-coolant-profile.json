@@ -1,0 +1,51 @@
+{
+  "profile": {
+    "uid": "kraken-coolant-quiet",
+    "name": "Kraken coolant responsive",
+    "function_uid": "0",
+    "p_type": "Graph",
+    "speed_profile": [
+      [
+        20,
+        25
+      ],
+      [
+        30,
+        30
+      ],
+      [
+        33,
+        40
+      ],
+      [
+        35,
+        60
+      ],
+      [
+        37,
+        85
+      ],
+      [
+        38,
+        100
+      ],
+      [
+        60,
+        100
+      ]
+    ],
+    "temp_source": {
+      "temp_name": "liquid",
+      "device_uid": "fa4f791f8b63a9adc86f96b4acdb5936756e938f7d9d1bc04ef7facf5b364849"
+    },
+    "temp_min": null,
+    "temp_max": null
+  },
+  "fan_outputs": [
+    "nct6799:fan2 (CPU_FAN)",
+    "nct6799:fan7 (CHA_FAN)"
+  ],
+  "kraken_fan_output": "Unmanaged; physically disconnected",
+  "coolercontrol_startup_delay_s": 15,
+  "pump": "Existing CPU-responsive 40%-100% profile retained"
+}
