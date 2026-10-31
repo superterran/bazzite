@@ -10,5 +10,6 @@ mkdir -p "$unit_dir"
 install -m 644 "$repo_root/config/systemd/user/app-dev.lizardbyte.app.Sunshine.service.d/session.conf" "$unit_dir/session.conf"
 systemctl --user daemon-reload
 systemctl --user enable app-dev.lizardbyte.app.Sunshine.service
+python3 "$repo_root/bin/setup-moonlight-apps.py"
 # Apply on next start; do not interrupt a stream during general system setup.
 echo 'Sunshine session environment configured; restart its user service to apply.'

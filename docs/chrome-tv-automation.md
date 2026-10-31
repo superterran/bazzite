@@ -1,5 +1,82 @@
 # One Chrome browser for Steam, Moonlight and Playwright
 
+## Moonlight session entries and productivity access
+
+Updated 2026-10-31. The main desktop host has three entries:
+
+| Entry | Behavior |
+| --- | --- |
+| Desktop | Keep GNOME if already running; otherwise select GNOME and log out of Game Mode. |
+| Steam Big Picture | Keep the current Game Mode display, including a running game, without focusing or launching Steam. From GNOME, select Game Mode and log out. |
+| Display Mode | Stream the current display without session commands. |
+
+Cross-session changes close the current local session and interrupt the stream.
+Reconnect Moonlight after the new login completes. Selecting Desktop during a game
+ends that Game Mode session; use Steam or Display Mode to view the running game.
+Disconnecting a client does not undo the session choice.
+
+`bin/moonlight-session.py` detects the current mode, refuses ambiguous states,
+and queues transitions in an independent user service named
+`moonlight-session-switch.service`. It prepares the existing AccountsService
+selection, stops the main Sunshine host, requests logout through the existing
+session helper, waits up to 100 seconds for a replacement local session, and
+starts Sunshine again. The private Chrome host is not changed. Inspect transition
+failures with `journalctl --user -u moonlight-session-switch.service`.
+
+Deploy app entries with `python3 bin/setup-moonlight-apps.py` or
+`desktop.d/sunshine-session.sh`. Deployment preserves unrelated apps/environment
+and backs up the previous live apps file beside it as
+`apps.json.before-session-entries-TIMESTAMP`. General setup defers the Sunshine
+restart; restart only when no client is streaming. Restore a backup to roll back
+the entries, then restart the main host.
+
+Validation: seven session/deployment tests pass; live mode detection reports game;
+requesting game returned without changing the Game Mode service PID (2978).
+Sunshine restarted with no established RTSP client connection and its serverinfo
+endpoint responded. GNOME logout/relogin and actual Moonlight playback/input
+across a transition still require a client test.
+
+### Productivity rollout plan
+
+1. **GNOME:** trial the installed GNOME Remote Desktop 50.2 RDP service with
+   `screen-share-mode=extend`. The installed schema supports it. GNOME's virtual
+   monitor can follow client resolution and resize through the RDP Display Control
+   Channel, making this the first candidate for ultrawide and resizable windows.
+   Test text sharpness, scaling, clipboard, keyboard shortcuts, reconnect and
+   latency at 3440x1440, 2560x1440 and the tablet's native aspect ratio. Start with
+   the existing GNOME session; evaluate headless/remote-login sessions separately
+   because same-user local Game Mode coexistence must be verified. RDP is not yet
+   enabled or exposed by this change.
+2. **Mac mini Moonlight:** install official Apple Silicon Sunshine, grant capture
+   and input permissions through normal macOS approval, retain private LAN/tailnet
+   access, and pair the intended Moonlight clients with host `100.90.54.59`.
+   Start with the existing display to verify VideoToolbox encoding, audio, input
+   and reconnect. Preserve FileVault, existing Screen Sharing and KVM recovery.
+   No Mac software was installed during this task.
+3. **Mac mini virtual display:** trial BetterDisplay with an independent virtual
+   screen and explicit ultrawide/tablet/HiDPI modes, then select that display in
+   Sunshine. Automate client-resolution selection and disconnect behavior only
+   after confirming capture and window placement; do not assume Moonlight window
+   resizing will resize the host desktop live.
+4. **Mac productivity comparison:** compare Jump Desktop Fluid's built-in virtual
+   display, client-matched resizing and Retina scaling against Moonlight plus
+   BetterDisplay. One virtual display is included in current Jump plans; multiple
+   virtual displays require Enterprise. Confirm client/platform pricing before
+   purchase. Jump's Linux host is alpha and its virtual display support is limited
+   to sessions Connect starts when no one is signed in, so it is not the first
+   choice for controlling this desktop's existing GNOME session.
+
+Mini discovery: authenticated through Closet's codex-rc SSH route, macOS 27.0.1,
+1920x1080@60 DELL display, no Sunshine/BetterDisplay/Jump application or matching
+LaunchAgent found. Direct desktop SSH matched the recorded host fingerprint but
+did not authenticate with available agent keys; use the verified Closet route.
+
+References: [GNOME RDP virtual monitor and resize behavior](https://lists.gnome.org/archives/commits-list/2022-February/msg14593.html),
+[GNOME Remote Desktop configuration](https://github.com/GNOME/gnome-remote-desktop/blob/main/docs/configuration.md),
+[Sunshine macOS installation](https://docs.lizardbyte.dev/projects/sunshine/latest/md_docs_2getting__started.html),
+[BetterDisplay](https://github.com/waydabber/BetterDisplay), and
+[Jump virtual display requirements and plans](https://docs.jumpdesktop.com/viewer/virtual-displays/).
+
 The persistent browser runs on a private virtual desktop. Steam and Moonlight view that same desktop. There is one Chrome process, one profile, one set of website sessions and one 1Password extension lock state.
 
 ## Use it

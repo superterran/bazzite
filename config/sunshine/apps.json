@@ -5,14 +5,17 @@
   "apps": [
     {
       "name": "Desktop",
+      "prep-cmd": [{"do": "python3 $(HOME)/repos/bazzite/bin/moonlight-session.py desktop", "undo": ""}],
       "image-path": "desktop.png"
     },
     {
       "name": "Steam Big Picture",
-      "detached": [
-        "python3 $(HOME)/repos/bazzite/bin/focus-steam-tv.py"
-      ],
+      "prep-cmd": [{"do": "python3 $(HOME)/repos/bazzite/bin/moonlight-session.py game", "undo": ""}],
       "image-path": "steam.png"
+    },
+    {
+      "name": "Display Mode",
+      "image-path": "desktop.png"
     }
   ]
 }
