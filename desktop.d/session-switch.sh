@@ -2,10 +2,12 @@
 # Repair desktop Game Mode launcher on DX images lacking steamosctl.
 set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-if command -v steamosctl >/dev/null; then
+if command -v steamosctl >/dev/null && ! grep -q bazzite-local-steamosctl-compat "$(command -v steamosctl)"; then
     echo 'Native steamosctl available; fallback not needed.'
     exit 0
 fi
+sudo install -Dm755 "$REPO_ROOT/bin/steamosctl-compat" /usr/local/bin/steamosctl
+sudo restorecon /usr/local/bin/steamosctl
 install -Dm755 "$REPO_ROOT/bin/desktop-mode" "$HOME/.local/bin/desktop-mode"
 install -Dm755 "$REPO_ROOT/bin/switch-bazzite-session.sh" "$HOME/.local/bin/switch-bazzite-session.sh"
 python3 - "$REPO_ROOT" <<'PYSETUP'

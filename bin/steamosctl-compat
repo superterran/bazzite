@@ -1,0 +1,19 @@
+#!/usr/bin/bash
+# bazzite-local-steamosctl-compat: DX images without steamos-manager.
+set -euo pipefail
+unset LD_PRELOAD LD_LIBRARY_PATH
+export PATH="/usr/local/bin:/usr/bin:/bin:$HOME/.local/bin"
+helper="$HOME/repos/bazzite/bin/switch-bazzite-session.sh"
+case "${1:-}" in
+  switch-to-desktop-mode) exec "$helper" desktop ;;
+  switch-to-game-mode) exec "$helper" game ;;
+  set-default-login-mode)
+    case "${2:-}" in
+      desktop) exec "$helper" desktop --prepare-only ;;
+      game) exec "$helper" game --prepare-only ;;
+      *) exit 2 ;;
+    esac ;;
+  set-default-desktop-session)
+    [[ "${2:-}" == gnome.desktop ]] || { echo 'Only the installed GNOME desktop is supported.' >&2; exit 2; } ;;
+  *) echo 'Unsupported steamosctl compatibility command.' >&2; exit 2 ;;
+esac

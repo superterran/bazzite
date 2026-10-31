@@ -1,43 +1,72 @@
 # One Chrome browser for Steam, Moonlight and Playwright
 
-## Moonlight stream entries and session switching rollback
+## Steam and Moonlight session switching
 
-Updated 2026-10-31 after a failed client session transition. The main desktop
-host exposes **Display Mode** and **Steam Big Picture**. Both are passive streams
-of the current display: no launch, focus, logout, preparation or undo commands.
-The redundant Desktop tile has been removed. Selecting Steam during a game
-leaves the game running and focused.
+Fixed and client-verified 2026-10-31. Steam's Switch to Desktop command now reaches
+GNOME Wayland, and the main Moonlight host offers three entries:
 
-Automatic GNOME/Game Mode switching is disabled. Compatibility invocations of
-`bin/moonlight-session.py`, including old `--worker` commands, now return without
-changing any session. `status` remains available for diagnosis. Setup merges the
-two passive entries into Sunshine and removes the legacy managed Desktop entry,
-while preserving unrelated apps and environment settings.
+| Entry | Behavior |
+| --- | --- |
+| Desktop | Keep GNOME if running; otherwise switch out of Game Mode into GNOME. |
+| Steam Big Picture | Keep Game Mode if running, preserving the current game and focus; otherwise log out of GNOME into Game Mode. |
+| Display Mode | Stream the current display with no session command. |
 
-The failed Desktop hook logged out of Game Mode at09:12. GNOME's session init
-then aborted repeatedly with "A graphical session is already running!"; the
-transition worker timed out and restarted Sunshine against the GDM greeter.
-The original mocked tests did not validate an actual logout/relogin. Do not
-restore switching hooks until the GNOME/session-manager lifecycle and actual
-Moonlight playback have been tested with an independent recovery route.
+A cross-session change logs out of the current session. The stream can briefly
+drop; reconnect once the target session is ready. Already-in-mode selections do
+not focus, launch, terminate or restart Steam. Client pairings and the separate
+private Chrome host remain intact.
 
-Recovery selected the existing Game Mode account session and restarted GDM only
-after confirming there was no remaining logged-in seat0 user session. Game Mode
-logged in successfully, and the main Sunshine host was restarted against that
-compositor. Five rollback tests pass, including inert legacy hooks and removal
-of the old Desktop app during deployment. Actual client playback awaits user
-confirmation; encoder initialization/serverinfo alone is not playback validation.
+### Root causes and repair
 
-Deploy with `python3 bin/setup-moonlight-apps.py` or
-`desktop.d/sunshine-session.sh`. Live apps backups are stored alongside apps.json
-as `apps.json.before-session-entries-TIMESTAMP`. Do not restore a backup containing
-session-changing hooks as a streaming recovery step.
+The Steam menu runs /usr/bin/steamos-session-select, which delegates to the
+packaged /usr/libexec/os-session-select. That script calls steamosctl, absent on
+this DX image; its command-not-found error left Steam at Switching to Desktop.
+The earlier local desktop-mode launcher did not repair this native menu path.
 
-The separate private Chrome host retains its configuration, identity and
-pairings. Both Sunshine instances advertise hostname-based mDNS names, producing
-`desktop` and `desktop #2` in Avahi; serverinfo distinguishes the main host at
-port47989 from **Chrome Browser** at48989. The two services have different UUIDs;
-this is separate from the removed duplicate desktop app tile.
+An earlier logout-only workaround also left graphical-session.target active in
+the persistent user manager. GNOME50 then aborted with "A graphical session is
+already running!". Stopping only the loginctl seat was insufficient.
+
+`bin/steamosctl-compat` is now installed at /usr/local/bin/steamosctl, a directory
+already in Steam's real PATH. It handles the native session commands, clears
+Steam's preload/library overrides, and dispatches to the shared
+`bin/switch-bazzite-session.sh`. Genuine packaged steamosctl is not overwritten;
+remove this marked local compatibility shim when the base image supplies the
+native command again. Installation: `bash desktop.d/session-switch.sh`.
+
+The shared helper validates and records the target through AccountsService, then
+queues an independent user service so Steam/logout cannot kill cleanup midway.
+Leaving Game Mode stops gamescope-session.target, graphical-session.target and
+graphical-session-pre.target. The normal GDM timed login then starts GNOME with a
+clean graphical lifecycle. Leaving GNOME uses its normal logout command.
+`bin/moonlight-session.py` uses this same helper and refuses ambiguous/starting
+states. Sunshine startup chooses sockets for the actual active compositor,
+avoiding stale socket paths left by the previous session.
+
+### Validation and recovery
+
+Live validation exercised the exact native Steam command, reached an initialized
+GNOME Wayland session, returned to Game Mode, then reached GNOME again through
+the Moonlight launch helper. The already-in-Game-Mode request preserved the Game
+Mode service PID. Eight regression checks pass, including native compatibility
+dispatch, graphical-target teardown, no-op selections and app deployment.
+The user confirmed GNOME picture, pointer and clicking work through Moonlight.
+The machine was left in GNOME.
+
+An independent root timer was armed to restore Game Mode if GNOME failed to
+start during testing, then canceled after successful transitions. It is not a
+permanent recovery watchdog. Existing SSH access remains available.
+
+Deploy apps with `python3 bin/setup-moonlight-apps.py` or the Sunshine setup
+script. Live apps backups remain beside apps.json. For a passive-only fallback,
+remove prep-cmd from Desktop/Steam and stream Display Mode. If GNOME cannot
+start, select Game Mode with `bin/switch-bazzite-session.sh game --prepare-only`,
+clear stale graphical targets, and use GDM recovery only after checking which
+local sessions would be affected.
+
+The two hostname-based Avahi advertisements, desktop and desktop #2, belong to
+the main and private Chrome Sunshine instances. Their serverinfo UUIDs and ports
+47989/48989 differ. Main host:10.0.0.226; separate Chrome Browser:10.0.0.226:48989.
 
 ### Productivity rollout plan
 

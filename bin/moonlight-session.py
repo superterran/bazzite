@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Report session state; former Moonlight switching hooks are now harmless."""
+"""Ensure the requested session, preserving an already running Game Mode."""
 import argparse
 import os
+from pathlib import Path
 import subprocess
 
 SUNSHINE = 'app-dev.lizardbyte.app.Sunshine.service'
@@ -25,13 +26,18 @@ def current_mode():
 
 
 def request(mode):
-    # Keep stale launch hooks harmless. Logging out can strand the host at GDM
-    # when the target session fails; streaming must never depend on relogin.
-    print('Automatic session switching is disabled; streaming the current display.')
+    current = current_mode()
+    if current == mode:
+        print('Requested session already running; streaming current display untouched.')
+        return
+    if current == 'unknown':
+        raise RuntimeError('Session is starting or ambiguous; retry once it is ready')
+    # The shared Steam/GNOME helper owns orderly graphical target teardown.
+    run(str(Path(__file__).with_name('switch-bazzite-session.sh')), mode)
 
 
 def switch(mode):
-    # Compatibility for an already queued --worker invocation.
+    # Compatibility for earlier callers; cleanup now lives in the shared helper.
     request(mode)
 
 

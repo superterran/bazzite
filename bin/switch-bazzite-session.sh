@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Bazzite DX fallback while the base image omits steamos-manager/steamosctl.
 set -euo pipefail
+unset LD_PRELOAD LD_LIBRARY_PATH
 mode="${1:-game}"
 case "$mode" in
   game) session=gamescope-session-steam ;;
@@ -18,8 +19,26 @@ if [[ "${2:-}" == --prepare-only ]]; then
     printf 'Next login session: %s\n' "$session"
     exit 0
 fi
+if [[ "$mode" == game ]] && systemctl --user is-active --quiet gamescope-session-plus@steam.service; then
+    echo 'Already in Game Mode; leaving the current display untouched.'
+    exit 0
+fi
+if [[ "$mode" == desktop ]] && pgrep -u "$uid" -x gnome-shell >/dev/null; then
+    echo 'Already in GNOME; leaving the current display untouched.'
+    exit 0
+fi
+if [[ "${2:-}" != --worker ]]; then
+    # Keep cleanup alive after Steam and its login session exit.
+    exec systemd-run --user --collect --unit=bazzite-session-switch \
+        /usr/bin/bash "$(readlink -f "$0")" "$mode" --worker
+fi
 if pgrep -u "$uid" -x gnome-shell >/dev/null; then
     exec gnome-session-quit --logout --no-prompt
+fi
+# End the user-manager graphical lifecycle, not just the loginctl seat. GNOME50
+# refuses to start if graphical-session.target is still active from Gamescope.
+if systemctl --user is-active --quiet gamescope-session-plus@steam.service; then
+    exec systemctl --user stop gamescope-session.target graphical-session.target graphical-session-pre.target
 fi
 # Gamescope has no GNOME session manager. End only the local seat session.
 sid="$(loginctl list-sessions --no-legend | awk -v uid="$uid" '$2 == uid && $4 == "seat0" {print $1; exit}')"

@@ -21,4 +21,4 @@ if not target.exists() or target.read_text() != content:
     temporary = target.with_suffix('.json.tmp')
     temporary.write_text(content)
     temporary.replace(target)
-print('Configured passive Display Mode and Steam Big Picture entries; session switching disabled.')
+print('Configured Desktop, Steam Big Picture, and passive Display Mode entries.')
