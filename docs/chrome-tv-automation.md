@@ -298,3 +298,11 @@ Chrome remains Flatpak and its extension does not share desktop unlocking.
 No vault credentials were exported or stored in launcher scripts. The private
 desktop service starts on boot and after failure; an app unlock may be required
 after reboot. This is a remote GUI session, not an unattended unlock mechanism.
+
+### Current Moonlight list — 2026-10-31
+
+At user request, the main host now exposes only Steam Big Picture. Desktop and
+Display Mode entries are retired. Steam still ensures Game Mode and does
+nothing when already there, preserving a running game. Encrypted productivity
+GNOME is reached independently through Jump on3392. Refresh client apps if the
+old tiles are cached. Private Chrome host and pairings are unchanged.

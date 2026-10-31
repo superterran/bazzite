@@ -60,8 +60,8 @@ before expiration (gateway outer certificate365days, local leaves825days).
 
 Backend VNC5914 is blocked by firewall in current external zones; adapter5915
 binds only loopback. The broker waits for the adapter's real RFB greeting before
-allowing xrdp to connect, eliminating a cold-session startup race. Neither
-normal desktop3391 nor its VNC5901 fallback was removed.
+allowing xrdp to connect, eliminating a cold-session startup race. The older unencrypted3391 and5901 listeners were subsequently retired;
+the original desktop-remote home remains on disk for rollback.
 
 ## Verification
 
@@ -81,3 +81,14 @@ felt much faster, then chose to keep resolution/settings as-is. Original
 productivity bridge template also includes compression for future deployment.
 No H.264 hardware video encoding is provided by this legacy VNC-to-RDP path.
 Audio remains disabled; clipboard is limited by xrdp's VNC backend.
+
+## Default desktop and authentication
+
+The encrypted desktop is the main productivity setup. Existing background and
+app customizations are preserved. Native 1Password SSH agent is the default for
+terminals and SSH; CLI app integration was enabled and an approved vault-list
+request succeeded. The app is enabled to start in future unlocked sessions;
+that fresh-session startup still needs verification. No private SSH keys were
+copied. Legacy3391/3389/5901 listeners are retired, with old home data retained.
+Moonlight now exposes only Steam Big Picture and preserves its Game Mode no-op
+behavior. Jump remains the encrypted desktop client on3392.

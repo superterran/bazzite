@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # GNOME productivity access with a client-sized virtual monitor.
 set -euo pipefail
+
+# Retired in favor of the independent encrypted desktop. Explicit rollback only.
+if [[ "${BAZZITE_ENABLE_LEGACY_PRODUCTIVITY:-0}" != 1 ]]; then
+    echo 'Legacy productivity setup skipped; encrypted GNOME is the default.'
+    exit 0
+fi
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 python3 "$repo_root/bin/setup-gnome-rdp.py"
 

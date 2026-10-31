@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
+# Retired in favor of the independent encrypted desktop. Explicit rollback only.
+if [[ "${BAZZITE_ENABLE_LEGACY_PRODUCTIVITY:-0}" != 1 ]]; then
+    echo 'Legacy productivity setup skipped; encrypted GNOME is the default.'
+    exit 0
+fi
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # Accept only tailnet clients, including when other interfaces allow high ports.
 for scope in runtime permanent; do

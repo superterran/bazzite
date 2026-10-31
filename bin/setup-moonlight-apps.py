@@ -9,7 +9,7 @@ root = Path(__file__).resolve().parents[1]
 target = Path.home() / '.config/sunshine/apps.json'
 template = json.loads((root / 'config/sunshine/apps.json').read_text())
 data = json.loads(target.read_text()) if target.exists() else template.copy()
-managed = {app['name'] for app in template['apps']} | {'Desktop'}
+managed = {app['name'] for app in template['apps']} | {'Desktop', 'Display Mode'}
 data['apps'] = template['apps'] + [app for app in data.get('apps', [])
                                 if app.get('name') not in managed]
 content = json.dumps(data, indent=2) + '\n'
@@ -21,4 +21,4 @@ if not target.exists() or target.read_text() != content:
     temporary = target.with_suffix('.json.tmp')
     temporary.write_text(content)
     temporary.replace(target)
-print('Configured Desktop, Steam Big Picture, and passive Display Mode entries.')
+print('Configured Steam Big Picture; retired Desktop and Display Mode entries.')

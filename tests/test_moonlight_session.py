@@ -77,15 +77,13 @@ class MoonlightSessionTests(unittest.TestCase):
                                 'LD_LIBRARY_PATH': '/unwanted-steam-runtime'})
             self.assertEqual((Path(folder) / 'args').read_text(), 'desktop\n')
 
-    def test_display_is_passive_and_steam_never_launches_or_focuses_steam(self):
+    def test_only_steam_is_exposed_and_never_launches_or_focuses_steam(self):
         data = json.loads((Path(__file__).parents[1] / 'config/sunshine/apps.json').read_text())
         self.assertEqual({a['name'] for a in data['apps']},
-                         {'Desktop', 'Display Mode', 'Steam Big Picture'})
+                         {'Steam Big Picture'})
         for app in data['apps']:
             for field in ('detached', 'cmd'):
                 self.assertFalse(app.get(field))
-            if app['name'] == 'Display Mode':
-                self.assertFalse(app.get('prep-cmd'))
 
     def test_deployment_preserves_custom_apps_and_environment(self):
         with tempfile.TemporaryDirectory() as home:
@@ -93,6 +91,7 @@ class MoonlightSessionTests(unittest.TestCase):
             target.parent.mkdir(parents=True)
             original = {'env': {'CUSTOM': 'keep'}, 'apps': [
                 {'name': 'Desktop', 'prep-cmd': [{'do': 'old-switch-command'}]},
+                {'name': 'Display Mode'},
                 {'name': 'Steam Big Picture', 'detached': ['old-focus-command']},
                 {'name': 'Custom App', 'cmd': 'keep-command'}]}
             target.write_text(json.dumps(original))
@@ -102,9 +101,9 @@ class MoonlightSessionTests(unittest.TestCase):
                                check=True, capture_output=True)
             result = json.loads(target.read_text())
             self.assertEqual(result['env'], original['env'])
-            self.assertEqual(len(result['apps']), 4)
+            self.assertEqual(len(result['apps']), 2)
             self.assertEqual(result['apps'][-1], original['apps'][-1])
-            self.assertNotIn('detached', result['apps'][1])
+            self.assertNotIn('detached', result['apps'][0])
             self.assertEqual(len(list(target.parent.glob('apps.json.before-*'))), 1)
 
 
