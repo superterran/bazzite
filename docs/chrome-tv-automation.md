@@ -306,3 +306,12 @@ Display Mode entries are retired. Steam still ensures Game Mode and does
 nothing when already there, preserving a running game. Encrypted productivity
 GNOME is reached independently through Jump on3392. Refresh client apps if the
 old tiles are cached. Private Chrome host and pairings are unchanged.
+
+### Cold-boot capture readiness
+
+After the maintenance reboot, Steam/Game Mode were running but Sunshine had
+started with no KMS monitor and stayed alive without a working encoder. A
+Sunshine-only restart restored KMS capture and H.264/HEVC/AV1 NVENC detection.
+The session wrapper now waits for a connected, enabled DRM output in Game Mode
+before starting Sunshine. This guard still needs validation on a future cold
+boot; client playback after recovery needs user confirmation.
