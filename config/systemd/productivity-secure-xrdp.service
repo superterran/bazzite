@@ -1,0 +1,16 @@
+[Unit]
+Description=TLS login gateway for encrypted GNOME desktop
+After=network-online.target tailscaled.service firewalld.service productivity-volume-broker.service
+Requires=productivity-volume-broker.service
+Wants=network-online.target tailscaled.service firewalld.service
+
+[Service]
+ExecStart=/usr/bin/podman start --attach productivity-secure-xrdp
+ExecStop=/usr/bin/podman stop --time 10 productivity-secure-xrdp
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=20
+LimitCORE=0
+
+[Install]
+WantedBy=multi-user.target

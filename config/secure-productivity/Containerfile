@@ -1,0 +1,10 @@
+FROM localhost/productivity-xrdp:test
+RUN apt-get update -qq && apt-get install -y --no-install-recommends python3 \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --uid 1002 --no-create-home --shell /bin/bash desktop-secure
+COPY bin/productivity-pam-unlock.py /usr/local/libexec/productivity-pam-unlock.py
+COPY config/secure-productivity/pam-xrdp-sesman /etc/pam.d/xrdp-sesman
+COPY config/secure-productivity/entrypoint.sh /usr/local/bin/productivity-xrdp-entrypoint
+RUN chmod 755 /usr/local/libexec/productivity-pam-unlock.py /usr/local/bin/productivity-xrdp-entrypoint
+ENV PRODUCTIVITY_UNLOCK_TRANSPORT=tls
+ENTRYPOINT ["/usr/local/bin/productivity-xrdp-entrypoint"]

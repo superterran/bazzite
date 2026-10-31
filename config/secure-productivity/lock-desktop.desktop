@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Lock encrypted desktop
+Comment=Close this desktop's apps and lock its encrypted home
+Icon=system-lock-screen
+Exec=/usr/bin/python3 /usr/local/libexec/productivity-pam-unlock.py --lock
+Terminal=false
+Categories=System;

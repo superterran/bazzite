@@ -1,0 +1,16 @@
+[Unit]
+Description=Encrypted GNOME home login and unlock broker
+After=local-fs.target
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/python3 /usr/local/libexec/productivity-volume-broker.py
+RuntimeDirectory=productivity-unlock
+RuntimeDirectoryMode=0755
+LimitCORE=0
+UMask=0077
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

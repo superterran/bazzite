@@ -1,0 +1,6 @@
+subjectAltName=DNS:productivity-unlock,IP:127.0.0.1
+extendedKeyUsage=serverAuth
+basicConstraints=critical,CA:FALSE
+keyUsage=critical,digitalSignature,keyEncipherment
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid,issuer

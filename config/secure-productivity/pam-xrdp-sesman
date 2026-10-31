@@ -1,0 +1,4 @@
+# Full-password authentication happens in a fixed host broker before VNC starts.
+auth required pam_exec.so quiet expose_authtok /usr/local/libexec/productivity-pam-unlock.py --tls
+account required pam_permit.so
+session required pam_permit.so

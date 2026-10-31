@@ -1,0 +1,11 @@
+[Unit]
+Description=Authenticated session lifetime for encrypted desktop user %i
+
+[Service]
+Type=exec
+User=%i
+PAMName=productivity-secure
+WorkingDirectory=/var/home/desktop-secure
+ExecStart=/usr/bin/sleep infinity
+KillMode=control-group
+LimitCORE=0

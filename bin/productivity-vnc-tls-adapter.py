@@ -8,6 +8,10 @@ import select
 import socket
 import ssl
 import threading
+import os
+
+BACKEND_PORT = int(os.environ.get('PRODUCTIVITY_VNC_BACKEND_PORT', '5902'))
+LISTEN_PORT = int(os.environ.get('PRODUCTIVITY_VNC_ADAPTER_PORT', '5903'))
 
 
 def exact(sock, size):
@@ -24,7 +28,7 @@ def session(client):
     upstream = None
     try:
         client.settimeout(15)
-        upstream = socket.create_connection(('127.0.0.1', 5902), 5)
+        upstream = socket.create_connection(('127.0.0.1', BACKEND_PORT), 5)
         client.sendall(exact(upstream, 12))
         version = exact(client, 12)
         print(f'VNC adapter client version: {version.decode().strip()}', flush=True)
@@ -74,8 +78,8 @@ def session(client):
 
 
 def serve(address, family):
-    with socket.create_server((address, 5903), family=family) as listener:
-        print(f'VNC TLS adapter listening on {address}:5903', flush=True)
+    with socket.create_server((address, LISTEN_PORT), family=family) as listener:
+        print(f'VNC TLS adapter listening on {address}:{LISTEN_PORT}', flush=True)
         while True:
             connection, _ = listener.accept()
             threading.Thread(target=session, args=(connection,), daemon=True).start()
