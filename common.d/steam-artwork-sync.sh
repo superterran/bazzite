@@ -8,6 +8,8 @@ if [[ ! -f "$settings_path" ]]; then
 fi
 mkdir -p "$HOME/.local/bin" "$HOME/.config/systemd/user"
 install -m 755 "$repo_root/bin/steam-artwork-sync.py" "$HOME/.local/bin/steam-artwork-sync.py"
+install -m 755 "$repo_root/bin/audit-steam-artwork.py" "$HOME/.local/bin/audit-steam-artwork.py"
+install -m 644 "$repo_root/bin/steam_shortcut_policy.py" "$HOME/.local/bin/steam_shortcut_policy.py"
 install -m 644 "$repo_root/bin/steam_client.py" "$HOME/.local/bin/steam_client.py"
 python3 - "$settings_path" <<'PY'
 from pathlib import Path

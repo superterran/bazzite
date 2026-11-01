@@ -107,3 +107,22 @@ just deploy-services      # Push config/systemd/user/ → live + systemctl daemo
 just backup-config        # Snapshot full system config (Flatpaks, RPMs, dconf, etc.)
 just setup-ally           # Run setup on ROG Ally via SSH
 ```
+
+
+## Steam library changes — desktop and ally
+
+Whenever changing Steam artwork or retiring shortcuts, follow
+[docs/steam-library-artwork.md](docs/steam-library-artwork.md) and the fleet
+gaming-sync reference. Artwork must be applied through Steam and exported with
+`python3 bin/steam-artwork-sync.py`; let Syncthing carry it through Closet, run
+the sync helper on the other awake gaming peer, then verify matching asset
+SHA256 by title/role with `python3 bin/audit-steam-artwork.py --peer ally`.
+IDs differ between devices: never copy shortcuts.vdf or
+reuse another machine's appid. Check sync timers are enabled and inspect folder
+pending/error counts. Do not report fleet completion while a peer is offline.
+
+User-requested retirement of a title must be checked on both gaming peers and
+recorded in each host's retired-shortcuts policy so setup cannot resurrect it.
+Preserve games, saves, controller layouts and unrelated shortcuts. Keep artwork
+masters and regeneration/apply helpers in this repo, back up replacements,
+visually inspect portrait/wide titles, and record real verification in profiles.

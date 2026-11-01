@@ -51,3 +51,33 @@ banner near bottom. Reviewed wording and full edges before applying600x900.
 This later revision is AI-recomposed from the original scan; the original scan
 and previous fitted version remain in source/history. Apply helper now uses the
 reviewed recomposed master so later setup does not restore the padded layout.
+
+## Required fleet verification
+
+For every future artwork or library cleanup change:
+
+1. Preserve local shortcut IDs and controller/save/application data; back up art.
+2. Apply title-safe portrait/wide assets through Steam and standard grid files.
+3. Run `python3 bin/steam-artwork-sync.py` on desktop. Syncthing carries the
+   title/role assets through Closet to Ally. Run its installed helper if needed.
+4. Check steam-artwork-sync.timer enabled/active on both. Check rom-artwork
+   idle, needFiles0, needBytes0, errors0 and pullErrors0 on both awake peers.
+5. Run `python3 bin/audit-steam-artwork.py --peer ally`. It compares actual
+   applied files by title/role, reports missing/different files, ignores Steam's
+   user0 bootstrap cache and never assumes cross-device appids match.
+6. Apply authorized title retirement on both requested peers and save their
+   per-host retired-shortcuts policies. Do not delete application/game files.
+7. Record verified results, device-only titles and offline/queued limitations.
+
+This requirement is in repo CLAUDE.md and the fleet skill's gaming-sync reference.
+The common setup installs the sync helper, audit command, retirement policy
+helper and15second timer. It does not install desktop-only utilities on Ally.
+
+Verified with Ally awake2026-11-01:23shared titles,113matching artwork-role
+SHA256s, zero missing/different files. The revised24Games portrait and all
+Mahjongg/Solitaire portrait/wide/hero/icon assets match under their different
+local appids. Both timers enabled/active; both Syncthing folders idle/no pending
+files/bytes/errors. Ally Dusklight removed too; no remaining retired titles in
+its active shortcuts. Desktop-only illustrated masters are present in the
+shared store and will apply by title if the corresponding title is installed
+later. User-only libraries are intentionally not cloned wholesale.
