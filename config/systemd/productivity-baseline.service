@@ -1,0 +1,12 @@
+[Unit]
+Description=Selective known-good Bazzite baseline on Closet
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /home/me/repos/bazzite/bin/backup-productivity-incremental.py --baseline
+UMask=0077
+LimitCORE=0
+Nice=15
+IOSchedulingClass=idle
+TimeoutStartSec=6h

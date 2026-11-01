@@ -1,0 +1,9 @@
+[Unit]
+Description=Nightly encrypted desktop history
+[Timer]
+OnCalendar=*-*-* 04:15:00
+RandomizedDelaySec=5min
+Persistent=false
+Unit=productivity-incremental.service
+[Install]
+WantedBy=timers.target

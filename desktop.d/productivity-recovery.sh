@@ -12,4 +12,8 @@ for unit in productivity-backup.service productivity-backup.timer; do
     sudo install -m 644 "$repo_root/config/systemd/$unit" /etc/systemd/system/
 done
 sudo systemctl daemon-reload
-sudo systemctl enable --now productivity-backup.timer
+if sudo test -s /var/lib/productivity-recovery/incremental-restore-test.json && systemctl is-enabled --quiet productivity-incremental.timer; then
+    echo 'Verified incremental history owns the nightly schedule; full archive remains manual.'
+else
+    sudo systemctl enable --now productivity-backup.timer
+fi

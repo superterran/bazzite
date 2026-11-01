@@ -1,0 +1,15 @@
+[Unit]
+Description=Encrypted deduplicated desktop history on Closet
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=/etc/credstore.encrypted/productivity-restic
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /home/me/repos/bazzite/bin/backup-productivity-incremental.py
+ExecStartPost=/usr/bin/python3 /home/me/repos/bazzite/bin/productivity-restic.py forget --host desktop --tag desktop --group-by host,tags --keep-daily 7 --keep-weekly 4 --keep-monthly 3 --prune
+UMask=0077
+LimitCORE=0
+Nice=15
+IOSchedulingClass=idle
+TimeoutStartSec=3h
