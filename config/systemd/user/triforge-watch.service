@@ -1,0 +1,9 @@
+[Unit]
+Description=Check official Triforge release and install on desktop and Ally
+
+[Service]
+Type=oneshot
+ExecStart=%h/repos/bazzite/bin/check-triforge.sh
+TimeoutStartSec=2h
+UMask=0077
+Nice=10

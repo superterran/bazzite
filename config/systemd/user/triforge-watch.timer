@@ -1,0 +1,10 @@
+[Unit]
+Description=Check Triforge every Monday and Thursday
+
+[Timer]
+OnCalendar=Mon,Thu *-*-* 10:00:00 America/New_York
+Persistent=true
+RandomizedDelaySec=5m
+
+[Install]
+WantedBy=timers.target
