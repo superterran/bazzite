@@ -5,6 +5,7 @@ Wants=network-online.target
 Requires=productivity-volume-broker.service
 
 [Service]
+EnvironmentFile=-/etc/productivity-push.env
 ExecStart=/usr/bin/python3 /usr/local/libexec/productivity-push.py
 LoadCredentialEncrypted=notification:/etc/credstore.encrypted/productivity-push
 RuntimeDirectory=productivity-push

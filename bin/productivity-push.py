@@ -19,7 +19,7 @@ import threading
 import time
 from urllib.parse import parse_qs
 
-BASE = 'https://desktop.tail3758dd.ts.net'
+BASE = os.environ.get('PRODUCTIVITY_APPROVAL_ORIGIN', 'https://desktop.tail3758dd.ts.net').rstrip('/')
 TTL = 300
 GUARD = threading.Lock()
 PENDING = {}

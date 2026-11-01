@@ -72,15 +72,15 @@ def main():
             run(['/usr/sbin/fsfreeze','--unfreeze',str(HOME)]);frozen=False
         run(['/usr/bin/systemctl','stop','productivity-backup-thaw.timer']) if os.path.ismount(HOME) else None
         (work/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
-        main_paths=['me/.bashrc','me/.bash_profile','me/.profile','me/.env','me/.ssh',
+        main_paths=['me/repos/bazzite','me/.bashrc','me/.bash_profile','me/.profile','me/.env','me/.ssh',
                     'me/.config/sunshine','me/.config/systemd/user','me/.config/environment.d',
                     'me/.config/gamescope','me/.config/gamescope-session-plus',
                     'me/.config/steam-artwork-sync.json','me/.config/retired-steam-shortcuts.json',
-                    'me/.config/secure-desktop-tv.json','me/.config/hardware-monitor.json',
+                    'me/.config/secure-desktop-tv.json','me/.config/hardware-monitor.json','me/.config/hardware-monitor',
                     'me/.config/Claude/claude_desktop_config.json','me/.local/share/Steam/userdata','me/.local/share/Steam/config']
         main_paths=[p for p in main_paths if (home/p).exists() or (home/p).is_symlink()]
         system_paths=['etc/productivity-secure.json','etc/coolercontrol','etc/systemd/system',
-                      'etc/pam.d/productivity-secure','etc/firewalld','etc/udev/rules.d']
+                      'etc/pam.d/productivity-secure','etc/productivity-push.env','etc/firewalld','etc/udev/rules.d','etc/ssh']
         system_paths=[p for p in system_paths if (Path('/')/p).exists()]
         tar=['/usr/bin/tar','--sparse','--acls','--xattrs','--selinux','--numeric-owner','--format=pax','--warning=no-file-changed','-c','-f','-',
              '--transform=s,^lib/,var/lib/,','--transform=s,^me/,home/me/,',
@@ -98,6 +98,7 @@ def main():
         destination=args.destination or config['backup_root']
         filename='desktop-secure-'+stamp+'.tar.zst.age'
         sink='''import pathlib,sys,os,hashlib,json
+os.umask(0o077)
 root=pathlib.Path(sys.argv[1]);root.mkdir(parents=True,exist_ok=True,mode=0o700)
 name=sys.argv[2];partial=root/(name+'.partial');digest=hashlib.sha256();size=0
 with partial.open('xb') as f:

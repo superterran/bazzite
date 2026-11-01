@@ -3,6 +3,12 @@
 set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 sudo test -s /etc/productivity-secure.json
+tailnet_ip=$(tailscale ip -4 | head -n 1)
+python3 - "$tailnet_ip" <<'CHECK'
+import ipaddress,sys
+if ipaddress.ip_address(sys.argv[1]) not in ipaddress.ip_network('100.64.0.0/10'):
+    raise SystemExit('Join Tailscale before deploying the encrypted gateway.')
+CHECK
 
 # TLS identities authenticate the gateway to the root broker. These are not
 # volume-unlock keys; the LUKS passphrase is supplied only by the remote login.
@@ -60,6 +66,13 @@ if ! sudo test -s /var/lib/productivity-secure-bridge/tls.key; then
     sudo chmod 600 /var/lib/productivity-secure-bridge/tls.key
 fi
 sudo install -m 644 "$repo_root/config/secure-productivity/xrdp.ini" /var/lib/productivity-secure-bridge/xrdp.ini
+sudo sed -i "s@^port=tcp://.*:3392$@port=tcp://$tailnet_ip:3392@" /var/lib/productivity-secure-bridge/xrdp.ini
+sudo python3 - "$tailnet_ip" <<'ADDRESS'
+import json,sys
+from pathlib import Path
+p=Path('/etc/productivity-secure.json');data=json.loads(p.read_text())
+data['rdp_address']=sys.argv[1]+':3392';p.write_text(json.dumps(data,indent=2)+'\n')
+ADDRESS
 if ! sudo podman image exists localhost/productivity-secure-xrdp:test; then
     sudo podman build -t localhost/productivity-secure-xrdp:test -f "$repo_root/config/secure-productivity/Containerfile" "$repo_root"
 fi

@@ -38,7 +38,7 @@ else {
     {id:'password', type:'CONCEALED', purpose:'PASSWORD', label:'password', value:password},
     {id:'notesPlain', type:'STRING', label:'notesPlain', value:'Independent encrypted GNOME desktop. RDP over Tailscale: 100.119.114.55 port 3392. Full password unlocks the LUKS2 home and authorizes login. Disconnect keeps it unlocked; Lock encrypted desktop ends apps and locks it. Keep this password for volume recovery. Original unencrypted desktop remains at port3391 during migration.'}
   ], urls:[{href:'rdp://100.119.114.55:3392', primary:true}]};
-  item = op(['item','create','--category','login','--title',title,'--vault',vault,'--format','json','-'], JSON.stringify(template));
+  item = op(['item','create','--vault',vault,'--format','json','-'], JSON.stringify(template));
 }
 let password = item.fields.find(f => f.purpose === 'PASSWORD').value;
 if (!password) {

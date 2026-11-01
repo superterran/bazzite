@@ -126,3 +126,7 @@ recorded in each host's retired-shortcuts policy so setup cannot resurrect it.
 Preserve games, saves, controller layouts and unrelated shortcuts. Keep artwork
 masters and regeneration/apply helpers in this repo, back up replacements,
 visually inspect portrait/wide titles, and record real verification in profiles.
+
+## Secure Desktop recovery changes
+
+Follow [docs/secure-desktop-recovery.md](docs/secure-desktop-recovery.md). Keep deployment source, encrypted home data and decryption keys separate. Preserve the tested Closet baseline; never initialize or overwrite an existing LUKS home during restore. After encryption/key/header changes, run the independent-copy recovery test and record its actual outcome. Never commit secrets or put them into a QR code. The fresh-host graphical rebuild remains untested until exercised on another host.
