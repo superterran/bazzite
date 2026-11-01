@@ -1,0 +1,33 @@
+[Unit]
+Description=Phone approval for encrypted desktop unlock
+After=network-online.target productivity-volume-broker.service
+Wants=network-online.target
+Requires=productivity-volume-broker.service
+
+[Service]
+ExecStart=/usr/bin/python3 /usr/local/libexec/productivity-push.py
+LoadCredentialEncrypted=notification:/etc/credstore.encrypted/productivity-push
+RuntimeDirectory=productivity-push
+RuntimeDirectoryMode=0755
+UMask=0077
+LimitCORE=0
+MemoryMax=128M
+TasksMax=32
+CPUQuota=20%
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+RestrictNamespaces=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+ReadWritePaths=/run/productivity-push
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
