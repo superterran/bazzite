@@ -5,6 +5,24 @@
     "home/me/.var/app/com.jeffser.Alpaca/data/whisper",
     "var/lib/docker/volumes/speaches-models",
     "var/lib/docker/volumes/hf-hub-cache",
-    "var/lib/docker/volumes/netdatacache"
+    "var/lib/docker/volumes/netdatacache",
+    "home/me/Documents/Codex/**/node_modules",
+    "home/me/Documents/Codex/**/.venv",
+    "home/me/Documents/Codex/**/venv",
+    "home/me/Documents/Codex/**/__pycache__",
+    "home/me/Documents/Codex/**/.next",
+    "home/me/Documents/Codex/**/.nuxt",
+    "home/me/Documents/Codex/**/.turbo",
+    "home/me/Documents/Codex/**/.cache",
+    "home/me/Documents/Codex/**/target",
+    "home/me/Documents/Codex/**/gaming-audit/disc-conversion",
+    "home/me/Documents/Codex/**/*.iso",
+    "home/me/Documents/Codex/**/*.rvz",
+    "home/me/Documents/Codex/**/*.wud",
+    "home/me/Documents/Codex/**/*.wux",
+    "home/me/Documents/Codex/**/*.wbfs",
+    "home/me/Documents/Codex/**/*.chd",
+    "home/me/Documents/Codex/**/*.wua",
+    "home/me/Documents/Codex/**/gaming-audit/road-rage/*.7z"
   ]
 }
