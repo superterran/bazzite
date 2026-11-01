@@ -46,7 +46,7 @@ def main():
  stats=json.loads(r.command(['stats','--mode','raw-data','--json'],capture_output=True,check=True).stdout)
  snapshots=json.loads(r.command(['snapshots','--json'],capture_output=True,check=True).stdout)
  if not any(x['id']==snapshot and 'baseline' in x.get('tags',[]) for x in snapshots):raise RuntimeError('Protected baseline absent after retention.')
- report={'baseline_snapshot':snapshot,'desktop_snapshot':desktop['snapshot_id'],'critical_config_files_restored_and_matched':len(expected),'repository_check':'passed','scheduled_service_and_retention':'passed','second_desktop_added_bytes':desktop['data_added_packed'],'initial_desktop_added_bytes':7690365546,'restic_raw_data_stats':stats,'fresh_machine_boot':'not tested','completed_utc':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime())}
+ report={'baseline_snapshot':snapshot,'desktop_snapshot':desktop['snapshot_id'],'critical_config_files_restored_and_matched':len(expected),'repository_check':'passed','scheduled_service_and_retention':'passed','followup_desktop_added_bytes':desktop['data_added_packed'],'initial_desktop_added_bytes':7690365546,'restic_raw_data_stats':stats,'fresh_machine_boot':'not tested','completed_utc':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime())}
  (BASE/'completed-backup-validation.json').write_text(json.dumps(report,indent=2)+'\n')
  print(json.dumps(report,indent=2),flush=True)
 if __name__=='__main__':main()

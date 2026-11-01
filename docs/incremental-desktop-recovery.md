@@ -216,3 +216,65 @@ save/source data comes from a separate read-only home snapshot. The source Git
 bundle is generated from that frozen repo, cached until refs change, and included
 with current backup configuration. The encrypted home still has its own briefly
 frozen backing-volume snapshot. Unsaved application memory is outside both.
+
+## Bootstrap when the original desktop and its SSH files are gone
+
+The recovery record now also escrows the EXISTING desktop-to-NAS SSH private
+identity, NAS root username, LAN/tailnet addresses and pinned NAS host key.
+No new NAS key/account or access policy was added. This closes the circular
+bootstrap problem of needing an SSH key that was itself inside the backup.
+This is an admin identity already present in the encrypted system backup; the
+recovery item must remain private. It is a concealed field, not an automatic new
+identity in the1Password SSH agent, so ordinary agent key ordering is unchanged.
+
+On a fresh Linux recovery host, install Python3, OpenSSH, Restic and1Password CLI.
+Sign into YOUR1Password account (owner CLI integration or normal account sign-in,
+not the NAS automation). Tailscale is needed when using the tailnet address.
+Then, with the current source checkout or independent encrypted source bundle:
+
+```
+python3 bin/backup-recovery-access.py -- snapshots
+python3 bin/backup-recovery-access.py -- restore SNAPSHOT_ID \
+  --target /mnt/restore-staging --sparse --verify
+# Outside LAN, after joining Tailscale:
+python3 bin/backup-recovery-access.py --address 100.101.167.38 -- snapshots
+```
+
+The helper retrieves the cloud record BEFORE contacting NAS, uses the escrowed
+SSH identity and repository password from anonymous0600-mode memory files, and
+checks the stored NAS host-key pin. No original ~/.ssh identity/config or agent
+is used. Only a temporary public known-hosts file is written. Restore requires an
+empty separate target and elevates only Restic when numeric ownership requires
+root;1Password access remains in the signed-in user's context. Read/recovery
+commands only; no forget/prune/key removal. Linux anonymous-memory support is
+required. The existing encrypted-volume password is still needed to unlock the
+restored LUKS image. Keep1Password account recovery/Emergency Kit independently.
+
+Setup bootstrap test passed against the real NAS: record re-read from1Password,
+SSH identity supplied solely from the escrowed value, original identity and agent
+disabled, pinned NAS host authenticated and five snapshots listed/decrypted.
+`--setup` is only for intentional escrow initialization on the existing desktop;
+`--verify` uses existing NAS1Password automation for setup validation and is NOT
+how a fresh host retrieves the record. Normal mode uses your independent owner
+account, without needing NAS just to fetch its access key.
+
+## Completed initial capture — 2026-11-01
+
+- NAS baseline161965ba (local source16e1a175),2,559,305files,53.2GiB newly packed
+  in the independent local capture. Same copied tree/time verified on NAS.
+- Local and NAS scope audits passed across all2,559,305files. A path-component
+  checker bug initially flagged nested app data as top-level cache; corrected and
+  verified without deleting that app data. Replication workflow rerun succeeded.
+- Repository checks passed; five critical main/system configuration files dumped
+  from NAS matched frozen-source hashes. Encrypted desktop independently restored,
+  unlocked and checked from both original NAS history and local system baseline.
+- Actual nightly service/retention succeeded. First follow-up added98,432,164packed
+  bytes (~94MiB); next repeat added5,830,992bytes (~5.6MiB), versus the initial
+  7.2GiB desktop point. Workload changes determine future growth, not these tests.
+- Cleanup removed roughly33.5GiB of unused interrupted-upload data. NAS repository
+  69,608,221,348bytes plus original protected archive/source folder8,725,689,196bytes:
+  about73GiB combined before the final small source bundle. Additional encrypted
+  system baseline remains on the separate local NVMe (~54GiB including indexes).
+- Incremental.timer enabled; full-archive and completed one-time replication timers
+  disabled.7daily/4weekly/3monthly policy active. No off-site copy and no fresh
+  bare-metal boot rehearsal. Evidence JSONs under /var/lib/productivity-recovery.

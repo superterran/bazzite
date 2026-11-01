@@ -136,3 +136,10 @@ captured. Follow docs/incremental-desktop-recovery.md; preserve the tested age
 archive, distinguish local staging from verified NAS replication, and inspect
 completed-backup-validation.json plus baseline-scope-audit.json before reporting
 completion. Do not remove a live repository lock or reboot NAS to force progress.
+
+NAS bootstrap access must survive loss of desktop's ~/.ssh. Recovery record
+escrows the existing NAS admin SSH identity and host pin; verify with
+bin/backup-recovery-access.py after intentional key/pin rotation. Never silently
+replace a differing escrow value, add an unrequested NAS account, or weaken host
+verification. Normal fresh-host recovery reads1Password through the owner's
+account before contacting NAS; NAS service-account lookup is setup/test only.

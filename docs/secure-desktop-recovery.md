@@ -178,3 +178,10 @@ and Closet; no off-site upload has been configured by this task.
 Archive `desktop-secure-20261101T175057Z.tar.zst.age`, 8676320350 encrypted bytes. SHA256: `47c35103b3a3efaa4035b124971ced8bbfa83cb6bd97316e82e69267d7c2e59a`. Independent decryption, LUKS unlock, ext4 check after journal replay on the copy, five saved-home hashes, nested notification credential and Git bundle verification passed at18:09UTC. A fresh-machine graphical rebuild remains untested.
 
 The original full-archive timer was configured for04:15; verified Restic history supersedes it after the documented switch. The new nightly history runs at04:15 with up to5minutes jitter while the desktop is awake. Missed jobs do not wake it. Inspect `systemctl status productivity-backup.timer productivity-backup.service` and `/var/lib/productivity-recovery/latest.json`. Backups are retained until deliberately reviewed; monitor NAS free space and preserve this tested baseline. No off-site copy is configured.
+
+NAS access bootstrap is also escrowed in the same recovery record: the existing
+NAS SSH identity and pinned server key, alongside the three encryption secrets.
+Use `bin/backup-recovery-access.py` with your independently signed-in owner
+1Password CLI if the original desktop/SSH files are gone. See the incremental
+runbook's bootstrap section; setup validation retrieved actual NAS snapshots
+without the original local SSH identity or agent.

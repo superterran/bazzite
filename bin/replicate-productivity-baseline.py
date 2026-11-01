@@ -17,7 +17,7 @@ def main():
  remote=json.loads(r.command(['snapshots','--json','--tag','baseline'],capture_output=True,check=True).stdout)
  matches=[x for x in remote if x.get('tree')==point['tree'] and x.get('time')==point['time'] and x.get('hostname')==point.get('hostname')]
  if len(matches)!=1:raise RuntimeError('Could not uniquely verify the copied baseline tree/time.')
- receipt={**local,'transport':'local-stage-copied','local_snapshot_id':local['snapshot_id'],'snapshot_id':matches[0]['id'],'nas_completed_utc':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime())}
+ receipt={**local,'transport':'local-stage-copied','staging_repository':LOCAL,'repository':json.loads(Path('/etc/productivity-restic.json').read_text())['repository'],'local_snapshot_id':local['snapshot_id'],'snapshot_id':matches[0]['id'],'nas_completed_utc':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime())}
  (BASE/'baseline-latest.json').write_text(json.dumps(receipt,indent=2)+'\n')
  subprocess.run(['/usr/bin/python3',str(ROOT/'bin/finalize-productivity-backup.py'),'--imported-baseline'],check=True)
  subprocess.run(['/usr/bin/python3',str(ROOT/'bin/audit-productivity-backup.py')],check=True)

@@ -128,3 +128,9 @@ Save-policy caveat: ROM saves currently idle/no pending/no errors with Closet;
 that does not establish coverage for every non-Steam or Steam Cloud game. Prefix
 exclusion remains conditional on auditing local-only saves. No prefix or local
 save has been removed. Current nightly encrypted-home backup is unchanged.
+
+Implementation completed2026-11-01: see incremental-desktop-recovery.md for the
+actual protected NAS baseline, verified extra local NVMe copy and nightly history.
+The complete selected capture packed to53.2GiB, substantially below the planning
+allowance. Initial NAS+legacy recovery material settled at about73GiB after cleanup;
+latest measured repeat added5.6MiB. Fresh bare-metal boot remains untested.
