@@ -43,7 +43,11 @@ if __name__=='__main__':
         original=fitted/(name+'-original.png')
         if not original.exists():shutil.copy2(source,original)
         output=fitted/(name+'-portrait.png')
-        subprocess.run(['magick',str(original),'-filter','point' if name=='moon-mission' else 'Lanczos','-resize','560x840','-background',color,'-gravity','center','-extent','600x900',str(output)],check=True)
+        revised=fitted/'24-games-recomposed-source.png'
+        if name=='24-games' and revised.exists():
+            subprocess.run(['magick',str(revised),'-resize','600x900!',str(output)],check=True)
+        else:
+            subprocess.run(['magick',str(original),'-filter','point' if name=='moon-mission' else 'Lanczos','-resize','560x840','-background',color,'-gravity','center','-extent','600x900',str(output)],check=True)
         apply(appid,'portrait',output)
         print('Applied fitted title-safe portrait:',name)
     print('Artwork backup:',BACKUP)

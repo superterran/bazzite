@@ -42,3 +42,12 @@ restore override. Other machines without that policy are unchanged.
 Artwork work did not request any encrypted-home unlock. Steam/Game Mode
 and Sunshine were not restarted. Current artwork does not alter any game save,
 controller layout, application installation or encrypted desktop customization.
+
+24 Games refinement: user requested the original box elements arranged to fill
+its tall card, rather than square scan floating in white padding. Created a
+reference-based image edit: Expert at upper left, complete Windows95 triangle
+at upper right, larger24GAMES/FORWINDOWS95 center, blue Ultimate Game Pack/CDROM
+banner near bottom. Reviewed wording and full edges before applying600x900.
+This later revision is AI-recomposed from the original scan; the original scan
+and previous fitted version remain in source/history. Apply helper now uses the
+reviewed recomposed master so later setup does not restore the padded layout.
