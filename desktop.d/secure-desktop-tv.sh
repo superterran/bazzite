@@ -16,3 +16,5 @@ if mountpoint -q /var/home/desktop-secure && sudo test -f /var/home/desktop-secu
         cut -d= -f2 > "$repo_root/config/secure-productivity/native-rdp-cert.sha256"
 fi
 /usr/bin/python3 "$repo_root/bin/setup-secure-desktop-tv.py"
+
+/usr/bin/python3 "$repo_root/bin/setup-secure-desktop-artwork.py"

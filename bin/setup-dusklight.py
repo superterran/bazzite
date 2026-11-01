@@ -9,6 +9,9 @@ from steam_client import evaluate
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--game-dir', type=Path, required=True)
 args = parser.parse_args()
+from steam_shortcut_policy import retired
+if retired('Dusklight'):
+    raise SystemExit('Dusklight shortcuts were retired on this host; game files retained.')
 game = args.game_dir.resolve()
 launcher = game / 'play.sh'
 if not launcher.is_file() or not (game / 'Dusklight-v2.0.3-linux-x86_64.AppImage').is_file():

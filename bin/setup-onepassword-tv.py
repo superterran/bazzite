@@ -10,6 +10,10 @@ ROOT=Path(__file__).resolve().parent.parent
 NAME='1Password'
 
 def main():
+    from steam_shortcut_policy import retired
+    if retired(NAME):
+        print('This Steam shortcut was retired by the user; keeping its app/data intact.')
+        return
     spec=importlib.util.spec_from_file_location('artwork',ROOT/'bin/steam-artwork-sync.py')
     artwork=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(artwork)

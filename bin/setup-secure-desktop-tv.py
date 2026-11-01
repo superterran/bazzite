@@ -37,7 +37,8 @@ def main():
     for(const [source,input,mode,button] of [[7,15,10,0],[6,15,10,1],[11,13,4,0]]){s.SetControllerInputBinding(id,{action_set_key:'Default',source_binding_key:source,input_key:input,activator_index:0,binding_index:0,source_mode:mode,new_binding:{type:2,mouse_button:{button}}});await s.m_updatingEditingConfigurationPromise;}
     s.SaveEditingConfiguration(id);return JSON.stringify(s.EditedConfiguration);})()'''.replace('APP',str(appid))
     (backup/'controller-after.json').write_text(evaluate(expression,timeout=60))
-    icons=list(Path('/usr/share/icons').glob('**/org.gnome.Connections.svg'))
+    custom_icon = ROOT/'config/secure-desktop-artwork/icon.png'
+    icons=[custom_icon] if custom_icon.exists() else list(Path('/usr/share/icons').glob('**/org.gnome.Connections.svg'))
     if icons:evaluate(f'SteamClient.Apps.SetShortcutIcon({appid},{json.dumps(str(icons[0]))})')
     settings={'appid':appid,'steam_gameid':str((appid<<32)|0x02000000),'name':NAME}
     (Path.home()/'.config/secure-desktop-tv.json').write_text(json.dumps(settings,indent=2)+'\n')
