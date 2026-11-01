@@ -41,9 +41,15 @@ def main():
     local=inventory()
     if args.local_json:
         print(json.dumps(local));return 0
-    remote=json.loads(subprocess.check_output(['ssh','-o','BatchMode=yes','-o','ConnectTimeout=8',
-                                               args.peer,'python3 - --local-json'],
-                                              input=Path(__file__).read_bytes(),timeout=45))
+    try:
+        remote=json.loads(subprocess.check_output(['ssh','-o','BatchMode=yes','-o','ConnectTimeout=8',
+                                                   '-o','ServerAliveInterval=5','-o','ServerAliveCountMax=2',
+                                                   args.peer,'python3 - --local-json'],
+                                                  input=Path(__file__).read_bytes(),timeout=25))
+    except (subprocess.TimeoutExpired,subprocess.CalledProcessError,json.JSONDecodeError):
+        print(json.dumps({'peer':args.peer,'verified':False,'status':'unavailable',
+                          'message':'Wake/connect the peer and retry; queued artwork is not verified.'}))
+        return 2
     matched=0;issues=[]
     shared=local.keys()&remote.keys()
     for title in sorted(shared):
