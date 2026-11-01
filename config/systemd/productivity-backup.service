@@ -1,0 +1,13 @@
+[Unit]
+Description=Age-encrypted secure desktop backup to Closet
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /home/me/repos/bazzite/bin/backup-secure-desktop.py
+UMask=0077
+LimitCORE=0
+Nice=15
+IOSchedulingClass=idle
+TimeoutStartSec=90min

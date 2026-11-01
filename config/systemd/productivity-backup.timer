@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily encrypted desktop recovery backup
+
+[Timer]
+OnCalendar=*-*-* 04:15:00
+RandomizedDelaySec=5min
+Persistent=false
+Unit=productivity-backup.service
+
+[Install]
+WantedBy=timers.target
