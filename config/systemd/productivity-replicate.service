@@ -1,0 +1,14 @@
+[Unit]
+Description=Replicate staged encrypted baseline to Closet and validate recovery
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=/var/lib/productivity-recovery/local-baseline-latest.json
+ConditionPathExists=!/var/lib/productivity-recovery/replication-complete.json
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /home/me/repos/bazzite/bin/replicate-productivity-baseline.py
+UMask=0077
+LimitCORE=0
+Nice=15
+IOSchedulingClass=idle
+TimeoutStartSec=6h

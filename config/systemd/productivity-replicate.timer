@@ -1,0 +1,9 @@
+[Unit]
+Description=Retry staged baseline replication while NAS is unavailable
+[Timer]
+OnActiveSec=1min
+OnUnitInactiveSec=15min
+AccuracySec=30s
+Unit=productivity-replicate.service
+[Install]
+WantedBy=timers.target

@@ -41,7 +41,7 @@ def main():
  line(170,'Restore to a separate staging location first. Never reinitialize the volume.')
  line(145,'Desktop + NAS loss still needs an off-site copy; none is configured yet.')
  line(105,'Nightly Restic: 04:15 + jitter; 7 daily / 4 weekly / 3 monthly points.',10)
- line(82,'No decryption key is stored on this sheet or with the NAS archive.')
+ line(82,'No plaintext recovery secret is printed here or stored beside the backups.')
  c.showPage()
  line(744,'TECHNICAL RESTORE REFERENCE',20)
  line(710,'Account: desktop-secure | UID 1002 | GID 1003')

@@ -156,3 +156,52 @@ actual nightly service including retention/prune, and records measured second-ru
 storage additions in completed-backup-validation.json. Check this report before
 claiming the full baseline and follow-up finished. Fresh-machine boot remains
 unexercised regardless of successful file recovery.
+
+Trust boundary: client-side encryption protects copies of the repository without its password. Closet is a trusted administration host: its existing1Password service-account automation can retrieve this recovery record. A full compromise of that automation/NAS root is different from someone obtaining only encrypted backup files. No isolation from the existing fleet administration trust is claimed.
+
+## Local staging and resilient NAS transport
+
+During first capture, Closet showed severe memory pressure; direct desktop SSH/
+HTTP stopped responding while the Mini could still reach it. The initial NAS
+uploader was stopped after independently cloning its frozen Btrfs capture.
+`stage-productivity-baseline.py` then backed up that SAME capture on the separate
+4TB NVMe, using a private mount namespace to retain canonical recovery paths.
+No host mounts or apps were changed. Local repository:
+`/var/mnt/fast/backups/desktop-restic-staging`, same1Password repository password.
+It is an additional encrypted copy, not off-site protection. Local receipt:
+`/var/lib/productivity-recovery/local-baseline-latest.json`.
+
+The local capture stored57082927658packed bytes (~53.2GiB),2559305files, in264seconds.
+Its snapshot16e1a175 is copied into the main NAS repository using Restic copy,
+not by copying selected repository files or exposing plaintext. Repositories
+have independent master keys and chunker parameters; the same recovery password
+opens both. The one-time copy may deduplicate large files less efficiently than
+subsequent native nightly runs. Do not delete the local copy until NAS validation
+is recorded. Retaining it after validation provides another-disk fallback.
+
+`productivity-replicate.service` authenticates NAS, copies baseline-tag snapshots,
+verifies copied tree/time, finalizes recovery tests and audits scope. Its timer
+retries every15minutes on failure and disables itself after success. It never
+reboots NAS or stops unrelated apps. A missing `replication-complete.json` means
+NAS replication has not yet passed. Original age archive and completed desktop
+history remain separate; the intentionally stopped first NAS baseline unit is
+not evidence of a completed baseline.
+
+`closet-backup-ssh.py --auto-route --sftp` uses pinned NAS authentication and
+prefers its known LAN address. If that address does not present an SSH banner,
+`closet-backup-route.py` relays the encrypted stream through Mini. NAS private key
+stays on desktop, no agent forwarding/key copy. Mini is needed only for fallback;
+its own SSH identity/availability must work then. Direct transport recovered
+without rebooting or reconfiguring NAS applications. Memory-pressure logs were
+observed, but no single root cause of the transient path failure is claimed.
+Server-alive timeouts prevent indefinite stuck jobs; NAS uploads are capped at
+20MiB/s while preserving read access. Root config records the actual transport.
+
+Every nightly metadata set now includes a cached Git bundle of current committed
+backup source, selected current backup configuration/units and desired timer
+state. Thus the initial OS baseline plus newer desktop metadata can recover backup
+plumbing added after the original system capture. On restore, preserve existing
+files, recover the bundle into a separate checkout, review configuration and
+re-run the restore test before enabling incremental.timer. Disable the obsolete
+full-archive timer and the completed one-time replication timer. Host-encrypted
+credentials still need normal recovery/re-encryption on a new host.

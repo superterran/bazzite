@@ -49,6 +49,25 @@ def main():
   (meta/'recovery-public.json').write_bytes(Path('/etc/productivity-recovery.json').read_bytes())
   (meta/'restic-public.json').write_bytes(Path('/etc/productivity-restic.json').read_bytes())
   (meta/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+  # Keep current backup infrastructure recoverable even when the protected OS
+  # baseline predates later backup setup changes. No private key is fetched here.
+  refs=run(['git','-c',f'safe.directory={ROOT}','-C',str(ROOT),'show-ref']).stdout
+  fingerprint=hashlib.sha256(refs).hexdigest();cached=BASE/'source-current.bundle';ref_file=BASE/'source-current.refs'
+  if not cached.exists() or not ref_file.exists() or ref_file.read_text()!=fingerprint:
+   temporary=BASE/'source-current.bundle.new';temporary.unlink(missing_ok=True)
+   run(['git','-c',f'safe.directory={ROOT}','-C',str(ROOT),'bundle','create',str(temporary),'--all'])
+   temporary.replace(cached);ref_file.write_text(fingerprint)
+  shutil.copy2(cached,meta/'bazzite.bundle')
+  configuration=meta/'configuration'
+  for name in ['productivity-restic.json','productivity-recovery.json','productivity-secure.json','productivity-push.env']:
+   source=Path('/etc')/name
+   if source.exists():
+    target=configuration/'etc'/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,target)
+  units=configuration/'etc/systemd/system';units.mkdir(parents=True,exist_ok=True)
+  for pattern in ['productivity-*.service','productivity-*.timer']:
+   for source in Path('/etc/systemd/system').glob(pattern):shutil.copy2(source,units/source.name)
+  (configuration/'backup-schedule.json').write_text(json.dumps({'enable_after_restore_test':['productivity-incremental.timer'],'disable':['productivity-backup.timer','productivity-replicate.timer']}))
+
   inputs=[volume,meta]
   excludes=[]
   if a.baseline:

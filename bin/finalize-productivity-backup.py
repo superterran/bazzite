@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """Wait for current baseline, verify saved config, exercise nightly history."""
-import hashlib,importlib.util,json,os,subprocess,time
+import hashlib,importlib.util,json,os,subprocess,time,sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];BASE=Path('/var/lib/productivity-recovery')
 spec=importlib.util.spec_from_file_location('r',ROOT/'bin/productivity-restic.py');r=importlib.util.module_from_spec(spec);spec.loader.exec_module(r)
@@ -8,14 +8,17 @@ def run(args,**kwargs):return subprocess.run(args,check=True,capture_output=True
 def main():
  if os.geteuid()!=0:raise SystemExit('Run as root.')
  os.umask(0o077)
- deadline=time.monotonic()+3*3600
- while True:
-  state=run(['systemctl','show','productivity-baseline.service','-p','ActiveState','--value'],text=True).stdout.strip()
-  if state not in {'active','activating','deactivating'}:break
-  if time.monotonic()>deadline:raise RuntimeError('Baseline verification deadline exceeded; capture may still be running.')
-  time.sleep(5)
- result=run(['systemctl','show','productivity-baseline.service','-p','Result','--value'],text=True).stdout.strip()
- if result!='success':raise RuntimeError('Baseline failed; old backup remains available. Inspect protected baseline log.')
+ if '--imported-baseline' not in sys.argv:
+  deadline=time.monotonic()+3*3600
+  while True:
+   state=run(['systemctl','show','productivity-baseline.service','-p','ActiveState','--value'],text=True).stdout.strip()
+   if state not in {'active','activating','deactivating'}:break
+   if time.monotonic()>deadline:raise RuntimeError('Baseline verification deadline exceeded; capture may still be running.')
+   time.sleep(5)
+  result=run(['systemctl','show','productivity-baseline.service','-p','Result','--value'],text=True).stdout.strip()
+  if result!='success':raise RuntimeError('Baseline failed; old backup remains available. Inspect protected baseline log.')
+ else:
+  if json.loads((BASE/'baseline-latest.json').read_text()).get('transport')!='local-stage-copied':raise RuntimeError('No successful imported baseline receipt.')
  receipt=json.loads((BASE/'baseline-latest.json').read_text());snapshot=receipt['snapshot_id']
  # Apply the same explicit replaceable-cache/model policy to this already-running
  # first capture without uploading all other data again. Never rewrite globally.

@@ -130,3 +130,9 @@ visually inspect portrait/wide titles, and record real verification in profiles.
 ## Secure Desktop recovery changes
 
 Follow [docs/secure-desktop-recovery.md](docs/secure-desktop-recovery.md). Keep deployment source, encrypted home data and decryption keys separate. Preserve the tested Closet baseline; never initialize or overwrite an existing LUKS home during restore. After encryption/key/header changes, run the independent-copy recovery test and record its actual outcome. Never commit secrets or put them into a QR code. The fresh-host graphical rebuild remains untested until exercised on another host.
+
+Backup deployment changes must be committed before the nightly source bundle is
+captured. Follow docs/incremental-desktop-recovery.md; preserve the tested age
+archive, distinguish local staging from verified NAS replication, and inspect
+completed-backup-validation.json plus baseline-scope-audit.json before reporting
+completion. Do not remove a live repository lock or reboot NAS to force progress.

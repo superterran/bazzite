@@ -18,7 +18,7 @@ password=json.loads(r.stdout)['password'].encode()
 subprocess.run(['sudo','install','-d','-m','700','/etc/credstore.encrypted'],check=True)
 subprocess.run(['sudo','systemd-creds','encrypt','--name=restic-password','-','/etc/credstore.encrypted/productivity-restic'],input=password,check=True,capture_output=True)
 password=None
-config={'repository':'sftp:closet:/mnt/storage/backups/desktop-restic','options':['sftp.command=ssh -F /dev/null -i /home/me/.ssh/id_ed25519_truenas -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o BatchMode=yes -o ConnectTimeout=10 -o UserKnownHostsFile=/home/me/.ssh/known_hosts -s root@closet.local sftp'], 'recovery_item':'Desktop Secure Recovery','retention':{'daily':7,'weekly':4,'monthly':3}}
+config={'repository':'sftp:closet:/mnt/storage/backups/desktop-restic','options':['sftp.command=/usr/bin/python3 /home/me/repos/bazzite/bin/closet-backup-ssh.py --auto-route --sftp'],'upload_limit_kib':20480,'recovery_item':'Desktop Secure Recovery','retention':{'daily':7,'weekly':4,'monthly':3}}
 subprocess.run(['sudo','tee','/etc/productivity-restic.json'],input=json.dumps(config).encode(),stdout=subprocess.DEVNULL,check=True)
 subprocess.run(['sudo','chmod','600','/etc/productivity-restic.json'],check=True)
 print('Repository password saved in 1Password and host-encrypted systemd credential; no plaintext key file.')
