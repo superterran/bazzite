@@ -13,3 +13,5 @@ python3 bin/setup-dusklight.py --game-dir /path/to/shared-games/dusklight
 A portable copy of the setup script and its helper modules is included in `dusklight/setup/` for the Ally. It creates a native Linux shortcut and preserves unrelated Steam entries. Steam CEF debugging must already be enabled, as for the existing fleet setup tools.
 
 2026-10-31: Desktop Steam entry 2323161660 verified by live Steam app overview (`Dusklight`). Launcher `--help` passes. AppImage SHA256 matches official release: `87ec251963c984ad2b3ac075281431d2221db2297dc19f2ab5daad92e969fc06`. Ally last seen five hours earlier; pinned tailnet SSH timed out. Folder queued for sync, but Ally transfer, shortcut registration and physical play remain unverified.
+
+Ally follow-up: connected over pinned tailnet SSH after user wake. Steam shortcut3802447962 named Dusklight verified in live Steam. AppImage checksum and launcher --help passed. shared-games idle, zero needed files/bytes and errors; temporary user-data probe round-trip desktop→Ally→desktop passed and probe removed. Gameplay remains pending disc import.
