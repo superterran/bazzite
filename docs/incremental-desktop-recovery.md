@@ -11,7 +11,7 @@ age archive remains separate and is never deleted by Restic retention.
 - `baseline`: selective known-good system capture. Actual OSTree sysroot,
   boot/EFI files, GPT/UUID/subvolume inventory, writable system configuration,
   installed Flatpaks/Homebrew/tools, selected main-home application data/config,
-  native encrypted-home image, repo state and persistent container data.
+  native encrypted-home image, agent/tool settings (including Codex/Claude), repo state and persistent container data.
   Baselines are protected from automatic desktop retention. Capture explicitly
   again after major intentional setup changes.
 - `desktop`: nightly snapshot of the LUKS backing image plus current manifest,

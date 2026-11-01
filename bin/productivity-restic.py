@@ -12,6 +12,7 @@ def command(args,**kwargs):
  env=dict(os.environ,RESTIC_PASSWORD_FILE=f'/proc/self/fd/{fd}',RESTIC_CACHE_DIR='/var/cache/productivity-restic')
  argv=['/usr/bin/restic','-r',cfg['repository']]
  for option in cfg['options']:argv+=['-o',option]
- try:return subprocess.run(argv+list(args),env=env,pass_fds=(fd,),**kwargs)
+ inherited=kwargs.pop('pass_fds',())
+ try:return subprocess.run(argv+list(args),env=env,pass_fds=(fd,*inherited),**kwargs)
  finally:os.close(fd)
 if __name__=='__main__':sys.exit(command(sys.argv[1:]).returncode)

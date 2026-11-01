@@ -3,6 +3,10 @@
 The Git repository recreates software/configuration. It is not a backup of your
 personal encrypted home. The independent Closet archive protects that data.
 
+## Current backup system
+
+Encrypted deduplicated Restic history and the selective system baseline are documented in [incremental-desktop-recovery.md](incremental-desktop-recovery.md). Its repository password is a third field in the same1Password recovery record. The original tested age archive below remains a protected independent baseline. After the new restore test passes, productivity-incremental.timer replaces the nightly full-archive timer; the old archive tool remains available manually.
+
 ## What to keep
 
 - Repository: https://github.com/superterran/bazzite (main). A Git bundle also
@@ -173,4 +177,4 @@ and Closet; no off-site upload has been configured by this task.
 
 Archive `desktop-secure-20261101T175057Z.tar.zst.age`, 8676320350 encrypted bytes. SHA256: `47c35103b3a3efaa4035b124971ced8bbfa83cb6bd97316e82e69267d7c2e59a`. Independent decryption, LUKS unlock, ext4 check after journal replay on the copy, five saved-home hashes, nested notification credential and Git bundle verification passed at18:09UTC. A fresh-machine graphical rebuild remains untested.
 
-Nightly backups run at04:15 with up to5minutes jitter, while the desktop is awake. Missed jobs do not wake it. Inspect `systemctl status productivity-backup.timer productivity-backup.service` and `/var/lib/productivity-recovery/latest.json`. Backups are retained until deliberately reviewed; monitor NAS free space and preserve this tested baseline. No off-site copy is configured.
+The original full-archive timer was configured for04:15; verified Restic history supersedes it after the documented switch. The new nightly history runs at04:15 with up to5minutes jitter while the desktop is awake. Missed jobs do not wake it. Inspect `systemctl status productivity-backup.timer productivity-backup.service` and `/var/lib/productivity-recovery/latest.json`. Backups are retained until deliberately reviewed; monitor NAS free space and preserve this tested baseline. No off-site copy is configured.

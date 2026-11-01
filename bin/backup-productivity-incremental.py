@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """Consistent encrypted-image incrementals and selective known-good baseline."""
-import argparse,fcntl,hashlib,importlib.util,json,os,resource,shutil,subprocess,time
+import argparse,fcntl,hashlib,importlib.util,json,os,resource,shutil,subprocess,time,signal,pwd
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 BASE=Path('/var/lib/productivity-recovery');CAP=BASE/'restic-capture'
@@ -11,13 +11,15 @@ def main():
  p=argparse.ArgumentParser();p.add_argument('--baseline',action='store_true');a=p.parse_args()
  if os.geteuid()!=0:raise SystemExit('Run as root.')
  resource.setrlimit(resource.RLIMIT_CORE,(0,0));os.umask(0o077);BASE.mkdir(mode=0o700,exist_ok=True)
+ def cancelled(signum,frame):raise SystemExit('Backup interrupted; cleaning its temporary snapshots.')
+ signal.signal(signal.SIGTERM,cancelled)
  lock=(BASE/'backup.lock').open('w');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
  CAP.mkdir(mode=0o700,exist_ok=True);meta=CAP/'metadata';meta.mkdir(exist_ok=True)
  snapshots=[];frozen=False;paused=[]
  stamp=time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime());mode='baseline' if a.baseline else 'desktop'
  before=run(['rpm-ostree','status','--json']).stdout
  if json.loads(before).get('transaction'):raise RuntimeError('OS transaction active; capture deferred.')
- manifest={'format':1,'mode':mode,'created_utc':stamp,'volume_uuid':run(['cryptsetup','luksUUID','/var/lib/productivity-volume/desktop-secure.luks'],text=True).stdout.strip(),'home_checksums':{},'bootable_bare_metal_restore_tested':False,'application_consistency':'filesystem snapshots; running databases require application-specific verification','excluded':['Steam game downloads and Windows prefix components; user profiles/registry retained, exhaustive game-save audit outstanding','Downloads','AI model downloads','Docker image/build cache','Claude VM bundles/logs/cache','repo dependency folders']}
+ manifest={'format':1,'mode':mode,'created_utc':stamp,'volume_uuid':run(['cryptsetup','luksUUID','/var/lib/productivity-volume/desktop-secure.luks'],text=True).stdout.strip(),'home_checksums':{},'account':'desktop-secure','uid':pwd.getpwnam('desktop-secure').pw_uid,'gid':pwd.getpwnam('desktop-secure').pw_gid,'repo_commit':run(['git','-c',f'safe.directory={ROOT}','-C',str(ROOT),'rev-parse','HEAD'],text=True).stdout.strip(),'bootable_bare_metal_restore_tested':False,'application_consistency':'filesystem snapshots; running databases require application-specific verification','excluded':['Steam game downloads and Windows prefix components; user profiles/registry retained, exhaustive game-save audit outstanding','Downloads','AI model downloads','Docker image/build cache','Claude VM bundles/logs/cache','repo dependency folders']}
  try:
   if a.baseline:
    # Pause only running containers briefly so volume and upper-layer capture is
@@ -79,9 +81,10 @@ def main():
       path=var/Path(upper).relative_to('/var')
       if path.exists():inputs.append(path)
    user=CAP/'home/me'
-   for name in ['.config','.var','.bashrc','.bash_profile','.profile','.env','.ssh','.gnupg','.pki','.gitconfig','.git-credentials','.npmrc','.docker','.1password','.steam','.homebrew','homebrew','Applications','bin','Documents','repos']:
+   for name in ['.config','.var','.bashrc','.bash_profile','.profile','.env','.ssh','.gnupg','.pki','.gitconfig','.git-credentials','.npmrc','.docker','.1password','.steam','.codex','.claude','.agents','.vscode','.kube','.aws','.azure','.oci','.cargo','.bun','.nvm','.homebrew','homebrew','Applications','bin','Documents','repos']:
     path=user/name
     if path.exists() or path.is_symlink():inputs.append(path)
+   inputs.extend(x for x in user.iterdir() if x.name.startswith('.') and x.is_file() and x not in inputs)
    local=user/'.local'
    inputs.extend(x for x in local.iterdir() if x.name!='share')
    inputs.extend(x for x in (local/'share').iterdir() if x.name not in {'containers','ramalama','uv','Trash','Steam'})
@@ -104,9 +107,12 @@ def main():
     excludes+=['--exclude',str(user/'repos')+'/'+pattern]
    # No OS deployment transition may straddle the root/boot capture.
    if run(['rpm-ostree','status','--json']).stdout!=before:raise RuntimeError('OS deployment changed during capture; baseline not committed.')
-  args=['backup','--host','desktop','--tag',mode,'--group-by','host,tags','--json','--read-concurrency','2',*excludes,*[str(x) for x in inputs]]
+  paths_fd=os.memfd_create('backup-paths',0);os.write(paths_fd,b'\0'.join(os.fsencode(str(x)) for x in inputs)+b'\0');os.lseek(paths_fd,0,0)
+  args=['backup','--host','desktop','--tag',mode,'--group-by','host,tags','--json','--read-concurrency','2',*excludes,'--files-from-raw',f'/proc/self/fd/{paths_fd}']
   log=BASE/(mode+'-latest.log')
-  with log.open('w') as output:result=restic.command(args,stdout=output,stderr=subprocess.STDOUT)
+  try:
+   with log.open('w') as output:result=restic.command(args,stdout=output,stderr=subprocess.STDOUT,pass_fds=(paths_fd,))
+  finally:os.close(paths_fd)
   if result.returncode:raise RuntimeError('Restic backup incomplete or failed; protected diagnostic '+str(log))
   records=[json.loads(line) for line in log.read_text().splitlines() if line.startswith('{')]
   summary=next(x for x in reversed(records) if x.get('message_type')=='summary')
