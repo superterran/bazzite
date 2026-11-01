@@ -22,7 +22,7 @@ def recovery_keys(existing_only=True):
     base=(ROOT/'bin/productivity-1password.cjs').read_text().split("const title = 'Desktop Encrypted GNOME';")[0]
     body=(ROOT/'bin/productivity-recovery-key.cjs').read_text().replace('__RECOVERY_MATERIAL__',json.dumps(material))
     remote=shlex.join(['docker','exec','-i','codex-rc','sh','-c','ulimit -c 0; exec node -'])
-    result=subprocess.run(['ssh','-o','BatchMode=yes','closet',remote],input=base+body,
+    result=subprocess.run(['/usr/bin/python3',str(ROOT/'bin/closet-backup-ssh.py'),'--auto-route','--',remote],input=base+body,
                           capture_output=True,text=True,check=True,timeout=120)
     record=json.loads(result.stdout)
     recipient=subprocess.run(['/home/linuxbrew/.linuxbrew/bin/age-keygen','-y'],input=record['identity'],capture_output=True,text=True,check=True).stdout.strip()

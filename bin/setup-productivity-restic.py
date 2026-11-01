@@ -11,7 +11,7 @@ let field=item.fields.find(f=>f.id==='resticPassword');
 if(!field){field={id:'resticPassword',type:'CONCEALED',label:'Incremental backup repository password',value:crypto.randomBytes(48).toString('base64url')};item.fields.push(field);op(['item','edit',item.id,'--vault',vault,'--format','json','-'],JSON.stringify(item));}
 process.stdout.write(JSON.stringify({password:field.value}));
 """
-remote=['ssh','-o','BatchMode=yes','closet',"docker exec -i codex-rc sh -c 'ulimit -c 0; exec node -'"]
+remote=['/usr/bin/python3',str(ROOT/'bin/closet-backup-ssh.py'),'--auto-route','--',"docker exec -i codex-rc sh -c 'ulimit -c 0; exec node -'"]
 r=subprocess.run(remote,input=base+body,text=True,capture_output=True,timeout=120)
 if r.returncode:raise SystemExit('Protected 1Password repository-key setup failed; no credential output logged.')
 password=json.loads(r.stdout)['password'].encode()

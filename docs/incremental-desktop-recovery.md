@@ -205,3 +205,5 @@ files, recover the bundle into a separate checkout, review configuration and
 re-run the restore test before enabling incremental.timer. Disable the obsolete
 full-archive timer and the completed one-time replication timer. Host-encrypted
 credentials still need normal recovery/re-encryption on a new host.
+
+Nightly failures retry after15minutes, bounded to3starts per2hours. This does not wake a sleeping host. Active repository locks are preserved; only stale records verified to belong to dead processes were removed during initial recovery. The local baseline independently passed1Password key access, sparse volume restore, LUKS unlock, copy-journal replay/clean fsck and five saved-file hashes (local-baseline-restore-test.json).

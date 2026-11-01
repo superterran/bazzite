@@ -3,6 +3,8 @@ Description=Encrypted deduplicated desktop history on Closet
 After=network-online.target
 Wants=network-online.target
 ConditionPathExists=/etc/credstore.encrypted/productivity-restic
+StartLimitIntervalSec=2h
+StartLimitBurst=3
 
 [Service]
 Type=oneshot
@@ -13,3 +15,5 @@ LimitCORE=0
 Nice=15
 IOSchedulingClass=idle
 TimeoutStartSec=3h
+Restart=on-failure
+RestartSec=15min

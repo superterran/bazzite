@@ -26,4 +26,9 @@ def command(args,repository=None,same_password_source=None,**kwargs):
  finally:
   os.close(fd)
   if source_fd is not None:os.close(source_fd)
-if __name__=='__main__':sys.exit(command(sys.argv[1:]).returncode)
+if __name__=='__main__':
+ argv=sys.argv[1:];override=None
+ if argv[:1]==['--local-repository']:
+  override=argv[1];argv=argv[2:]
+  if not Path(override).is_absolute():raise SystemExit('Local repository must be an absolute path.')
+ sys.exit(command(argv,repository=override).returncode)
