@@ -82,3 +82,9 @@ secure-desktop recovery verification is documented separately in
 
 Primary architecture reference:
 https://ostreedev.github.io/ostree/deployment/
+
+## User scope refinement
+
+User excludes replaceable AI models and Docker images/build cache from the proposed baseline. This is a backup exclusion only, not authorization to delete live files. Preserve persistent container volumes, unique writable container data and configuration; inspect/export them separately rather than copying disposable image/cache storage. No revised total has been measured yet.
+
+Encrypted desktop measured live:64GiB logical sparse LUKS image,7.2GiB physically allocated,4.4GiB used inside ext4. Current independent encrypted backup is8676320350bytes (~8.1GiB) and also includes selected main-system configuration and recovery artifacts.
