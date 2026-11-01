@@ -55,3 +55,10 @@ through stdin, never a plaintext file or command argument.
 Rollback: stop/disable productivity-push.service and remove only its Tailscale
 Serve443 mapping if still pointing at18742. Leave the encrypted broker, RDP3392,
 Steam, Sunshine, home data and existing recovery password untouched.
+
+Safari form correction: initial iPhone form submission returned Invalid origin.
+The original no-referrer policy can cause Origin:null on form POST. Changed to
+same-origin, retaining strict Origin/Host checks, CSRF/cookie validation and no
+referrers to other sites. Added regression coverage; six tests pass. Refreshed
+notification after restarting only the isolated approval service. iPhone retry
+confirmation pending.

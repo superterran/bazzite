@@ -82,6 +82,15 @@ class ApprovalTests(unittest.TestCase):
             self.assertEqual(self.post('/unlock', body, cookie)[0], 403)
             self.assertEqual(broker.call_count, 3)
 
+    def test_form_preserves_same_origin_provenance(self):
+        connection = http.client.HTTPConnection('127.0.0.1', self.server.server_port)
+        connection.request('GET', '/')
+        response = connection.getresponse()
+        self.assertEqual(response.getheader('Referrer-Policy'), 'same-origin')
+        response.read()
+        connection.close()
+        self.assertEqual(self.post('/claim', '{}', origin='null')[0], 403)
+
     def test_delivery_failure_revokes_request(self):
         with patch.object(push, 'notify', side_effect=RuntimeError('private transport detail')):
             result = push.request_unlock()

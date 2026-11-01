@@ -110,7 +110,9 @@ class Web(http.server.BaseHTTPRequestHandler):
         self.send_header('Content-Type', content)
         self.send_header('Content-Length', str(len(data)))
         self.send_header('Cache-Control', 'no-store')
-        self.send_header('Referrer-Policy', 'no-referrer')
+        # Safari may send Origin: null on form POST with no-referrer.
+        # Keep same-origin form provenance while hiding referrers off-site.
+        self.send_header('Referrer-Policy', 'same-origin')
         self.send_header('X-Content-Type-Options', 'nosniff')
         self.send_header('Content-Security-Policy', "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'")
         if cookie:
