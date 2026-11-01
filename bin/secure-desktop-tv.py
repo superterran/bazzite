@@ -67,6 +67,8 @@ def main():
             control('cancel ' + ticket)
     # Deliver the password once by anonymous stdin, never argv or disk. A hard
     # Steam stop also terminates the viewer; it never terminates remote GNOME.
+    # Keep the local playback buffer short; the default Pulse tlength was250ms.
+    os.environ['PULSE_LATENCY_MSEC'] = '50'
     parent = os.getpid()
     def child_setup():
         ctypes.CDLL(None).prctl(1, signal.SIGTERM, 0, 0, 0)
@@ -77,7 +79,7 @@ def main():
     child = subprocess.Popen([CLIENT, endpoint, '/u:desktop-secure', '/d:.',
                               *transport, '/from-stdin:force', '/cert:fingerprint:sha256:' + fingerprint,
                               '/f', '/size:1920x1080', '+smart-sizing', '/bpp:24', '+clipboard',
-                              '/sound:sys:pulse', '/audio-mode:0',
+                              '/sound:sys:pulse,latency:50', '/audio-mode:0',
                               '-grab-keyboard', '/t:Secure Desktop', '/log-level:OFF'],
                              stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                              preexec_fn=child_setup)

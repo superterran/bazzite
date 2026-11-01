@@ -165,3 +165,13 @@ still uses compatibility VNC-to-RDP and has not received the hardware encoding
 improvement. A supported native-RDP client could use GNOME's accelerated path
 if a separately scoped network endpoint is deliberately exposed; current3393
 remains local-only by firewall. Do not claim the Jump network path is fixed.
+
+Audio/animation follow-up: user reports smooth video/minimize animation, but
+Activities looks different and lip sync seems off (direction unclear). User
+considers Activities difference minor; no Shell overrides/extensions applied.
+GNOME remote-access handles can inhibit some animations independently of
+enable-animations=true. Live FreeRDP Pulse properties showed tlength44100bytes
+at44100Hz stereo16bit (~250ms) and8192frame node latency (~186ms). Saved
+/sound:sys:pulse,latency:50 plus PULSE_LATENCY_MSEC=50 for the next viewer launch.
+Current connection was not interrupted. New buffering and lip sync are not yet
+verified by the user; do not claim synchronization is fixed.
