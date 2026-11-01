@@ -1,6 +1,6 @@
-# bazzite repo — System Automation for bazzite-desktop
+# Bazzite OS setup — desktop and ally
 
-This repository is the **infrastructure-as-code source of truth** for the bazzite-desktop machine.
+This repository is the **infrastructure-as-code source of truth** for desktop and ally. Bazzite is their shared OS; identify each machine by its canonical fleet name.
 Systemd services, helper scripts, config templates, and setup automation all live here.
 
 GitHub: `superterran/bazzite`

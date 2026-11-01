@@ -3,7 +3,7 @@
 # requires-python = ">=3.11,<3.14"
 # dependencies = ["evdev>=1.7"]
 # ///
-"""PS/Home button → pause Apple TV and select PC HDMI, without grabbing input."""
+"""Triple-tap PS/Home → pause Apple TV and select PC HDMI; single presses untouched."""
 from __future__ import annotations
 import asyncio
 import os
@@ -64,14 +64,32 @@ async def _fire_tv_switch() -> None:
 
 
 class SwitchGate:
+    """Require three distinct taps from the same controller before touching the TV."""
     def __init__(self):
         self.last_fire = float('-inf')
         self.task = None
+        self.taps = {}
+        self.held = set()
 
-    def press(self) -> bool:
+    def release(self, source):
+        self.held.discard(source)
+
+    def press(self, source="default") -> bool:
         now = time.monotonic()
-        if now - self.last_fire < DEBOUNCE_SEC or self.task and not self.task.done():
+        if source in self.held:
             return False
+        self.held.add(source)
+        if now - self.last_fire < DEBOUNCE_SEC or self.task and not self.task.done():
+            self.taps.pop(source, None)
+            return False
+        taps = [t for t in self.taps.get(source, []) if now - t <= 1.5]
+        if taps and now - taps[-1] < .12:
+            return False
+        taps.append(now)
+        self.taps[source] = taps
+        if len(taps) < 3:
+            return False
+        self.taps.clear()
         self.last_fire = now
         self.task = asyncio.create_task(_fire_tv_switch())
         return True
@@ -82,12 +100,16 @@ async def _watch(dev: InputDevice, gate: SwitchGate) -> None:
     try:
         async for event in dev.async_read_loop():
             # No grab: Steam receives the same guide button, including its chords.
-            if event.type == ecodes.EV_KEY and event.code == ecodes.BTN_MODE and event.value == 1:
-                if gate.press():
-                    print(f"{dev.name}: PS/Home → selecting {TARGET_INPUT}", flush=True)
+            if event.type == ecodes.EV_KEY and event.code == ecodes.BTN_MODE:
+                if event.value == 0:
+                    gate.release(dev.path)
+                elif event.value == 1 and gate.press(dev.path):
+                    print(f"{dev.name}: PS/Home triple-tap → selecting {TARGET_INPUT}", flush=True)
     except OSError as exc:
         print(f"{dev.name}: disconnected ({exc})", flush=True)
     finally:
+        gate.release(dev.path)
+        gate.taps.pop(dev.path, None)
         dev.close()
 
 

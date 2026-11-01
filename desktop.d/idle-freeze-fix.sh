@@ -1,5 +1,7 @@
 #!/bin/bash
-# Cure (and instrument) the idle hard-freeze on bazzite-desktop.
+# Preserve idle-freeze instrumentation; C1 restriction is now an explicit opt-in.
+# 2026-10-25: BIOS1805 trial restored C2/C3 and lowered idle package power.
+# June notes below are historical; C1-only did not prevent the later freezes.
 #
 # Symptom: every few hours / overnight the box hard-locks — unresponsive to SSH,
 # no video, COOL to the touch. Netdata + journald black-box (2026-06-06) showed it
@@ -47,22 +49,30 @@ if install_dropin "$REPO_ROOT/config/sysctl.d/99-hang-capture.conf" \
     sudo sysctl --system >/dev/null
 fi
 
-echo "3/3 C-state mitigation (limit idle to C1)..."
-# Durable: kernel karg (takes effect on next boot, survives image updates).
-if ! rpm-ostree kargs 2>/dev/null | grep -q 'processor.max_cstate=1'; then
-    sudo rpm-ostree kargs --append-if-missing=processor.max_cstate=1
-    echo "✓ Queued karg processor.max_cstate=1 (reboot to activate)"
-else
-    echo "✓ karg processor.max_cstate=1 already present"
-fi
-# Live: disable the deep ACPI C-states now so we don't have to wait for a reboot.
-# State indices on this box: 0=POLL 1=C1 2=C2 3=C3 — disable 2 and 3 == max_cstate=1.
-for st in 2 3; do
-    for f in /sys/devices/system/cpu/cpu*/cpuidle/state$st/disable; do
-        echo 1 | sudo tee "$f" >/dev/null
+# Historical C1-only workaround is opt-in after the BIOS1805 idle-power trial.
+# Do not silently re-add the boot limit during a normal setup re-apply.
+if [[ "${BAZZITE_LIMIT_CSTATES:-0}" == "1" ]]; then
+    echo "3/3 C-state mitigation (limit idle to C1)..."
+    # Durable: kernel karg (takes effect on next boot, survives image updates).
+    if ! rpm-ostree kargs 2>/dev/null | grep -q 'processor.max_cstate=1'; then
+        sudo rpm-ostree kargs --append-if-missing=processor.max_cstate=1
+        echo "✓ Queued karg processor.max_cstate=1 (reboot to activate)"
+    else
+        echo "✓ karg processor.max_cstate=1 already present"
+    fi
+    # Live: disable the deep ACPI C-states now so we don't have to wait for a reboot.
+    # State indices on this box: 0=POLL 1=C1 2=C2 3=C3 — disable 2 and 3 == max_cstate=1.
+    for st in 2 3; do
+        for f in /sys/devices/system/cpu/cpu*/cpuidle/state$st/disable; do
+            [[ -e "$f" ]] || continue
+            echo 1 | sudo tee "$f" >/dev/null
+        done
     done
-done
-echo "✓ Disabled C2/C3 live on all CPUs"
+    echo "✓ Disabled C2/C3 live on all CPUs"
+else
+    echo "3/3 C1-only workaround skipped (opt in with BAZZITE_LIMIT_CSTATES=1)."
+    echo "    Existing kernel arguments are not changed by this step."
+fi
 
 echo ""
 echo "Verify:"
@@ -70,5 +80,5 @@ echo "  watchdog : $(systemctl show -p RuntimeWatchdogUSec --value) on $(systemc
 echo "  panic    : softlockup_panic=$(cat /proc/sys/kernel/softlockup_panic) panic=$(cat /proc/sys/kernel/panic)"
 echo "  cpu0 idle: $(for s in /sys/devices/system/cpu/cpu0/cpuidle/state*/; do echo -n "$(cat "$s"/name):$(cat "$s"/disable) "; done)"
 echo ""
-echo "✅ Stability fixes applied. Deep C-states disabled live; karg makes it durable on next reboot."
-echo "   Next real cure: update B850-I BIOS (1078 is ~11mo old) + set Power Supply Idle = Typical Current Idle."
+echo "✅ Watchdog and hang capture installed; optional C1 restriction follows the explicit opt-in above."
+echo "   Current trial evidence and rollback: docs/noctua-cooling.md"

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Hardware Monitor
+Comment=Live temperatures, cooling speeds, and GPU telemetry
+Exec=@REPO_ROOT@/bin/launch-hardware-monitor.sh
+Icon=utilities-system-monitor
+Terminal=false
+Categories=System;Monitor;

@@ -1,6 +1,6 @@
 # TV Control via DualSense PS / Controller Home Button
 
-Tap the PS button on a DualSense, or Home on an 8BitDo Ultimate, to:
+Triple-tap the PS button on a DualSense, or Home on an 8BitDo Ultimate (three presses within 1.5 seconds), to:
 
 1. Pause whatever is playing on the Living Room Apple TV (best-effort — preserves position)
 2. Switch the Living Room TCL Google TV to bazzite's HDMI input (HDMI 2)
@@ -125,3 +125,6 @@ adb -s 10.0.0.7:5555 shell dumpsys tv_input | grep -A2 'TvPassThroughService'
 ```
 
 Update the `INPUTS` array in `tv-switch.sh`.
+
+## Accidental-switch protection (2026-10-26)
+PS/Home now requires three distinct presses from the same controller within1.5seconds. Held/repeat presses, single/double presses and taps across controllers do not trigger;2second cooldown retained. Input is not grabbed, preserving Steam chords. Gate tested with mocked TV actions: single/double, triple, held duplicate, cooldown, controller separation, expiry all passed. Listener restarted without sending TV commands. Moonlight onscreen controller fault: initial25second event capture got0button events; Sunshine logged controller already allocated. Restarted main Sunshine service (private browser host retained); service active. Client reconnect/button confirmation pending. No TV switch or AppleTV pause was invoked during troubleshooting.
