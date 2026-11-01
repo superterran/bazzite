@@ -33,7 +33,9 @@ def main():
         notice('The Secure Desktop viewer is not installed.')
         return 1
     # The gateway certificate is pinned; no credential or clipboard files shared.
-    fingerprint = (ROOT / 'config/secure-productivity/viewer-cert.sha256').read_text().strip()
+    native = os.environ.get('SECURE_DESKTOP_BRIDGE') != '1'
+    pinfile = 'native-rdp-cert.sha256' if native else 'viewer-cert.sha256'
+    fingerprint = (ROOT / 'config/secure-productivity' / pinfile).read_text().strip()
     request = control('viewer')
     if not request['ok']:
         notice(request['message'])
@@ -70,9 +72,12 @@ def main():
         ctypes.CDLL(None).prctl(1, signal.SIGTERM, 0, 0, 0)
         if os.getppid() != parent:
             os._exit(1)
-    child = subprocess.Popen([CLIENT, '/v:100.119.114.55:3392', '/u:desktop-secure', '/d:.',
-                              '/sec:tls', '/from-stdin:force', '/cert:fingerprint:sha256:' + fingerprint,
-                              '/f', '+dynamic-resolution', '/bpp:24', '+clipboard',
+    endpoint = '/v:127.0.0.1:3393' if native else '/v:100.119.114.55:3392'
+    transport = ['/sec:nla', '/gfx:AVC420:on'] if native else ['/sec:tls']
+    child = subprocess.Popen([CLIENT, endpoint, '/u:desktop-secure', '/d:.',
+                              *transport, '/from-stdin:force', '/cert:fingerprint:sha256:' + fingerprint,
+                              '/f', '/size:1920x1080', '+smart-sizing', '/bpp:24', '+clipboard',
+                              '/sound:sys:pulse', '/audio-mode:0',
                               '-grab-keyboard', '/t:Secure Desktop', '/log-level:OFF'],
                              stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                              preexec_fn=child_setup)

@@ -109,3 +109,59 @@ stayed the existing session. Eight approval tests cover expiry, origin/CSRF,
 three attempts, link claim and one-use viewer credential handoff. Controller
 layout was saved through Steam; physical controller interactions and exit flow
 still need user validation. No password in process command arguments.
+
+## Accelerated TV path — 2026-11-01
+
+The initial TV viewer used xrdp/VNC and felt slow. Native GNOME RDP is now
+enabled inside the same encrypted account on3393, using a separate TLS identity
+and the existing full encryption password stored by GRD inside the encrypted
+home. Its RDP credential cache required one GRD-only restart; GNOME/apps/home
+were preserved. Native RDP listens only while that user session is unlocked.
+Firewall drop rules restrict3393 in external zones; the TV uses127.0.0.1. The
+existing Tailscale3392 gateway remains available for Jump and phone-based cold
+unlock. GNOME's CUDA initialized, client negotiated AVC420 and NVIDIA reported
+an active encoder session. User explicitly reported noticeably/significantly
+smoother TV behavior. No claim that Jump3392 became hardware encoded.
+
+The TV launcher defaults to native NLA/GFX/H.264 with a pinned native certificate.
+SECURE_DESKTOP_BRIDGE=1 selects the old compatible bridge and its original pin.
+Phone approval remains mandatory for either viewer. Native RDP config and
+credentials persist inside the encrypted home; after boot the existing broker
+starts GRD only after successful full-key unlock. Provision/refresh native RDP
+with BAZZITE_CONFIGURE_NATIVE_RDP=1 desktop.d/secure-native-rdp.sh while unlocked;
+it briefly disconnects remote viewers but does not stop the compositor/apps.
+Changing the volume/recovery password requires updating native credentials too.
+Native password is never exposed through argv/logs by setup.
+
+Animations were re-enabled after acceleration. The current4K virtual monitor
+was temporarily scaled2x using Mutter's display API. TV launch defaults now
+request1920x1080 and smart-size fullscreen on the4K TV, giving roughly2x apparent
+UI size with one-quarter as many remote pixels. Dynamic client resizing is
+disabled for this TV preset; Jump retains its adaptive bridge. RDP sound playback
+is requested through the viewer's PulseAudio backend, targeting the main HDMI
+default output; encrypted desktop apps initially use their virtual audio sink.
+User confirmed the new size and sound both work. Mutter reported1920x1080
+at1x inside the session, while the fullscreen TV window remained3840x2160;
+RDP audio was connected and unmuted on the main HDMI sink. GNOME animations
+are enabled. This is a TV preset, not a global font-size change.
+
+Linux Fluid investigation: vendor10.16.83RPM was signature-verified against
+pinned vendor keyB9B6833B44081D9973D2E9749DAE447061724867, extracted rather than
+installed globally. An isolated user-local trial was attempted inside the
+encrypted account. Vendor bundle only contains Qt xcb/offscreen GUI plugins,
+not Wayland; explicit xcb UI started when given existing Xwayland display/auth.
+Trial was stopped, is not enabled at boot, has no account link, and no Fluid
+connection/encoding was verified. No global Jump service/PAM/login changes.
+Personal cloud account enrollment and attachment to this background GNOME
+session remain unresolved. Cloudless Fluid is documented as Teams Enterprise,
+so it is not assumed available on the user's existing purchase. Staged public
+trial files remain inside the encrypted home, not in an active startup path.
+
+Final state: native GPU-encoded TV viewer is user-confirmed significantly
+smoother, and its1080p scaled size plus HDMI sound are user-confirmed working.
+The same GNOME compositor PID13717 persisted throughout capture/audio changes.
+Linux Fluid trial is stopped with no auto-start/account link; network Jump3392
+still uses compatibility VNC-to-RDP and has not received the hardware encoding
+improvement. A supported native-RDP client could use GNOME's accelerated path
+if a separately scoped network endpoint is deliberately exposed; current3393
+remains local-only by firewall. Do not claim the Jump network path is fixed.
