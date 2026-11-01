@@ -35,7 +35,7 @@ def main():
    for relative in ['.config/dconf/user','.bashrc','.ssh/config','.local/share/gnome-remote-desktop/credentials.ini','.local/share/gnome-shell/extensions/bottom-overview@fthx/metadata.json']:
     file=HOME/relative
     if file.is_file():manifest['home_checksums'][relative]=hashlib.sha256(file.read_bytes()).hexdigest()
-  for name,source in ([('root','/sysroot'),('var','/var'),('home','/var/home')] if a.baseline else [('var','/var')]):
+  for name,source in ([('root','/sysroot'),('var','/var'),('home','/var/home')] if a.baseline else [('var','/var'),('home','/var/home')]):
    target=CAP/name
    if target.exists():raise RuntimeError('Capture subvolume already exists; inspect previous failure before retrying.')
    run(['btrfs','subvolume','snapshot','-r',source,str(target)]);snapshots.append(target)
@@ -51,11 +51,12 @@ def main():
   (meta/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
   # Keep current backup infrastructure recoverable even when the protected OS
   # baseline predates later backup setup changes. No private key is fetched here.
-  refs=run(['git','-c',f'safe.directory={ROOT}','-C',str(ROOT),'show-ref']).stdout
+  git_root=CAP/'home/me/repos/bazzite'
+  refs=run(['git','-c',f'safe.directory={git_root}','-C',str(git_root),'show-ref']).stdout
   fingerprint=hashlib.sha256(refs).hexdigest();cached=BASE/'source-current.bundle';ref_file=BASE/'source-current.refs'
   if not cached.exists() or not ref_file.exists() or ref_file.read_text()!=fingerprint:
    temporary=BASE/'source-current.bundle.new';temporary.unlink(missing_ok=True)
-   run(['git','-c',f'safe.directory={ROOT}','-C',str(ROOT),'bundle','create',str(temporary),'--all'])
+   run(['git','-c',f'safe.directory={git_root}','-C',str(git_root),'bundle','create',str(temporary),'--all'])
    temporary.replace(cached);ref_file.write_text(fingerprint)
   shutil.copy2(cached,meta/'bazzite.bundle')
   configuration=meta/'configuration'
@@ -69,6 +70,15 @@ def main():
   (configuration/'backup-schedule.json').write_text(json.dumps({'enable_after_restore_test':['productivity-incremental.timer'],'disable':['productivity-backup.timer','productivity-replicate.timer']}))
 
   inputs=[volume,meta]
+  if not a.baseline:
+   user=CAP/'home/me'
+   for relative in ['My Games','.config/unity3d','.local/share/Larian Studios','.local/share/Streets of Rage 4 Save and Config']:
+    path=user/relative
+    if path.exists():inputs.append(path)
+   for prefix in (user/'.local/share/Steam/steamapps/compatdata').glob('*/pfx'):
+    profile=prefix/'drive_c/users/steamuser'
+    if profile.exists():inputs.append(profile)
+    inputs.extend(x for x in prefix.glob('*.reg') if x.is_file())
   excludes=[]
   if a.baseline:
    boot=CAP/'boot-files';boot.mkdir(exist_ok=True)
@@ -100,7 +110,7 @@ def main():
       path=var/Path(upper).relative_to('/var')
       if path.exists():inputs.append(path)
    user=CAP/'home/me'
-   for name in ['.config','.var','.bashrc','.bash_profile','.profile','.env','.ssh','.gnupg','.pki','.gitconfig','.git-credentials','.npmrc','.docker','.1password','.steam','.codex','.claude','.agents','.vscode','.kube','.aws','.azure','.oci','.cargo','.bun','.nvm','.homebrew','homebrew','Applications','bin','Documents','repos']:
+   for name in ['.config','.var','.bashrc','.bash_profile','.profile','.env','.ssh','.gnupg','.pki','.gitconfig','.git-credentials','.npmrc','.docker','.1password','.steam','.codex','.claude','.agents','.vscode','.kube','.aws','.azure','.oci','.cargo','.bun','.nvm','.homebrew','homebrew','Applications','bin','Documents','My Games','repos']:
     path=user/name
     if path.exists() or path.is_symlink():inputs.append(path)
    inputs.extend(x for x in user.iterdir() if x.name.startswith('.') and x.is_file() and x not in inputs)

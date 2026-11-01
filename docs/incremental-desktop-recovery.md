@@ -207,3 +207,12 @@ full-archive timer and the completed one-time replication timer. Host-encrypted
 credentials still need normal recovery/re-encryption on a new host.
 
 Nightly failures retry after15minutes, bounded to3starts per2hours. This does not wake a sleeping host. Active repository locks are preserved; only stale records verified to belong to dead processes were removed during initial recovery. The local baseline independently passed1Password key access, sparse volume restore, LUKS unlock, copy-journal replay/clean fsck and five saved-file hashes (local-baseline-restore-test.json).
+
+Nightly scope also retains the compact Steam-prefix user profiles/registry and
+common native save roots (My Games, Unity settings, Larian Studios and Streets
+of Rage4 saves). These are a local-only-save safety net, not full Windows prefixes
+or downloaded games, and not an exhaustive per-game Steam Cloud audit. Main-home
+save/source data comes from a separate read-only home snapshot. The source Git
+bundle is generated from that frozen repo, cached until refs change, and included
+with current backup configuration. The encrypted home still has its own briefly
+frozen backing-volume snapshot. Unsaved application memory is outside both.
