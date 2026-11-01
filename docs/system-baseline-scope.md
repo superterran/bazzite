@@ -90,3 +90,41 @@ User excludes replaceable AI models and Docker images/build cache from the propo
 Encrypted desktop measured live:64GiB logical sparse LUKS image,7.2GiB physically allocated,4.4GiB used inside ext4. Current independent encrypted backup is8676320350bytes (~8.1GiB) and also includes selected main-system configuration and recovery artifacts.
 
 Refined estimate: approximately370GiB before compression, retaining Downloads, Proton prefixes, container volumes and an allowance for unique Docker writable layers. This subtracts the three measured model directories and disposable root Docker storage from the conservative scope; it retains rootless Podman storage pending a safe split. Roughly360GiB is outside the7.2GiB secure-home image. This is sizing, not a captured archive or verified container-data export; Docker writable-layer export still needs implementation.
+
+## Narrow system/settings scope and repository-local state
+
+User requests that repo dependencies and remotely recoverable tracked source not
+inflate the baseline. Preserve .env/ignored local config, untracked unique files,
+uncommitted tracked edits, and local/unpushed Git history. Never assume ignored
+means disposable, or that all commits have reached a remote. Record repo paths,
+HEAD/refs, remote mappings privately and verify remote availability during actual
+capture. Capture Git bundles (including local refs) and working-tree deltas;
+linked worktrees need their shared Git metadata too. Git LFS objects/submodules
+and deleted-but-uncommitted paths need explicit treatment in a capture tool.
+
+Read-only inventory helper bin/inventory-repo-recovery.py creates a PRIVATE0600
+report outside Git; it is not a backup or a complete restore manifest. Initial
+scan found186repositories plus2invalid/broken Git entries. Whole repo directory
+is ~44GiB. Local/untracked/ignored candidates after common dependency exclusions
+were14.2GiB, of which10.3GiB were Adventurer GGUF/ggml model downloads. After
+excluding these already-approved replaceable models, allow about4GiB of local
+candidates plus5.7GiB Git metadata before further review/compression. Broken
+usp-osf nested checkout (~780MiB) and historical visual-comfort linked worktree
+(~38MiB) must be retained/reviewed separately, not silently dropped. Nothing was
+modified or deleted in those projects. Vendor/build output still occurs among
+candidates and could shrink further only after review. Repositories outside
+~/repos and permission-inaccessible directories need separate coverage.
+
+The narrow estimate is now roughly120–130GiB BEFORE compression: approximately
+97GiB for saved OS/boot, installed Flatpaks/Homebrew/tools, app data and config,
+secure home and selected local app state; add ~17GiB persistent Docker data and
+unique writable-state allowance, and ~10GiB repo-local files/Git metadata plus
+broken-checkout margin. This is a scope estimate, not a verified backup artifact.
+Downloads, home build/checkouts and general developer data are outside this
+narrow scope unless selected above. Installed app binaries are deliberately kept
+to restore the working setup, rather than redownload/reprovision every app.
+
+Save-policy caveat: ROM saves currently idle/no pending/no errors with Closet;
+that does not establish coverage for every non-Steam or Steam Cloud game. Prefix
+exclusion remains conditional on auditing local-only saves. No prefix or local
+save has been removed. Current nightly encrypted-home backup is unchanged.
