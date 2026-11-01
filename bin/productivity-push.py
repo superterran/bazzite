@@ -53,7 +53,7 @@ def notify(token):
         smtp.send_message(message)
 
 
-def request_unlock():
+def request_unlock(viewer=False):
     global LAST_REQUEST
     with GUARD:
         now = time.monotonic()
@@ -62,11 +62,16 @@ def request_unlock():
         token = secrets.token_urlsafe(32)
         PENDING.clear()
         PENDING[token] = {'expires': now + TTL, 'session': secrets.token_urlsafe(32),
-                          'csrf': secrets.token_urlsafe(32), 'attempts': 0, 'busy': False}
+                          'csrf': secrets.token_urlsafe(32), 'attempts': 0, 'busy': False,
+                          'ticket': secrets.token_urlsafe(32) if viewer else None}
+        ticket = PENDING[token]['ticket']
         LAST_REQUEST = now
     try:
         notify(token)
-        return {'ok': True, 'message': 'Approval notification sent. Open it on your phone.'}
+        result = {'ok': True, 'message': 'Approval notification sent. Open it on your phone.'}
+        if viewer:
+            result['ticket'] = ticket
+        return result
     except Exception:
         with GUARD:
             PENDING.pop(token, None)
@@ -175,19 +180,38 @@ class Web(http.server.BaseHTTPRequestHandler):
             except Exception:
                 ok = False
             finally:
-                password = None
                 raw = None
                 fields = None
             with GUARD:
                 entry['busy'] = False
-                if ok:
+                if ok and entry.get('ticket'):
+                    # Hand off once to the requesting local viewer, in memory only.
+                    entry['password'] = password
+                    entry['expires'] = time.monotonic() + 30
+                    entry['approved'] = True
+                elif ok:
                     PENDING.pop(token, None)
+            password = None
             if ok:
-                return self.reply(200, '<h1>Desktop unlocked</h1><p>Your encrypted GNOME session is ready in Jump. You can close this page.</p>',
+                return self.reply(200, '<h1>Desktop unlocked</h1><p>Your encrypted GNOME session is ready. If requested from the TV, its viewer is connecting. You can close this page.</p>',
                                   cookie='__Host-desktop=; Secure; HttpOnly; SameSite=Strict; Path=/; Max-Age=0')
             return self.reply(401, '<h1>Unlock did not succeed</h1><p>Go back to retry with the full password from Desktop Encrypted GNOME, or request a new approval.</p>')
         except (ValueError, KeyError, TypeError, http.cookies.CookieError):
             self.reply(400, 'Invalid request')
+
+
+def take_ticket(ticket):
+    with GUARD:
+        for token, entry in list(PENDING.items()):
+            if entry['expires'] < time.monotonic():
+                PENDING.pop(token, None)
+                continue
+            if entry.get('ticket') and hmac.compare_digest(entry['ticket'], ticket):
+                if entry.get('approved'):
+                    PENDING.pop(token, None)
+                    return {'ok': True, 'state': 'ready', 'password': entry.pop('password')}
+                return {'ok': True, 'state': 'pending'}
+    return {'ok': False, 'state': 'expired'}
 
 
 class Request(socketserver.StreamRequestHandler):
@@ -196,10 +220,20 @@ class Request(socketserver.StreamRequestHandler):
         _, uid, _ = struct.unpack('3i', self.connection.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, 12))
         if uid not in (0, 1000):
             result = {'ok': False, 'message': 'Not authorized'}
-        elif self.rfile.readline(64).strip() != b'request':
-            result = {'ok': False, 'message': 'Invalid command'}
         else:
-            result = request_unlock()
+            command = self.rfile.readline(256).decode().strip()
+            if command in ('request', 'viewer'):
+                result = request_unlock(viewer=command == 'viewer')
+            elif command.startswith('cancel '):
+                with GUARD:
+                    for token, entry in list(PENDING.items()):
+                        if entry.get('ticket') and hmac.compare_digest(entry['ticket'], command[7:]):
+                            PENDING.pop(token, None)
+                result = {'ok': True}
+            elif command.startswith('take '):
+                result = take_ticket(command[5:])
+            else:
+                result = {'ok': False, 'message': 'Invalid command'}
         self.wfile.write(json.dumps(result).encode() + b'\n')
 
 
@@ -207,7 +241,17 @@ class Requests(socketserver.ThreadingUnixStreamServer):
     daemon_threads = True
 
 
+def reap_expired():
+    while True:
+        time.sleep(1)
+        with GUARD:
+            for token, entry in list(PENDING.items()):
+                if entry['expires'] < time.monotonic():
+                    PENDING.pop(token, None)
+
+
 if __name__ == '__main__':
+    threading.Thread(target=reap_expired, daemon=True).start()
     MAIL = json.loads((Path(os.environ['CREDENTIALS_DIRECTORY']) / 'notification').read_text())
     path = Path('/run/productivity-push/request.sock')
     path.unlink(missing_ok=True)

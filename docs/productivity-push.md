@@ -41,9 +41,10 @@ only that existing broker manages the volume and encrypted GNOME session.
 It cannot lock sessions or switch display modes through any HTTP endpoint.
 SMTP delivery carries an expiring link through Gmail/Pushover, not the volume key.
 
-The TV fullscreen viewer/Steam shortcut is a separate pending step. This service
-only makes the encrypted virtual desktop ready; it does not launch a viewer,
-move windows, resize displays, restart Steam/Sunshine, or end running games.
+The TV fullscreen viewer/Steam shortcut is now installed as described below.
+The approval service itself only makes the encrypted virtual desktop ready;
+the Steam launcher owns the viewer. Neither service restarts Steam/Sunshine or
+ends running games.
 Do not test lock/re-unlock while a user has unsaved encrypted desktop work.
 
 Deployment: desktop.d/productivity-push.sh installs public source and enables
@@ -62,3 +63,49 @@ same-origin, retaining strict Origin/Host checks, CSRF/cookie validation and no
 referrers to other sites. Added regression coverage; six tests pass. Refreshed
 notification after restarting only the isolated approval service. iPhone retry
 confirmation pending.
+
+## TV shortcut
+
+Steam now has **Secure Desktop**, appid3716438448, gameid15961981591790551040.
+Launch it to request phone approval and show a waiting dialog. Use the latest
+Pushover link and 1Password, then the native FreeRDP viewer opens fullscreen on
+the Gamescope game display, with dynamic resolution and the same desktop-secure
+GNOME session. This can displace a Jump connection because the backend has a
+single active viewer; it does not create another desktop or close remote apps.
+Controller layout uses the established desktop mouse/navigation bindings:
+right stick/touchpad mouse, triggers for clicks, D-pad arrows, A Enter, B Escape,
+X Tab, Y Space. Steam+X opens Steam's on-screen keyboard. Guide/Steam menu lets
+you exit the shortcut and return to Steam. Actual controller feel needs user
+validation; regular keyboard/mouse also work. Remote audio remains disabled.
+
+A separate random viewer ticket is returned only over the main-user/root
+peer-checked Unix socket, never in the notification URL. After valid phone
+password and broker success, the service holds that password in memory for up
+to30seconds, for one retrieval by the requesting local viewer. The viewer feeds
+it to FreeRDP through anonymous stdin; no command argument/file/clipboard is
+used. Expired handoffs are reaped every second. This deliberately authorizes the
+main gaming UID to receive that approved session credential in memory. Someone
+already controlling that account could inspect its viewer process; this does
+not isolate a running desktop from a compromised host. No unattended volume
+unlock key is saved. The existing full password remains the recovery route.
+
+FreeRDP pins the gateway's SHA256 certificate via the public viewer-cert.sha256
+file. Refresh the pin after deliberately renewing the gateway TLS certificate
+using desktop.d/secure-desktop-tv.sh. That script installs FreeRDP if missing and
+registers/updates only the Secure Desktop shortcut. Physical GNOME remains a
+recovery option; its main account home still contains Steam/gaming state. It
+was not erased or converted into an encrypted home.
+
+Closing the viewer keeps encrypted GNOME running/unlocked. Use **Lock encrypted
+desktop** inside GNOME to end apps and close the volume. Do not equate exiting
+the Steam shortcut with locking encryption.
+
+### End-to-end verification — 2026-11-01
+
+User approved the Pushover request and explicitly confirmed TV shows the
+encrypted desktop. Native FreeRDP window is fullscreen3840x2160 on Gamescope's
+game display; xrdp logged successful resize to3840x2160. Encrypted GNOME/home
+stayed the existing session. Eight approval tests cover expiry, origin/CSRF,
+three attempts, link claim and one-use viewer credential handoff. Controller
+layout was saved through Steam; physical controller interactions and exit flow
+still need user validation. No password in process command arguments.

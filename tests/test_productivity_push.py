@@ -82,6 +82,29 @@ class ApprovalTests(unittest.TestCase):
             self.assertEqual(self.post('/unlock', body, cookie)[0], 403)
             self.assertEqual(broker.call_count, 3)
 
+    def test_viewer_password_handoff_is_separate_expiring_and_single_use(self):
+        with patch.object(push, 'notify'):
+            request = push.request_unlock(viewer=True)
+        ticket = request['ticket']
+        token = next(iter(push.PENDING))
+        self.assertNotEqual(token, ticket)
+        self.assertEqual(push.take_ticket(token)['state'], 'expired')
+        self.assertEqual(push.take_ticket(ticket)['state'], 'pending')
+        csrf, cookie = self.claim(token)
+        body = urlencode({'username': 'desktop-secure', 'password': 'test-only', 'csrf': csrf})
+        with patch.object(push, 'broker', return_value=True):
+            self.assertEqual(self.post('/unlock', body, cookie)[0], 200)
+        result = push.take_ticket(ticket)
+        self.assertEqual(result['password'], 'test-only')
+        self.assertEqual(push.take_ticket(ticket)['state'], 'expired')
+        self.assertEqual(push.PENDING, {})
+
+    def test_expired_handoff_does_not_release_password(self):
+        push.PENDING['test-token'] = {'ticket': 'test-ticket', 'expires': time.monotonic()-1,
+                                      'approved': True, 'password': 'test-only'}
+        self.assertEqual(push.take_ticket('test-ticket')['state'], 'expired')
+        self.assertEqual(push.PENDING, {})
+
     def test_form_preserves_same_origin_provenance(self):
         connection = http.client.HTTPConnection('127.0.0.1', self.server.server_port)
         connection.request('GET', '/')
