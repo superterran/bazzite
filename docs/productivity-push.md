@@ -175,3 +175,19 @@ at44100Hz stereo16bit (~250ms) and8192frame node latency (~186ms). Saved
 /sound:sys:pulse,latency:50 plus PULSE_LATENCY_MSEC=50 for the next viewer launch.
 Current connection was not interrupted. New buffering and lip sync are not yet
 verified by the user; do not claim synchronization is fixed.
+
+## Bottom-edge Activities and session closure
+
+Bottom Overview19 (bottom-overview@fthx), reviewed GNOME50-compatible archive
+version_tag77092, installed only inside the encrypted account. Saved enabled
+extension UUID while preserving other extensions. Current GNOME did not support
+loading/reloading this newly installed extension over its extension D-Bus API;
+it will load on the next fresh compositor session. Setup source pins SHA256 and
+checks metadata/archive paths. Behavior through the remote pointer still needs
+user validation: upstream uses a pressure barrier rather than a simple dwell,
+and suppresses activation over fullscreen applications.
+
+User explicitly authorized ending the encrypted session after returning to Steam.
+Root broker lock accepted; verified mapping desktop-secure-home absent and home
+unmounted, while Game Mode stayed active. Apps closed as part of ending that
+session. Do not unlock again solely to test the extension without a new request.
