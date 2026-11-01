@@ -17,6 +17,21 @@ def main():
  result=run(['systemctl','show','productivity-baseline.service','-p','Result','--value'],text=True).stdout.strip()
  if result!='success':raise RuntimeError('Baseline failed; old backup remains available. Inspect protected baseline log.')
  receipt=json.loads((BASE/'baseline-latest.json').read_text());snapshot=receipt['snapshot_id']
+ # Apply the same explicit replaceable-cache/model policy to this already-running
+ # first capture without uploading all other data again. Never rewrite globally.
+ before=json.loads(r.command(['snapshots','--json','--tag','baseline'],capture_output=True,check=True).stdout)
+ filters=[]
+ for pattern in json.loads((ROOT/'config/productivity-backup-excludes.json').read_text())['capture_relative']:
+  filters+=['--exclude',str(BASE/'restic-capture'/pattern)]
+ with (BASE/'baseline-filter.log').open('w') as log:r.command(['rewrite','--forget',*filters,snapshot],stdout=log,stderr=subprocess.STDOUT,check=True)
+ after=json.loads(r.command(['snapshots','--json','--tag','baseline'],capture_output=True,check=True).stdout)
+ new=[x for x in after if x['id'] not in {y['id'] for y in before}]
+ if len(new)>1:raise RuntimeError('Ambiguous filtered baseline; inspect without deleting anything else.')
+ if new:
+  receipt['unfiltered_snapshot_id']=snapshot;snapshot=new[0]['id'];receipt['snapshot_id']=snapshot
+  receipt['filters_applied']=json.loads((ROOT/'config/productivity-backup-excludes.json').read_text())['capture_relative']
+  (BASE/'baseline-latest.json').write_text(json.dumps(receipt,indent=2)+'\n')
+
  expected=json.loads((BASE/'baseline-file-checksums.json').read_text())
  for path,digest in expected.items():
   data=r.command(['dump',snapshot,path],capture_output=True,check=True).stdout

@@ -126,3 +126,33 @@ Do not claim a fresh-machine boot test based solely on a successful file restore
 Retain1Password Emergency Kit/account recovery separately. No off-site copy is
 configured. Replicate the entire repository with appropriate tools, including
 its keys/config/index/data/snapshots, if adding off-site recovery later.
+
+## Initial validation and cache refinements — 2026-11-01
+
+Independent repository access using the1Password key, separate LUKS image restore,
+copy-only journal replay/clean fsck, five saved-home hashes, and recovery of both
+versions of an overwritten test fixture passed. Root-only evidence:
+`/var/lib/productivity-recovery/incremental-restore-test.json`.
+The first desktop snapshot added7690365546packed bytes (~7.2GiB).
+
+The finalizer waits for the first baseline and applies
+`config/productivity-backup-excludes.json` to that explicit snapshot ID only.
+This filters additional Flatpak caches/Whisper models and disposable Docker model/
+monitoring cache volumes discovered during capture, without recopying everything.
+It replaces that intermediate snapshot with its filtered counterpart; the protected
+original age archive is untouched. Scoped nightly prune reclaims unreferenced data.
+Future captures apply those exclusions directly. No live files are removed.
+
+Installed rootless container image/writable distro layers are excluded; mounted
+persistent volumes and host-side app settings are retained. The sole observed
+rootless container was Envision, with most layer bulk in installed /usr software;
+its container image and internal package/config customizations may need rebuilding.
+This is not a full container-engine clone. Docker persistent volumes, container
+inspection metadata and unique root Docker upper-layer files are separately kept.
+
+Finalizer then checks five saved configuration files against hashes from the
+immutable source snapshots, runs Restic repository metadata checks, executes the
+actual nightly service including retention/prune, and records measured second-run
+storage additions in completed-backup-validation.json. Check this report before
+claiming the full baseline and follow-up finished. Fresh-machine boot remains
+unexercised regardless of successful file recovery.

@@ -1,0 +1,10 @@
+{
+  "description": "Additional replaceable app caches/model downloads excluded from the selective baseline; paths are relative to restic-capture.",
+  "capture_relative": [
+    "home/me/.var/app/*/cache",
+    "home/me/.var/app/com.jeffser.Alpaca/data/whisper",
+    "var/lib/docker/volumes/speaches-models",
+    "var/lib/docker/volumes/hf-hub-cache",
+    "var/lib/docker/volumes/netdatacache"
+  ]
+}

@@ -105,6 +105,8 @@ def main():
     excludes+=['--exclude',str(user/'repos')+'/**/'+directory]
    for pattern in ['**/*.gguf','**/*.safetensors','**/models/ggml-*.bin']:
     excludes+=['--exclude',str(user/'repos')+'/'+pattern]
+   for pattern in json.loads((ROOT/'config/productivity-backup-excludes.json').read_text())['capture_relative']:
+    excludes+=['--exclude',str(CAP/pattern)]
    # No OS deployment transition may straddle the root/boot capture.
    if run(['rpm-ostree','status','--json']).stdout!=before:raise RuntimeError('OS deployment changed during capture; baseline not committed.')
   paths_fd=os.memfd_create('backup-paths',0);os.write(paths_fd,b'\0'.join(os.fsencode(str(x)) for x in inputs)+b'\0');os.lseek(paths_fd,0,0)
