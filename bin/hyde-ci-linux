@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+exec podman run --rm --replace --name hyde-ci-linux --init \
+  --userns=keep-id:uid=10001,gid=10001 --user 10001:10001 \
+  --cap-drop=ALL --security-opt=no-new-privileges \
+  --cpus=4 --memory=6g --pids-limit=768 --shm-size=256m \
+  -v "$HOME/.local/share/hyde-ci/service:/runner:Z" \
+  localhost/hyde-ci-linux:2.338.2

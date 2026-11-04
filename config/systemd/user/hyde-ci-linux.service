@@ -1,0 +1,14 @@
+[Unit]
+Description=Hyde repository-scoped Linux Actions runner
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/home/me/repos/bazzite/bin/hyde-ci-linux
+ExecStop=/usr/bin/podman stop --time 60 hyde-ci-linux
+Restart=always
+RestartSec=20
+TimeoutStopSec=90
+
+[Install]
+WantedBy=default.target
