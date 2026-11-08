@@ -4,6 +4,9 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
+# Graphical sessions can export this internal Podman marker. The runner must
+# create its own rootless namespace instead of inheriting a stale marker.
+UnsetEnvironment=_CONTAINERS_USERNS_CONFIGURED
 ExecStart=/home/me/repos/bazzite/bin/hyde-ci-linux
 ExecStop=/usr/bin/podman stop --time 60 hyde-ci-linux
 Restart=always
